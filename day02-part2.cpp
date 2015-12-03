@@ -1,5 +1,5 @@
 /*
- * Calculate needed wrapping paper
+ * Calculate needed wrapping ribbon
  */
 
 #include <iostream>
@@ -8,8 +8,8 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-int paper_needed(int, int, int);
-int smallest_value(int, int, int);
+int ribbon_needed(int, int, int);
+int largest_value(int, int, int);
 
 int main() {
   int total_needed = 0, side[3] = {0,0,0};
@@ -54,7 +54,7 @@ int main() {
 	// This shouldn't happen... but treat it like a newline
 	cout << "There shouldn't be 4 sides? Check your input." << endl;
 	
-	total_needed += paper_needed(side[0], side[1], side[2]);
+	total_needed += ribbon_needed(side[0], side[1], side[2]);
 	cout << "Total needed so far: " << total_needed << endl;
 
 	side[0] = 0;
@@ -68,7 +68,7 @@ int main() {
 	cout << "There should be 3 sides! Check your input." << endl;
       }
 
-      total_needed += paper_needed(side[0], side[1], side[2]);
+      total_needed += ribbon_needed(side[0], side[1], side[2]);
       cout << "Total needed so far: " << total_needed << endl;      
       
       side[0] = 0;
@@ -87,29 +87,26 @@ int main() {
   return 0;
 }
 
-int smallest_value(int a, int b, int c)
+int largest_value(int a, int b, int c)
 {
-  int small = a;
-  if ( b < small ) {
-    small = b;
+  int large = a;
+  if ( b > large ) {
+    large = b;
   }
-  if ( c < small ) {
-    small = c;
+  if ( c > large ) {
+    large = c;
   }
-  cout << "The smallest value was " << small << endl;
-  return small;
+  cout << "The largest value was " << large << endl;
+  return large;
 }
 
-int paper_needed(int length, int width, int height)
+int ribbon_needed(int length, int width, int height)
 {
-  int area_lw, area_lh, area_wh, total;
+  int total;
 
-  area_lw = length * width;
-  area_lh = length * height;
-  area_wh = width * height;
-
-  total = 2 * ( area_lw + area_lh + area_wh) +
-	   smallest_value(area_lw, area_lh, area_wh);
+  total = length + width + height - largest_value( length, width, height);
+  total *= 2;
+  total += length * width * height;
 
   cout << "Total for box " << length << "x" << width
        << "x" << height << " = " << total << endl;
