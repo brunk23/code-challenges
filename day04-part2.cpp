@@ -4,6 +4,8 @@
 
 using std::cout;
 using std::endl;
+using std::string;
+using std::stringstream;
 
 #include <sstream>
 #include <string>
@@ -12,17 +14,15 @@ using std::endl;
 int main()
 {
   unsigned char encoded[MD5_DIGEST_LENGTH];
-  std::string key = "ckczppom";
-  std::stringstream temp;
-  std::string foo;
+  string key = "abcdef";
+  string combined;
+  stringstream temp;
   long number;
-  std::string combined;
-
+  
   for (number = 0; number < LONG_MAX; ++number) {
     temp.str("");
-    temp << number;
-    foo = temp.str();
-    combined = key + foo;
+    temp << key << number;
+    combined = temp.str();
 
     MD5( (unsigned char *) combined.c_str(), combined.size(),
 	 (unsigned char *) &encoded);
