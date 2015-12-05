@@ -14,7 +14,7 @@ using std::stringstream;
 int main()
 {
   unsigned char encoded[MD5_DIGEST_LENGTH];
-  string key = "abcdef";
+  string key = "ckczppom";
   string combined;
   stringstream temp;
   long number;
