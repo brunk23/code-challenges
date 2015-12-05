@@ -27,7 +27,6 @@ int main()
     MD5( (unsigned char *) combined.c_str(), combined.size(),
 	 (unsigned char *) &encoded);
 
-    cout << combined << endl;
     if( encoded[0] == 0 && encoded[1] == 0 && (encoded[2]&0xff) == 0 ) {
       cout << combined << ": " << number << " is a match folks!" << endl;
       break;
