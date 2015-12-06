@@ -27,7 +27,6 @@ int main()
   
   string input;
   while (getline(cin, input) ) {
-    cout << "input: " << input << endl;
     operation = 0;
     point = 0;
     ondig = false;
@@ -44,10 +43,10 @@ int main()
       operation = 3;
     }
     if ( operation == 0 ) {
-      cout << "Invalid input.!" << endl;
+      cout << "Invalid input!" << endl;
       continue;
     }
-    for (int x = 0; x < input.size(); x++) {
+    for (unsigned int x = 0; x < input.size(); x++) {
       switch ( input[x] ) {
       case '0':
       case '1':
