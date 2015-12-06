@@ -17,9 +17,6 @@ int main()
   while ( getline(cin, input) ) {
     if ( niceString(input.c_str()) ) {
       count++;
-      cout << input << " is nice." << endl;
-    } else {
-      cout << input << " is naughty." << endl;
     }
   }
   cout << count << " strings were nice." << endl;
@@ -44,8 +41,6 @@ bool niceString(const char *test) {
     for (int x = count+1; test[x] != 0; ++x) {
       if ( (test[count] == test[x]) &&
 	   (test[count+1] == test[x+1])) {
-	cout << test[count] << test[count+1] << " == "
-	     << test[x] << test[x+1];
 	repeatPair = true;
 	break;
       }
