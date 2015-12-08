@@ -41,7 +41,8 @@ int main()
 {
   int location;
   // There are only 336 lines in the input, so there
-  // will be fewer than 400 unique wires
+  // will be fewer than 400 unique wires, actually 339
+  // wires total. Some wires don't have a signal?
   Wire wires[MAX];
 
   // empty the array
@@ -50,6 +51,8 @@ int main()
   // populate the array
   read_input(wires);
 
+  cout << "Number of wires: " << next_empty(wires) << endl;
+  
   location = get_location(wires, "b");
   if (location > 0 ) {
     // we're going to cheat and just manually code this number
