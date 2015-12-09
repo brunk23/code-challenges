@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <climits>
+
 
 using std::cout;
 using std::cin;
@@ -7,13 +10,13 @@ using std::endl;
 using std::getline;
 using std::string;
 using std::size_t;
-using std::stoi;
 
 const int CITIES = 10;
 
 void read_input(string names[CITIES], int distance[CITIES][CITIES]);
 int which_city(string names[CITIES], string city);
 void print_distance_array(int dist[CITIES][CITIES]);
+int shortest_distance(const int possible[CITIES], const int full[CITIES][CITIES]);
 
 int main()
 {
@@ -36,6 +39,46 @@ int main()
 }
 
 /*
+ * Will recursively call itself to find the shortest distances
+ */
+int shortest_distance(const int possible[CITIES],
+			const int full[CITIES][CITIES])
+{
+	int shortest = INT_MAX;
+	int left[CITIES];
+	int remaining = 0;
+
+	// copy array into one we can modify
+	for(int i = 0; i < CITIES; ++i) {
+		if( (shortest = possible[i]) > 0 ) {
+			remaining++;
+		}
+	}
+
+	// if we have one remaining, return it.
+	if ( remaining < 2 ) {
+		return shortest;
+	}
+	
+	// go through each possible city, only checking ones with
+	// a distance > 0, and find the shortest.
+	for(int i = 0; i < CITIES; ++i) {
+		if( possible[i] > 0 ) {
+			for(int j = 0; j < CITIES; ++j) {
+				if( possible[j] > 0 ) {
+					left[j] = full[i][j];
+				}
+			}
+			remaining = shortest_distance(left, full);			
+			if( remaining < shortest ) {
+				shortest = remaining;
+			}
+		}
+	}
+	return shortest;
+}
+
+/*
  * Print the array for debugging purposes
  */
 void print_distance_array(int dist[CITIES][CITIES]) {
@@ -46,10 +89,6 @@ void print_distance_array(int dist[CITIES][CITIES]) {
 		cout << endl;
 	}
 }
-enum TOKEN {
-	FIRST,
-	SECOND
-};
 
 /*
  * Will read the input and populate both arrays as needed for the
@@ -58,7 +97,6 @@ enum TOKEN {
 void read_input(string names[CITIES], int distance[CITIES][CITIES]) {
 	string input, name1, name2;
 	int dist, n1_spot, n2_spot;
-	TOKEN location = FIRST;
 	size_t start, len;
 
 	while( getline(cin, input) ) {
@@ -70,7 +108,7 @@ void read_input(string names[CITIES], int distance[CITIES][CITIES]) {
 		len -= start;
 		name2 = input.substr(start,len);
 		start += len + 3;
-		dist = stoi(input.substr(start));
+		dist = atoi(input.substr(start).c_str());
 
 	/*
 		cout << input << endl;
