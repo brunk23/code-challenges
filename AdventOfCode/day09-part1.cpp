@@ -13,6 +13,7 @@ const int CITIES = 10;
 
 void read_input(string names[CITIES], int distance[CITIES][CITIES]);
 int which_city(string names[CITIES], string city);
+void print_distance_array(int dist[CITIES][CITIES]);
 
 int main()
 {
@@ -28,10 +29,23 @@ int main()
 
 	read_input(names, distance);
 
+	print_distance_array(distance);
+
 
 	return 0;
 }
 
+/*
+ * Print the array for debugging purposes
+ */
+void print_distance_array(int dist[CITIES][CITIES]) {
+	for(int x = 0; x < CITIES; x++) {
+		for(int y = 0; y < CITIES; y++) {
+			cout << "\t" << dist[x][y];
+		}
+		cout << endl;
+	}
+}
 enum TOKEN {
 	FIRST,
 	SECOND
@@ -76,7 +90,12 @@ void read_input(string names[CITIES], int distance[CITIES][CITIES]) {
 			cout << x << ": " << names[x] << endl;
 		}
 	 */
-
+		if ( !((n1_spot < 0) || (n2_spot < 0)) ) {
+			distance[n1_spot][n2_spot] = dist;
+			distance[n2_spot][n1_spot] = dist;
+		} else {
+			cout << "ERROR, NAME NOT FOUND\n";
+		}
 	}
 }
 
