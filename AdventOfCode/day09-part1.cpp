@@ -17,11 +17,14 @@ void read_input(string names[CITIES], int distance[CITIES][CITIES]);
 int which_city(string names[CITIES], string city);
 void print_distance_array(int dist[CITIES][CITIES]);
 int shortest_distance(const int possible[CITIES], const int full[CITIES][CITIES]);
+void print_small_array(const int possible[CITIES]);
 
 int main()
 {
 	string names[CITIES];
 	int distance[CITIES][CITIES];
+	int shortest = INT_MAX;
+	int temp;
 	
 	for(int x = 0; x < CITIES; x++) {
 		for(int y = 0; y < CITIES; y++) {
@@ -32,8 +35,19 @@ int main()
 
 	read_input(names, distance);
 
-	print_distance_array(distance);
+	//	print_distance_array(distance);
 
+	for(int x = 0; x < CITIES; x++ ) {
+		if( names[x].compare("") != 0 ) {
+	//		cout << "Checking " << names[x] << endl;
+			temp = shortest_distance(distance[x],distance);
+			if ( temp < shortest ) {
+				shortest = temp;
+			}
+		}
+	}	
+	
+	cout << "The shortest distance was " << shortest << endl;
 
 	return 0;
 }
@@ -48,18 +62,24 @@ int shortest_distance(const int possible[CITIES],
 	int left[CITIES];
 	int remaining = 0;
 
+	//	print_small_array(possible);
+
 	// copy array into one we can modify
 	for(int i = 0; i < CITIES; ++i) {
-		if( (shortest = possible[i]) > 0 ) {
+		if( ( possible[i] ) > 0 ) {
 			remaining++;
 		}
 	}
 
 	// if we have one remaining, return it.
 	if ( remaining < 2 ) {
-		return shortest;
+		for(int i = 0; i < CITIES; ++i) {
+			if( possible[i] > 0 ) {
+				return possible[i];
+			}
+		}
 	}
-	
+
 	// go through each possible city, only checking ones with
 	// a distance > 0, and find the shortest.
 	for(int i = 0; i < CITIES; ++i) {
@@ -67,15 +87,27 @@ int shortest_distance(const int possible[CITIES],
 			for(int j = 0; j < CITIES; ++j) {
 				if( possible[j] > 0 ) {
 					left[j] = full[i][j];
+				} else {
+					left[j] = 0;
 				}
 			}
-			remaining = shortest_distance(left, full);			
+			remaining = possible[i];
+			remaining += shortest_distance(left, full);			
 			if( remaining < shortest ) {
 				shortest = remaining;
 			}
 		}
 	}
+	// cout << "returning: " << shortest << endl;
 	return shortest;
+}
+
+void print_small_array(const int possible[CITIES])
+{
+	for(int x = 0; x < CITIES; x++) {
+		cout << "\t" << possible[x];
+	}
+	cout << endl;
 }
 
 /*
