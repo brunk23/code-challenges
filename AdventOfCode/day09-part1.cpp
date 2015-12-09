@@ -7,10 +7,12 @@ using std::endl;
 using std::getline;
 using std::string;
 using std::size_t;
+using std::stoi;
 
 const int CITIES = 10;
 
 void read_input(string names[CITIES], int distance[CITIES][CITIES]);
+int which_city(string names[CITIES], string city);
 
 int main()
 {
@@ -35,8 +37,13 @@ enum TOKEN {
 	SECOND
 };
 
+/*
+ * Will read the input and populate both arrays as needed for the
+ * problem description
+ */
 void read_input(string names[CITIES], int distance[CITIES][CITIES]) {
 	string input, name1, name2;
+	int dist, n1_spot, n2_spot;
 	TOKEN location = FIRST;
 	size_t start, len;
 
@@ -48,10 +55,47 @@ void read_input(string names[CITIES], int distance[CITIES][CITIES]) {
 		len = input.find(" = ");
 		len -= start;
 		name2 = input.substr(start,len);
-		start += len + 4;
+		start += len + 3;
+		dist = stoi(input.substr(start));
+
+	/*
 		cout << input << endl;
 		cout << "name1: " << name1 << endl 
-		     << "name2: " << name2 << endl;
-	}
+		     << "name2: " << name2 << endl
+		     << "dist : " << dist << endl;
+	 */
 
+		n1_spot = -1;
+		n2_spot = -1;
+		// We have parsed the input, now store it.
+		n1_spot = which_city(names, name1);
+		n2_spot = which_city(names, name2);
+
+	/*
+		for(int x = 0; x < CITIES; x++) {
+			cout << x << ": " << names[x] << endl;
+		}
+	 */
+
+	}
+}
+
+/*
+ * Will return the location of a city in the array and will
+ * put a city in the array if one isn't there already
+ */
+int which_city(string names[CITIES], string city) {
+	int spot = -1;
+	for(int x = 0; x < CITIES; x++) {
+		if(0 == names[x].compare(city)) {
+			spot = x;
+			break;
+		}
+		if(0 == names[x].compare("")) {
+			spot = x;
+			names[x] = city;
+			break;
+		}
+	}	
+	return spot;
 }
