@@ -18,7 +18,7 @@ int main()
   string next = "";
   char current = '\0';
   
-  for (int i = 0; i < 40; ++i ) {
+  for (int i = 0; i < 50; ++i ) {
     next = "";    
     count = 0;
     for ( unsigned int x = 0; x < input.size(); x++) {
