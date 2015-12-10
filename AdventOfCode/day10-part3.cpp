@@ -39,19 +39,40 @@ int main()
 
 	init_table(table);
 
-	cout << look_say_length(table, 70, 40) << endl;
+	// We are looking for the 40th (part 1) and 50th (part 2)
+	// evolution of the string "1321131112" ... which happens to
+	// be element #70 "Yb", so we call the function with that
+	// as the element to evolve.
+
+	cout << "Part 1 (40 evolutions): "
+		<< look_say_length(table, 70, 40) << endl
+		<< "Part 2 (50 evolutions): "
+		<< look_say_length(table, 70, 50) << endl;
 
 
 	return 0;
 }
 
+/*
+ * This will call itself until it has reached the last required evolution.
+ * At that point, it will return the length of the element it was called
+ * with. If there are still more evolutions to do, it will call itself
+ * on each of the strings it evolves to and reduce the remaining evolutions
+ * by one.
+ */
 unsigned long look_say_length(element table[ELEMENTS], int elem, int depth) 
 {
 	unsigned long total = 0;
 	if ( depth == 0 ) {
 		return table[elem].length;
 	}
-
+	
+	/*
+	 * If we aren't at the last depth, call ourselves for each of the
+	 * evolves states that this element has (reducing the depth of
+	 * remaining evolution by 1). For add the total length for each
+	 * of the possible states.
+	 */
 	for(int x = 0; x < 6; ++x) {
 		if( table[elem].evolves[x] > 0 ) {
 			total += look_say_length(table, table[elem].evolves[x], depth - 1);
@@ -63,6 +84,10 @@ unsigned long look_say_length(element table[ELEMENTS], int elem, int depth)
 /*
  * We hard code Conway's table and relationships
  * From: http://www.se16.info/js/lands2.htm
+ *
+ * I don't know if there is a way to generate this. While each element
+ * decays into the next lowest element, it doesn't always do just that.
+ * So I hard code.
  */
 void init_table(element table[ELEMENTS]) {
 	table[0].length = 0;
