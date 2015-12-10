@@ -1,5 +1,8 @@
 #include <iostream>
 
+using std::cout;
+using std::endl;
+
 struct element {
 	int length;
 	int evolves[6];
@@ -25,7 +28,8 @@ enum name {
 	Pa,	U
 };
 
-void init_table(struct table[ELEMENTS]);
+void init_table(element table[ELEMENTS]);
+unsigned long look_say_length(element table[ELEMENTS], int elem, int depth);
 
 int main()
 {
@@ -35,7 +39,25 @@ int main()
 
 	init_table(table);
 
+	cout << look_say_length(table, 70, 40) << endl;
+
+
 	return 0;
+}
+
+unsigned long look_say_length(element table[ELEMENTS], int elem, int depth) 
+{
+	unsigned long total = 0;
+	if ( depth == 0 ) {
+		return table[elem].length;
+	}
+
+	for(int x = 0; x < 6; ++x) {
+		if( table[elem].evolves[x] > 0 ) {
+			total += look_say_length(table, table[elem].evolves[x], depth - 1);
+		}
+	}
+	return total;
 }
 
 /*
@@ -304,579 +326,579 @@ void init_table(element table[ELEMENTS]) {
 	table[Ni].evolves[5] = 0;
 	
 	// Cu "131112" -> Ni
-	table[29].length = 6;
-	table[29].evolves[0] = 28;
-	table[29].evolves[1] = 0;
-	table[29].evolves[2] = 0;
-	table[29].evolves[3] = 0;
-	table[29].evolves[4] = 0;
-	table[29].evolves[5] = 0;
+	table[Cu].length = 6;
+	table[Cu].evolves[0] = Ni;
+	table[Cu].evolves[1] = 0;
+	table[Cu].evolves[2] = 0;
+	table[Cu].evolves[3] = 0;
+	table[Cu].evolves[4] = 0;
+	table[Cu].evolves[5] = 0;
 	
 	// Zn "312" -> Cu
-	table[30].length = 3;
-	table[30].evolves[0] = 29;
-	table[30].evolves[1] = 0;
-	table[30].evolves[2] = 0;
-	table[30].evolves[3] = 0;
-	table[30].evolves[4] = 0;
-	table[30].evolves[5] = 0;
+	table[Zn].length = 3;
+	table[Zn].evolves[0] = Cu;
+	table[Zn].evolves[1] = 0;
+	table[Zn].evolves[2] = 0;
+	table[Zn].evolves[3] = 0;
+	table[Zn].evolves[4] = 0;
+	table[Zn].evolves[5] = 0;
 
 	// Ga "13221133122211332" -> Eu Ca Ac H Ca Zn
-	table[31].length = 17;
-	table[31].evolves[0] = 63;
-	table[31].evolves[1] = 20;
-	table[31].evolves[2] = 89;
-	table[31].evolves[3] = 1;
-	table[31].evolves[4] = 20;
-	table[31].evolves[5] = 30;
+	table[Ga].length = 17;
+	table[Ga].evolves[0] = Eu;
+	table[Ga].evolves[1] = Ca;
+	table[Ga].evolves[2] = Ac;
+	table[Ga].evolves[3] = H;
+	table[Ga].evolves[4] = Ca;
+	table[Ga].evolves[5] = Zn;
 
 	// Ge "31131122211311122113222" -> Ho Ga
-	table[32].length = 23;
-	table[32].evolves[0] = 67;
-	table[32].evolves[1] = 31]
-	table[32].evolves[2] = 0;
-	table[32].evolves[3] = 0;
-	table[32].evolves[4] = 0;
-	table[32].evolves[5] = 0;
+	table[Ge].length = 23;
+	table[Ge].evolves[0] = Ho;
+	table[Ge].evolves[1] = Ga;
+	table[Ge].evolves[2] = 0;
+	table[Ge].evolves[3] = 0;
+	table[Ge].evolves[4] = 0;
+	table[Ge].evolves[5] = 0;
 
 	// As "11131221131211322113322112" -> Ge Na
-	table[33].length = 26;
-	table[33].evolves[0] = 32;
-	table[33].evolves[1] = 11;
-	table[33].evolves[2] = 0;
-	table[33].evolves[3] = 0;
-	table[33].evolves[4] = 0;
-	table[33].evolves[5] = 0;
+	table[As].length = 26;
+	table[As].evolves[0] = Ge;
+	table[As].evolves[1] = Na;
+	table[As].evolves[2] = 0;
+	table[As].evolves[3] = 0;
+	table[As].evolves[4] = 0;
+	table[As].evolves[5] = 0;
 
 	// Se "13211321222113222112" -> As
-	table[34].length = 20;
-	table[34].evolves[0] = 33;
-	table[34].evolves[1] = 0;
-	table[34].evolves[2] = 0;
-	table[34].evolves[3] = 0;
-	table[34].evolves[4] = 0;
-	table[34].evolves[5] = 0;
+	table[Se].length = 20;
+	table[Se].evolves[0] = As;
+	table[Se].evolves[1] = 0;
+	table[Se].evolves[2] = 0;
+	table[Se].evolves[3] = 0;
+	table[Se].evolves[4] = 0;
+	table[Se].evolves[5] = 0;
 
 	// Br "3113112211322112" -> Se
-	table[35].length = 16;
-	table[35].evolves[0] = 34;
-	table[35].evolves[1] = 0;
-	table[35].evolves[2] = 0;
-	table[35].evolves[3] = 0;
-	table[35].evolves[4] = 0;
-	table[35].evolves[5] = 0;
+	table[Br].length = 16;
+	table[Br].evolves[0] = Se;
+	table[Br].evolves[1] = 0;
+	table[Br].evolves[2] = 0;
+	table[Br].evolves[3] = 0;
+	table[Br].evolves[4] = 0;
+	table[Br].evolves[5] = 0;
 
 	// Kr "11131221222112" -> Br
-	table[36].length = 14;
-	table[36].evolves[0] = 35;
-	table[36].evolves[1] = 0;
-	table[36].evolves[2] = 0;
-	table[36].evolves[3] = 0;
-	table[36].evolves[4] = 0;
-	table[36].evolves[5] = 0;
+	table[Kr].length = 14;
+	table[Kr].evolves[0] = Br;
+	table[Kr].evolves[1] = 0;
+	table[Kr].evolves[2] = 0;
+	table[Kr].evolves[3] = 0;
+	table[Kr].evolves[4] = 0;
+	table[Kr].evolves[5] = 0;
 
 	// Rb "1321122112" -> Kr
-	table[37].length = 10;
-	table[37].evolves[0] = 36;
-	table[37].evolves[1] = 0;
-	table[37].evolves[2] = 0;
-	table[37].evolves[3] = 0;
-	table[37].evolves[4] = 0;
-	table[37].evolves[5] = 0;
+	table[Rb].length = 10;
+	table[Rb].evolves[0] = Kr;
+	table[Rb].evolves[1] = 0;
+	table[Rb].evolves[2] = 0;
+	table[Rb].evolves[3] = 0;
+	table[Rb].evolves[4] = 0;
+	table[Rb].evolves[5] = 0;
 
 	// Sr "3112112" -> Rb
-	table[38].length = 7;
-	table[38].evolves[0] = 37;
-	table[38].evolves[1] = 0;
-	table[38].evolves[2] = 0;
-	table[38].evolves[3] = 0;
-	table[38].evolves[4] = 0;
-	table[38].evolves[5] = 0;
+	table[Sr].length = 7;
+	table[Sr].evolves[0] = Rb;
+	table[Sr].evolves[1] = 0;
+	table[Sr].evolves[2] = 0;
+	table[Sr].evolves[3] = 0;
+	table[Sr].evolves[4] = 0;
+	table[Sr].evolves[5] = 0;
 
 	// Y "1112133" -> Sr U
-	table[39].length = 7;
-	table[39].evolves[0] = 38;
-	table[39].evolves[1] = 92;
-	table[39].evolves[2] = 0;
-	table[39].evolves[3] = 0;
-	table[39].evolves[4] = 0;
-	table[39].evolves[5] = 0;
+	table[Y].length = 7;
+	table[Y].evolves[0] = Sr;
+	table[Y].evolves[1] = U;
+	table[Y].evolves[2] = 0;
+	table[Y].evolves[3] = 0;
+	table[Y].evolves[4] = 0;
+	table[Y].evolves[5] = 0;
 
 	// Zr "12322211331222113112211" -> Y H Ca Tc
-	table[40].length = 23;
-	table[40].evolves[0] = 39;
-	table[40].evolves[1] = 1;
-	table[40].evolves[2] = 20;
-	table[40].evolves[3] = 43;
-	table[40].evolves[4] = 0;
-	table[40].evolves[5] = 0;
+	table[Zr].length = 23;
+	table[Zr].evolves[0] = Y;
+	table[Zr].evolves[1] = H;
+	table[Zr].evolves[2] = Ca;
+	table[Zr].evolves[3] = Tc;
+	table[Zr].evolves[4] = 0;
+	table[Zr].evolves[5] = 0;
 
 	// Nb "1113122113322113111221131221" -> Er Zr
-	table[41].length = 28;
-	table[41].evolves[0] = 68;
-	table[41].evolves[1] = 40;
-	table[41].evolves[2] = 0;
-	table[41].evolves[3] = 0;
-	table[41].evolves[4] = 0;
-	table[41].evolves[5] = 0;
+	table[Nb].length = 28;
+	table[Nb].evolves[0] = Er;
+	table[Nb].evolves[1] = Zr;
+	table[Nb].evolves[2] = 0;
+	table[Nb].evolves[3] = 0;
+	table[Nb].evolves[4] = 0;
+	table[Nb].evolves[5] = 0;
 
 	// Mo "13211322211312113211" -> Nb
-	table[42].length = 20;
-	table[42].evolves[0] = 41;
-	table[42].evolves[1] = 0;
-	table[42].evolves[2] = 0;
-	table[42].evolves[3] = 0;
-	table[42].evolves[4] = 0;
-	table[42].evolves[5] = 0;
+	table[Mo].length = 20;
+	table[Mo].evolves[0] = Nb;
+	table[Mo].evolves[1] = 0;
+	table[Mo].evolves[2] = 0;
+	table[Mo].evolves[3] = 0;
+	table[Mo].evolves[4] = 0;
+	table[Mo].evolves[5] = 0;
 
 	// Tc "311322113212221" -> Mo
-	table[43].length = 15;
-	table[43].evolves[0] = 42;
-	table[43].evolves[1] = 0;
-	table[43].evolves[2] = 0;
-	table[43].evolves[3] = 0;
-	table[43].evolves[4] = 0;
-	table[43].evolves[5] = 0;
+	table[Tc].length = 15;
+	table[Tc].evolves[0] = Mo;
+	table[Tc].evolves[1] = 0;
+	table[Tc].evolves[2] = 0;
+	table[Tc].evolves[3] = 0;
+	table[Tc].evolves[4] = 0;
+	table[Tc].evolves[5] = 0;
 
 	// Ru "132211331222113112211" Eu Ca Tc
-	table[44].length = 21;
-	table[44].evolves[0] = 63;
-	table[44].evolves[1] = 20;
-	table[44].evolves[2] = 43;
-	table[44].evolves[3] = 0;
-	table[44].evolves[4] = 0;
-	table[44].evolves[5] = 0;
+	table[Ru].length = 21;
+	table[Ru].evolves[0] = Eu;
+	table[Ru].evolves[1] = Ca;
+	table[Ru].evolves[2] = Tc;
+	table[Ru].evolves[3] = 0;
+	table[Ru].evolves[4] = 0;
+	table[Ru].evolves[5] = 0;
 
 	// Rh "311311222113111221131221" -> Ho Ru
-	table[45].length = 24;
-	table[45].evolves[0] = 67;;
-	table[45].evolves[1] = 44;
-	table[45].evolves[2] = 0;
-	table[45].evolves[3] = 0;
-	table[45].evolves[4] = 0;
-	table[45].evolves[5] = 0;
+	table[Rh].length = 24;
+	table[Rh].evolves[0] = Ho;
+	table[Rh].evolves[1] = Ru;
+	table[Rh].evolves[2] = 0;
+	table[Rh].evolves[3] = 0;
+	table[Rh].evolves[4] = 0;
+	table[Rh].evolves[5] = 0;
 
 	// Pd "111312211312113211" -> Rh
-	table[46].length = 18;
-	table[46].evolves[0] = 45;
-	table[46].evolves[1] = 0;
-	table[46].evolves[2] = 0;
-	table[46].evolves[3] = 0;
-	table[46].evolves[4] = 0;
-	table[46].evolves[5] = 0;
+	table[Pd].length = 18;
+	table[Pd].evolves[0] = Rh;
+	table[Pd].evolves[1] = 0;
+	table[Pd].evolves[2] = 0;
+	table[Pd].evolves[3] = 0;
+	table[Pd].evolves[4] = 0;
+	table[Pd].evolves[5] = 0;
 
 	// Ag "132113212221" -> Pd
-	table[47].length = 12;
-	table[47].evolves[0] = 46;
-	table[47].evolves[1] = 0;
-	table[47].evolves[2] = 0;
-	table[47].evolves[3] = 0;
-	table[47].evolves[4] = 0;
-	table[47].evolves[5] = 0;
+	table[Ag].length = 12;
+	table[Ag].evolves[0] = Pd;
+	table[Ag].evolves[1] = 0;
+	table[Ag].evolves[2] = 0;
+	table[Ag].evolves[3] = 0;
+	table[Ag].evolves[4] = 0;
+	table[Ag].evolves[5] = 0;
 	
 	// Cd "3113112211" -> Ag
-	table[48].length = 10;
-	table[48].evolves[0] = 47;
-	table[48].evolves[1] = 0;
-	table[48].evolves[2] = 0;
-	table[48].evolves[3] = 0;
-	table[48].evolves[4] = 0;
-	table[48].evolves[5] = 0;
+	table[Cd].length = 10;
+	table[Cd].evolves[0] = Ag;
+	table[Cd].evolves[1] = 0;
+	table[Cd].evolves[2] = 0;
+	table[Cd].evolves[3] = 0;
+	table[Cd].evolves[4] = 0;
+	table[Cd].evolves[5] = 0;
 	
 	// In "11131221" -> Cd
-	table[49].length = 8;
-	table[49].evolves[0] = 48;
-	table[49].evolves[1] = 0;
-	table[49].evolves[2] = 0;
-	table[49].evolves[3] = 0;
-	table[49].evolves[4] = 0;
-	table[49].evolves[5] = 0;
+	table[In].length = 8;
+	table[In].evolves[0] = Cd;
+	table[In].evolves[1] = 0;
+	table[In].evolves[2] = 0;
+	table[In].evolves[3] = 0;
+	table[In].evolves[4] = 0;
+	table[In].evolves[5] = 0;
 	
 	// Sn "13211" -> In
-	table[50].length = 5;
-	table[50].evolves[0] = 49;
-	table[50].evolves[1] = 0;
-	table[50].evolves[2] = 0;
-	table[50].evolves[3] = 0;
-	table[50].evolves[4] = 0;
-	table[50].evolves[5] = 0;
+	table[Sn].length = 5;
+	table[Sn].evolves[0] = In;
+	table[Sn].evolves[1] = 0;
+	table[Sn].evolves[2] = 0;
+	table[Sn].evolves[3] = 0;
+	table[Sn].evolves[4] = 0;
+	table[Sn].evolves[5] = 0;
 	
 	// Sb "3112221" -> Pm Sn
-	table[51].length = 7;
-	table[51].evolves[0] = 61;
-	table[51].evolves[1] = 50;
-	table[51].evolves[2] = 0;
-	table[51].evolves[3] = 0;
-	table[51].evolves[4] = 0;
-	table[51].evolves[5] = 0;
+	table[Sb].length = 7;
+	table[Sb].evolves[0] = Pm;
+	table[Sb].evolves[1] = Sn;
+	table[Sb].evolves[2] = 0;
+	table[Sb].evolves[3] = 0;
+	table[Sb].evolves[4] = 0;
+	table[Sb].evolves[5] = 0;
 	
 	// Te "1322113312211" -> Eu Ca Sb
-	table[52].length = 13;
-	table[52].evolves[0] = 63;
-	table[52].evolves[1] = 20;
-	table[52].evolves[2] = 51;
-	table[52].evolves[3] = 0;
-	table[52].evolves[4] = 0;
-	table[52].evolves[5] = 0;
+	table[Te].length = 13;
+	table[Te].evolves[0] = Eu;
+	table[Te].evolves[1] = Ca;
+	table[Te].evolves[2] = Sb;
+	table[Te].evolves[3] = 0;
+	table[Te].evolves[4] = 0;
+	table[Te].evolves[5] = 0;
 	
 	// I "311311222113111221" -> Ho Te
-	table[53].length = 18;
-	table[53].evolves[0] = 67;
-	table[53].evolves[1] = 52;
-	table[53].evolves[2] = 0;
-	table[53].evolves[3] = 0;
-	table[53].evolves[4] = 0;
-	table[53].evolves[5] = 0;
+	table[I].length = 18;
+	table[I].evolves[0] = Ho;
+	table[I].evolves[1] = Te;
+	table[I].evolves[2] = 0;
+	table[I].evolves[3] = 0;
+	table[I].evolves[4] = 0;
+	table[I].evolves[5] = 0;
 
 	// Xe "11131221131211" -> I
-	table[54].length = 14;
-	table[54].evolves[0] = 53;
-	table[54].evolves[1] = 0;
-	table[54].evolves[2] = 0;
-	table[54].evolves[3] = 0;
-	table[54].evolves[4] = 0;
-	table[54].evolves[5] = 0;
+	table[Xe].length = 14;
+	table[Xe].evolves[0] = I;
+	table[Xe].evolves[1] = 0;
+	table[Xe].evolves[2] = 0;
+	table[Xe].evolves[3] = 0;
+	table[Xe].evolves[4] = 0;
+	table[Xe].evolves[5] = 0;
 
 	// Cs "13211321" -> Xe
-	table[55].length = 8;
-	table[55].evolves[0] = 54;
-	table[55].evolves[1] = 0;
-	table[55].evolves[2] = 0;
-	table[55].evolves[3] = 0;
-	table[55].evolves[4] = 0;
-	table[55].evolves[5] = 0;
+	table[Cs].length = 8;
+	table[Cs].evolves[0] = Xe;
+	table[Cs].evolves[1] = 0;
+	table[Cs].evolves[2] = 0;
+	table[Cs].evolves[3] = 0;
+	table[Cs].evolves[4] = 0;
+	table[Cs].evolves[5] = 0;
 
-	// Ba "311311" -> Ca
-	table[56].length = 6;
-	table[56].evolves[0] = 55;
-	table[56].evolves[1] = 0;
-	table[56].evolves[2] = 0;
-	table[56].evolves[3] = 0;
-	table[56].evolves[4] = 0;
-	table[56].evolves[5] = 0;
+	// Ba "311311" -> Cs
+	table[Ba].length = 6;
+	table[Ba].evolves[0] = Cs;
+	table[Ba].evolves[1] = 0;
+	table[Ba].evolves[2] = 0;
+	table[Ba].evolves[3] = 0;
+	table[Ba].evolves[4] = 0;
+	table[Ba].evolves[5] = 0;
 
 	// La "11131" -> Ba
-	table[57].length = 5;
-	table[57].evolves[0] = 56;
-	table[57].evolves[1] = 0;
-	table[57].evolves[2] = 0;
-	table[57].evolves[3] = 0;
-	table[57].evolves[4] = 0;
-	table[57].evolves[5] = 0;
+	table[La].length = 5;
+	table[La].evolves[0] = Ba;
+	table[La].evolves[1] = 0;
+	table[La].evolves[2] = 0;
+	table[La].evolves[3] = 0;
+	table[La].evolves[4] = 0;
+	table[La].evolves[5] = 0;
 
 	// Ce "1321133112" -> La H Ca Co
-	table[58].length = 10;
-	table[58].evolves[0] = 57;
-	table[58].evolves[1] = 1;
-	table[58].evolves[2] = 20;
-	table[58].evolves[3] = 27;
-	table[58].evolves[4] = 0;
-	table[58].evolves[5] = 0;
+	table[Ce].length = 10;
+	table[Ce].evolves[0] = La;
+	table[Ce].evolves[1] = H;
+	table[Ce].evolves[2] = Ca;
+	table[Ce].evolves[3] = Co;
+	table[Ce].evolves[4] = 0;
+	table[Ce].evolves[5] = 0;
 
 	// Pr "31131112" -> Ce
-	table[59].length = 8;
-	table[59].evolves[0] = 58;
-	table[59].evolves[1] = 0;
-	table[59].evolves[2] = 0;
-	table[59].evolves[3] = 0;
-	table[59].evolves[4] = 0;
-	table[59].evolves[5] = 0;
+	table[Pr].length = 8;
+	table[Pr].evolves[0] = Ce;
+	table[Pr].evolves[1] = 0;
+	table[Pr].evolves[2] = 0;
+	table[Pr].evolves[3] = 0;
+	table[Pr].evolves[4] = 0;
+	table[Pr].evolves[5] = 0;
 
 	// Nd "111312" -> Pr
-	table[60].length = 6;
-	table[60].evolves[0] = 59;
-	table[60].evolves[1] = 0;
-	table[60].evolves[2] = 0;
-	table[60].evolves[3] = 0;
-	table[60].evolves[4] = 0;
-	table[60].evolves[5] = 0;
+	table[Nd].length = 6;
+	table[Nd].evolves[0] = Pr;
+	table[Nd].evolves[1] = 0;
+	table[Nd].evolves[2] = 0;
+	table[Nd].evolves[3] = 0;
+	table[Nd].evolves[4] = 0;
+	table[Nd].evolves[5] = 0;
 
 	// Pm "132" -> Nd
-	table[61].length = 3;
-	table[61].evolves[0] = 60;
-	table[61].evolves[1] = 0;
-	table[61].evolves[2] = 0;
-	table[61].evolves[3] = 0;
-	table[61].evolves[4] = 0;
-	table[61].evolves[5] = 0;
+	table[Pm].length = 3;
+	table[Pm].evolves[0] = Nd;
+	table[Pm].evolves[1] = 0;
+	table[Pm].evolves[2] = 0;
+	table[Pm].evolves[3] = 0;
+	table[Pm].evolves[4] = 0;
+	table[Pm].evolves[5] = 0;
 
 	// Sm "311332" -> Pm Ca Zn
-	table[16].length = 6;
-	table[16].evolves[0] = 61;
-	table[16].evolves[1] = 20;
-	table[16].evolves[2] = 30;
-	table[16].evolves[3] = 0;
-	table[16].evolves[4] = 0;
-	table[16].evolves[5] = 0;
+	table[Sm].length = 6;
+	table[Sm].evolves[0] = Pm;
+	table[Sm].evolves[1] = Ca;
+	table[Sm].evolves[2] = Zn;
+	table[Sm].evolves[3] = 0;
+	table[Sm].evolves[4] = 0;
+	table[Sm].evolves[5] = 0;
 
-	// Cl "132112" -> S
-	table[17].length = 6;
-	table[17].evolves[0] = 16;
-	table[17].evolves[1] = 0;
-	table[17].evolves[2] = 0;
-	table[17].evolves[3] = 0;
-	table[17].evolves[4] = 0;
-	table[17].evolves[5] = 0;
+	// Eu "1113222" -> Sm
+	table[Eu].length = 7;
+	table[Eu].evolves[0] = Sm;
+	table[Eu].evolves[1] = 0;
+	table[Eu].evolves[2] = 0;
+	table[Eu].evolves[3] = 0;
+	table[Eu].evolves[4] = 0;
+	table[Eu].evolves[5] = 0;
 
-	// Ar "3112" -> Cl
-	table[18].length = 4;
-	table[18].evolves[0] = 17;
-	table[18].evolves[1] = 0;
-	table[18].evolves[2] = 0;
-	table[18].evolves[3] = 0;
-	table[18].evolves[4] = 0;
-	table[18].evolves[5] = 0;
+	// Gd "13221133112" -> Eu Ca Co
+	table[Gd].length = 11;
+	table[Gd].evolves[0] = Eu;
+	table[Gd].evolves[1] = Ca;
+	table[Gd].evolves[2] = Co;
+	table[Gd].evolves[3] = 0;
+	table[Gd].evolves[4] = 0;
+	table[Gd].evolves[5] = 0;
 
-	// K "1112" -> Ar
-	table[19].length = 4;
-	table[19].evolves[0] = 18;
-	table[19].evolves[1] = 0;
-	table[19].evolves[2] = 0;
-	table[19].evolves[3] = 0;
-	table[19].evolves[4] = 0;
-	table[19].evolves[5] = 0;
+	// Tb "3113112221131112" -> Ho Gd
+	table[Tb].length = 16;
+	table[Tb].evolves[0] = Ho;
+	table[Tb].evolves[1] = Gd;
+	table[Tb].evolves[2] = 0;
+	table[Tb].evolves[3] = 0;
+	table[Tb].evolves[4] = 0;
+	table[Tb].evolves[5] = 0;
 
-	// Ca "12" -> K
-	table[20].length = 2;
-	table[20].evolves[0] = 19;
-	table[20].evolves[1] = 0;
-	table[20].evolves[2] = 0;
-	table[20].evolves[3] = 0;
-	table[20].evolves[4] = 0;
-	table[20].evolves[5] = 0;
+	// Dy "111312211312" -> Tb
+	table[Dy].length = 12;
+	table[Dy].evolves[0] = Tb;
+	table[Dy].evolves[1] = 0;
+	table[Dy].evolves[2] = 0;
+	table[Dy].evolves[3] = 0;
+	table[Dy].evolves[4] = 0;
+	table[Dy].evolves[5] = 0;
 
-	// Sc "3113112221133112" -> Ho Pa H Ca Co
-	table[21].length = 16;
-	table[21].evolves[0] = 67;
-	table[21].evolves[1] = 91;
-	table[21].evolves[2] = 1;
-	table[21].evolves[3] = 20;
-	table[21].evolves[4] = 27;
-	table[21].evolves[5] = 0;
+	// Ho "1321132" -> Dy
+	table[Ho].length = 7;
+	table[Ho].evolves[0] = Dy;
+	table[Ho].evolves[1] = 0;
+	table[Ho].evolves[2] = 0;
+	table[Ho].evolves[3] = 0;
+	table[Ho].evolves[4] = 0;
+	table[Ho].evolves[5] = 0;
 
-	// Ti "11131221131112" -> Sc
-	table[22].length = 14;
-	table[22].evolves[0] = 21;
-	table[22].evolves[1] = 0;
-	table[22].evolves[2] = 0;
-	table[22].evolves[3] = 0;
-	table[22].evolves[4] = 0;
-	table[22].evolves[5] = 0;
+	// Er "311311222" -> Ho Pm
+	table[Er].length = 9;
+	table[Er].evolves[0] = Ho;
+	table[Er].evolves[1] = Pm;
+	table[Er].evolves[2] = 0;
+	table[Er].evolves[3] = 0;
+	table[Er].evolves[4] = 0;
+	table[Er].evolves[5] = 0;
 
-	// V "13211312" -> Ti
-	table[23].length = 8;
-	table[23].evolves[0] = 22;
-	table[23].evolves[1] = 0;
-	table[23].evolves[2] = 0;
-	table[23].evolves[3] = 0;
-	table[23].evolves[4] = 0;
-	table[23].evolves[5] = 0;
+	// Tm "11131221133112" -> Er Ca Co
+	table[Tm].length = 14;
+	table[Tm].evolves[0] = Er;
+	table[Tm].evolves[1] = Ca;
+	table[Tm].evolves[2] = Co;
+	table[Tm].evolves[3] = 0;
+	table[Tm].evolves[4] = 0;
+	table[Tm].evolves[5] = 0;
 
-}	// H "22" -> H (does not evolve)
-	table[1].length = 2;
-	table[1].evolves[0] = 1;
-	table[1].evolves[1] = 0;
-	table[1].evolves[2] = 0;
-	table[1].evolves[3] = 0;
-	table[1].evolves[4] = 0;
-	table[1].evolves[5] = 0;
+	// Yb "1321131112" -> Tm
+	table[Yb].length = 10;
+	table[Yb].evolves[0] = Tm;
+	table[Yb].evolves[1] = 0;
+	table[Yb].evolves[2] = 0;
+	table[Yb].evolves[3] = 0;
+	table[Yb].evolves[4] = 0;
+	table[Yb].evolves[5] = 0;
 	
-	// He "13112221133211322112211213322112" -> Hf Pa H Ca Li
-	table[2].length = 32;
-	table[2].evolves[0] = 72;
-	table[2].evolves[1] = 91;
-	table[2].evolves[2] = 1;
-	table[2].evolves[3] = 20;
-	table[2].evolves[4] = 3;
-	table[2].evolves[5] = 0;
+	// Lu "311312" -> Yb
+	table[Lu].length = 6;
+	table[Lu].evolves[0] = Yb;
+	table[Lu].evolves[1] = 0;
+	table[Lu].evolves[2] = 0;
+	table[Lu].evolves[3] = 0;
+	table[Lu].evolves[4] = 0;
+	table[Lu].evolves[5] = 0;
 	
-	// Li "312211322212221121123222112" -> He
-	table[3].length = 27;
-	table[3].evolves[0] = 2;
-	table[3].evolves[1] = 0;
-	table[3].evolves[2] = 0;
-	table[3].evolves[3] = 0;
-	table[3].evolves[4] = 0;
-	table[3].evolves[5] = 0;
+	// Hf "11132" -> Lu
+	table[Hf].length = 5;
+	table[Hf].evolves[0] = Lu;
+	table[Hf].evolves[1] = 0;
+	table[Hf].evolves[2] = 0;
+	table[Hf].evolves[3] = 0;
+	table[Hf].evolves[4] = 0;
+	table[Hf].evolves[5] = 0;
 	
-	// Be "111312211312113221133211322112211213322112" -> Ge Ca Li
-	table[4].length = 42;
-	table[4].evolves[0] = 32;
-	table[4].evolves[1] = 20;
-	table[4].evolves[2] = 3;;
-	table[4].evolves[3] = 0;
-	table[4].evolves[4] = 0;
-	table[4].evolves[5] = 0;
+	// Ta "13112221133211322112211213322113" -> Hf Pa H Ca W
+	table[Ta].length = 32;
+	table[Ta].evolves[0] = Hf;
+	table[Ta].evolves[1] = Pa;
+	table[Ta].evolves[2] = H;
+	table[Ta].evolves[3] = Ca;
+	table[Ta].evolves[4] = W;
+	table[Ta].evolves[5] = 0;
 	
-	// B "1321132122211322212221121123222112" -> Be
-	table[5].length = 34;
-	table[5].evolves[0] = 4;
-	table[5].evolves[1] = 0;
-	table[5].evolves[2] = 0;
-	table[5].evolves[3] = 0;
-	table[5].evolves[4] = 0;
-	table[5].evolves[5] = 0;
+	// W "312211322212221121123222113" -> Ta
+	table[W].length = 27;
+	table[W].evolves[0] = Ta;
+	table[W].evolves[1] = 0;
+	table[W].evolves[2] = 0;
+	table[W].evolves[3] = 0;
+	table[W].evolves[4] = 0;
+	table[W].evolves[5] = 0;
 	
-	// C "3113112211322112211213322112" -> B
-	table[6].length = 28;
-	table[6].evolves[0] = 5;
-	table[6].evolves[1] = 0;
-	table[6].evolves[2] = 0;
-	table[6].evolves[3] = 0;
-	table[6].evolves[4] = 0;
-	table[6].evolves[5] = 0;
+	// Re "111312211312113221133211322112211213322113" -> Ge Ca W
+	table[Re].length = 42;
+	table[Re].evolves[0] = Ge;
+	table[Re].evolves[1] = Ca;
+	table[Re].evolves[2] = W;
+	table[Re].evolves[3] = 0;
+	table[Re].evolves[4] = 0;
+	table[Re].evolves[5] = 0;
 	
-	// N "111312212221121123222112" -> C
-	table[7].length = 24;
-	table[7].evolves[0] = 6;
-	table[7].evolves[1] = 0;
-	table[7].evolves[2] = 0;
-	table[7].evolves[3] = 0;
-	table[7].evolves[4] = 0;
-	table[7].evolves[5] = 0;
+	// Os "1321132122211322212221121123222113" -> Re
+	table[Os].length = 34;
+	table[Os].evolves[0] = Re;
+	table[Os].evolves[1] = 0;
+	table[Os].evolves[2] = 0;
+	table[Os].evolves[3] = 0;
+	table[Os].evolves[4] = 0;
+	table[Os].evolves[5] = 0;
 
-	// O "132112211213322112" -> N
-	table[8].length = 18;
-	table[8].evolves[0] = 7;
-	table[8].evolves[1] = 0;
-	table[8].evolves[2] = 0;
-	table[8].evolves[3] = 0;
-	table[8].evolves[4] = 0;
-	table[8].evolves[5] = 0;
+	// Ir "3113112211322112211213322113" -> Os
+	table[Ir].length = 28;
+	table[Ir].evolves[0] = Os;
+	table[Ir].evolves[1] = 0;
+	table[Ir].evolves[2] = 0;
+	table[Ir].evolves[3] = 0;
+	table[Ir].evolves[4] = 0;
+	table[Ir].evolves[5] = 0;
 
-	// F "31121123222112" -> O
-	table[9].length = 14;
-	table[9].evolves[0] = 8;
-	table[9].evolves[1] = 0;
-	table[9].evolves[2] = 0;
-	table[9].evolves[3] = 0;
-	table[9].evolves[4] = 0;
-	table[9].evolves[5] = 0;
+	// Pt "111312212221121123222113" -> Ir
+	table[Pt].length = 24;
+	table[Pt].evolves[0] = Ir;
+	table[Pt].evolves[1] = 0;
+	table[Pt].evolves[2] = 0;
+	table[Pt].evolves[3] = 0;
+	table[Pt].evolves[4] = 0;
+	table[Pt].evolves[5] = 0;
 
-	// Ne "111213322112" -> F
-	table[10].length = 12;
-	table[10].evolves[0] = 9;
-	table[10].evolves[1] = 0;
-	table[10].evolves[2] = 0;
-	table[10].evolves[3] = 0;
-	table[10].evolves[4] = 0;
-	table[10].evolves[5] = 0;
+	// Au "132112211213322113" -> Pt
+	table[Au].length = 18;
+	table[Au].evolves[0] = Pt;
+	table[Au].evolves[1] = 0;
+	table[Au].evolves[2] = 0;
+	table[Au].evolves[3] = 0;
+	table[Au].evolves[4] = 0;
+	table[Au].evolves[5] = 0;
 
-	// Na "123222112" -> Ne
-	table[11].length = 9;
-	table[11].evolves[0] = 10;
-	table[11].evolves[1] = 0;
-	table[11].evolves[2] = 0;
-	table[11].evolves[3] = 0;
-	table[11].evolves[4] = 0;
-	table[11].evolves[5] = 0;
+	// Hg "31121123222113" -> Au
+	table[Hg].length = 14;
+	table[Hg].evolves[0] = Au;
+	table[Hg].evolves[1] = 0;
+	table[Hg].evolves[2] = 0;
+	table[Hg].evolves[3] = 0;
+	table[Hg].evolves[4] = 0;
+	table[Hg].evolves[5] = 0;
 
-	// Mg "3113322112" -> Pm Na
-	table[12].length = 10;
-	table[12].evolves[0] = 61;
-	table[12].evolves[1] = 11;
-	table[12].evolves[2] = 0;
-	table[12].evolves[3] = 0;
-	table[12].evolves[4] = 0;
-	table[12].evolves[5] = 0;
+	// Tl "111213322113" -> Hg
+	table[Tl].length = 12;
+	table[Tl].evolves[0] = Hg;
+	table[Tl].evolves[1] = 0;
+	table[Tl].evolves[2] = 0;
+	table[Tl].evolves[3] = 0;
+	table[Tl].evolves[4] = 0;
+	table[Tl].evolves[5] = 0;
 
-	// Al "1113222112" -> Mg
-	table[13].length = 10;
-	table[13].evolves[0] = 12;
-	table[13].evolves[1] = 0;
-	table[13].evolves[2] = 0;
-	table[13].evolves[3] = 0;
-	table[13].evolves[4] = 0;
-	table[13].evolves[5] = 0;
+	// Pb "123222113" -> Tl
+	table[Pb].length = 9;
+	table[Pb].evolves[0] = Tl;
+	table[Pb].evolves[1] = 0;
+	table[Pb].evolves[2] = 0;
+	table[Pb].evolves[3] = 0;
+	table[Pb].evolves[4] = 0;
+	table[Pb].evolves[5] = 0;
 
-	// Si "1322112" -> Al
-	table[14].length = 7;
-	table[14].evolves[0] = 13;
-	table[14].evolves[1] = 0;
-	table[14].evolves[2] = 0;
-	table[14].evolves[3] = 0;
-	table[14].evolves[4] = 0;
-	table[14].evolves[5] = 0;
+	// Bi "3113322113" -> Pm Pb
+	table[Bi].length = 10;
+	table[Bi].evolves[0] = Pm;
+	table[Bi].evolves[1] = Pb;
+	table[Bi].evolves[2] = 0;
+	table[Bi].evolves[3] = 0;
+	table[Bi].evolves[4] = 0;
+	table[Bi].evolves[5] = 0;
 
-	// P "311311222112" -> Ho Si
-	table[15].length = 12;
-	table[15].evolves[0] = 67;
-	table[15].evolves[1] = 14;
-	table[15].evolves[2] = 0;
-	table[15].evolves[3] = 0;
-	table[15].evolves[4] = 0;
-	table[15].evolves[5] = 0;
+	// Po "1113222113" -> Bi
+	table[Po].length = 10;
+	table[Po].evolves[0] = Bi;
+	table[Po].evolves[1] = 0;
+	table[Po].evolves[2] = 0;
+	table[Po].evolves[3] = 0;
+	table[Po].evolves[4] = 0;
+	table[Po].evolves[5] = 0;
 
-	// S "1113122112" -> P
-	table[16].length = 10;
-	table[16].evolves[0] = 15;
-	table[16].evolves[1] = 0;
-	table[16].evolves[2] = 0;
-	table[16].evolves[3] = 0;
-	table[16].evolves[4] = 0;
-	table[16].evolves[5] = 0;
+	// At "1322113" -> Po
+	table[At].length = 7;
+	table[At].evolves[0] = Po;
+	table[At].evolves[1] = 0;
+	table[At].evolves[2] = 0;
+	table[At].evolves[3] = 0;
+	table[At].evolves[4] = 0;
+	table[At].evolves[5] = 0;
 
-	// Cl "132112" -> S
-	table[17].length = 6;
-	table[17].evolves[0] = 16;
-	table[17].evolves[1] = 0;
-	table[17].evolves[2] = 0;
-	table[17].evolves[3] = 0;
-	table[17].evolves[4] = 0;
-	table[17].evolves[5] = 0;
+	// Rn "311311222113" -> Ho At
+	table[Rn].length = 12;
+	table[Rn].evolves[0] = Ho;
+	table[Rn].evolves[1] = At;
+	table[Rn].evolves[2] = 0;
+	table[Rn].evolves[3] = 0;
+	table[Rn].evolves[4] = 0;
+	table[Rn].evolves[5] = 0;
 
-	// Ar "3112" -> Cl
-	table[18].length = 4;
-	table[18].evolves[0] = 17;
-	table[18].evolves[1] = 0;
-	table[18].evolves[2] = 0;
-	table[18].evolves[3] = 0;
-	table[18].evolves[4] = 0;
-	table[18].evolves[5] = 0;
+	// Fr "1113122113" -> Rn
+	table[Fr].length = 10;
+	table[Fr].evolves[0] = Rn;
+	table[Fr].evolves[1] = 0;
+	table[Fr].evolves[2] = 0;
+	table[Fr].evolves[3] = 0;
+	table[Fr].evolves[4] = 0;
+	table[Fr].evolves[5] = 0;
 
-	// K "1112" -> Ar
-	table[19].length = 4;
-	table[19].evolves[0] = 18;
-	table[19].evolves[1] = 0;
-	table[19].evolves[2] = 0;
-	table[19].evolves[3] = 0;
-	table[19].evolves[4] = 0;
-	table[19].evolves[5] = 0;
+	// Ra "132113" -> Fr
+	table[Ra].length = 6;
+	table[Ra].evolves[0] = Fr;
+	table[Ra].evolves[1] = 0;
+	table[Ra].evolves[2] = 0;
+	table[Ra].evolves[3] = 0;
+	table[Ra].evolves[4] = 0;
+	table[Ra].evolves[5] = 0;
 
-	// Ca "12" -> K
-	table[20].length = 2;
-	table[20].evolves[0] = 19;
-	table[20].evolves[1] = 0;
-	table[20].evolves[2] = 0;
-	table[20].evolves[3] = 0;
-	table[20].evolves[4] = 0;
-	table[20].evolves[5] = 0;
+	// Ac "3113" -> Ra
+	table[Ac].length = 4;
+	table[Ac].evolves[0] = Ra;
+	table[Ac].evolves[1] = 0;
+	table[Ac].evolves[2] = 0;
+	table[Ac].evolves[3] = 0;
+	table[Ac].evolves[4] = 0;
+	table[Ac].evolves[5] = 0;
 
-	// Sc "3113112221133112" -> Ho Pa H Ca Co
-	table[21].length = 16;
-	table[21].evolves[0] = 67;
-	table[21].evolves[1] = 91;
-	table[21].evolves[2] = 1;
-	table[21].evolves[3] = 20;
-	table[21].evolves[4] = 27;
-	table[21].evolves[5] = 0;
+	// Th "1113" -> Ac
+	table[Th].length = 4;
+	table[Th].evolves[0] = Ac;
+	table[Th].evolves[1] = 0;
+	table[Th].evolves[2] = 0;
+	table[Th].evolves[3] = 0;
+	table[Th].evolves[4] = 0;
+	table[Th].evolves[5] = 0;
 
-	// Ti "11131221131112" -> Sc
-	table[22].length = 14;
-	table[22].evolves[0] = 21;
-	table[22].evolves[1] = 0;
-	table[22].evolves[2] = 0;
-	table[22].evolves[3] = 0;
-	table[22].evolves[4] = 0;
-	table[22].evolves[5] = 0;
+	// Pa "13" -> Th
+	table[Pa].length = 2;
+	table[Pa].evolves[0] = Th;
+	table[Pa].evolves[1] = 0;
+	table[Pa].evolves[2] = 0;
+	table[Pa].evolves[3] = 0;
+	table[Pa].evolves[4] = 0;
+	table[Pa].evolves[5] = 0;
 
-	// V "13211312" -> Ti
-	table[23].length = 8;
-	table[23].evolves[0] = 22;
-	table[23].evolves[1] = 0;
-	table[23].evolves[2] = 0;
-	table[23].evolves[3] = 0;
-	table[23].evolves[4] = 0;
-	table[23].evolves[5] = 0;
+	// U "3" -> Pa
+	table[U].length = 1;
+	table[U].evolves[0] = Pa;
+	table[U].evolves[1] = 0;
+	table[U].evolves[2] = 0;
+	table[U].evolves[3] = 0;
+	table[U].evolves[4] = 0;
+	table[U].evolves[5] = 0;
 
 }
