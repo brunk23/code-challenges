@@ -14,15 +14,18 @@ int main()
 	int count = 0;
 	string input = "1321131112";
 	string next = "";
+	string *inpt = &input;
+	string *buff = &next;
+	string *swp;
 	char count_c;
 	char current = '\0';
 	
 	for (int i = 0; i < 50; ++i ) {
-		next = "";	
+		*buff = "";
 		count = 0;
-		for ( unsigned int x = 0; x < input.size(); x++) {
+		for ( unsigned int x = 0; x < inpt->size(); x++) {
 
-			if( current == input[x] ) {
+			if( current == inpt->at(x) ) {
 				count++;
 			} else {
 				if( current && count ) {
@@ -40,9 +43,9 @@ int main()
 					} else {
 						cout << "ERROR";
 					}}}	 // Terminate the nested if blocks
-					next = next + count_c + current;
+					*buff = *buff + count_c + current;
 				}
-				current = input[x];
+				current = inpt->at(x);
 				count = 1;
 			}
 		}
@@ -57,13 +60,16 @@ int main()
 		} else {
 			cout << "ERROR";
 		}}}	 // Terminate the nested if blocks
-		next = next + count_c + current;
-		input = next;	
+		*buff = *buff + count_c + current;
+		// we use pointers to reduce memory copying
+		swp = inpt;
+		inpt = buff;	
+		buff = swp;
 			// cout << i << ": " << input << endl;
-		cout << i << ": " << input.size() << endl;
+		cout << i << ": " << inpt->size() << endl;
 	}
 	
-	cout << next.size() << endl;
+	cout << inpt->size() << endl;
 
 
 	return 0;
