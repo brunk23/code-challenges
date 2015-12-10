@@ -7,6 +7,10 @@ using std::cin;
 using std::endl;
 using std::string;
 
+/*
+ * Quick tool to help produce string lengths for day 10
+ * while populating the structure.
+ */
 int main()
 {
 	string input;
