@@ -17,9 +17,11 @@ int main()
 	int count = 0;
 	char passwd[PASS_SIZE] = "hxbxwxba";;
 
-	do {
-		inc_passwd(passwd);	
-	} while ( !valid_password( passwd ) );
+	for(int x = 0; x < 2; x++) {
+		do {
+			inc_passwd(passwd);	
+		} while ( !valid_password( passwd ) );
+	}
 	cout << passwd << " is the next valid password." << endl;
 
 	return 0;
