@@ -13,7 +13,7 @@ using std::size_t;
 
 const int NONE = 0;
 const int PEOPLE = 10;
-const int MYVAL = 500;		// Must be >= 41 for correct answer
+const int MYVAL = 0;
 
 void read_input(string names[PEOPLE], int happiness[PEOPLE][PEOPLE]);
 int which_person(string names[PEOPLE], string city);
@@ -25,7 +25,7 @@ int main()
 {
 	string names[PEOPLE];
 	int happiness[PEOPLE][PEOPLE];
-	int longest = INT_MIN;
+	int largest = INT_MIN;
 	int temp;
 	
 	for(int x = 0; x < PEOPLE; x++) {
@@ -37,21 +37,16 @@ int main()
 
 	read_input(names, happiness);
 
-	print_happiness_array(happiness, names);
+	// print_happiness_array(happiness, names);
 
-	for(int x = 0; x < PEOPLE; x++ ) {
-		if( names[x].compare("") != NONE  ) {
-	//		cout << "Checking " << names[x] << endl;
-			temp = largest_happiness(happiness[x],happiness, x);
-			if ( temp > longest ) {
-				longest = temp;
-			}
+	// We seat everyone around ourself
+	for(int x = 1; x < PEOPLE; ++x) {
+		temp = largest_happiness(happiness[x],happiness, 0);
+		if (temp > largest) {
+			largest = temp;
 		}
 	}	
-	
-	// We subtract 1000 to remove the +500 and +500 relationship
-	// between myself and the person next to me.
-	cout << "The longest happiness was " << (longest-2*MYVAL) << endl;
+	cout << "The largest happiness was " << largest << endl;
 
 	return 0;
 }
@@ -82,10 +77,6 @@ int largest_happiness(const int possible[PEOPLE],
 				int a,b;
 				a = possible[i];
 				b = full[i][first];
-				if ( a == 9999 )
-					a = 0;
-				if ( b == 9999 )
-					b = 0;
 				// cout << "Return [Last] a + b: " << a << 
 				//	" + " << b << " = " << a+b << endl;
 				return a+b;
@@ -93,11 +84,11 @@ int largest_happiness(const int possible[PEOPLE],
 		}
 	}
 
-	// go through each possible city, only checking ones with
-	// a happiness > 0, and find the longest.
+	// go through each possible partner, only checking ones with
+	// a happiness != 0, and find the largest.
 	for(int i = 0; i < PEOPLE; ++i) {
 		if( possible[i] != NONE ) {
-			if( first == 0 ) {
+			if( first == -1 ) {
 				first = i;
 			}
 			for(int j = 0; j < PEOPLE; ++j) {
@@ -108,9 +99,6 @@ int largest_happiness(const int possible[PEOPLE],
 				}
 			}
 			remaining = possible[i];
-			if ( remaining == 9999) {
-				remaining = 0;
-			}
 			remaining += largest_happiness(left, full, first);			
 			if( remaining > largest ) {
 				largest = remaining;
@@ -199,17 +187,6 @@ void read_input(string names[PEOPLE], int happiness[PEOPLE][PEOPLE]) {
 		}
 	 */
 
-		// We use 500 to represent the happiness if someone
-		// sits next to us. This works while the problem
-		// description says there is no gain or loss.  I don't
-		// fully understand why large numbers work here but
-		// using a small number (like 1) fails to produce the
-		// correct results.
-
-		// Other large numbers (e.g 200, 1000, etc.) also work
-		// but once we get below 41 it fails.  This probably means
-		// I approached this problem in a sub-optimal way and there
-		// is a better way to include myself.
 		if ( !((n1_spot < 0) || (n2_spot < 0)) ) {
 			happiness[n1_spot][n2_spot] += happy;
 			happiness[n1_spot][0] = MYVAL;
