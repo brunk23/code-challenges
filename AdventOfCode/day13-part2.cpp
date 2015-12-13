@@ -11,9 +11,9 @@ using std::getline;
 using std::string;
 using std::size_t;
 
-const int NONE = 0;
+const int ZERO = 0;
 const int PEOPLE = 10;
-const int MYVAL = 0;
+const int MYVAL = ZERO;
 
 void read_input(string names[PEOPLE], int happiness[PEOPLE][PEOPLE]);
 int which_person(string names[PEOPLE], string city);
@@ -30,7 +30,7 @@ int main()
 	
 	for(int x = 0; x < PEOPLE; x++) {
 		for(int y = 0; y < PEOPLE; y++) {
-			happiness[x][y] = NONE;
+			happiness[x][y] = ZERO;
 		}
 		names[x] = "";
 	}
@@ -65,7 +65,7 @@ int largest_happiness(const int possible[PEOPLE],
 
 	// copy array into one we can modify
 	for(int i = 0; i < PEOPLE; ++i) {
-		if( ( possible[i] ) != NONE  ) {
+		if( ( possible[i] ) != ZERO  ) {
 			remaining++;
 		}
 	}
@@ -73,7 +73,7 @@ int largest_happiness(const int possible[PEOPLE],
 	// if we have one remaining, return it.
 	if ( remaining < 2 ) {
 		for(int i = 0; i < PEOPLE; ++i) {
-			if( possible[i] != NONE ) {
+			if( possible[i] != ZERO ) {
 				int a,b;
 				a = possible[i];
 				b = full[i][first];
@@ -87,15 +87,15 @@ int largest_happiness(const int possible[PEOPLE],
 	// go through each possible partner, only checking ones with
 	// a happiness != 0, and find the largest.
 	for(int i = 0; i < PEOPLE; ++i) {
-		if( possible[i] != NONE ) {
+		if( possible[i] != ZERO ) {
 			if( first == -1 ) {
 				first = i;
 			}
 			for(int j = 0; j < PEOPLE; ++j) {
-				if( possible[j] != NONE ) {
+				if( possible[j] != ZERO ) {
 					left[j] = full[i][j];
 				} else {
-					left[j] = NONE;
+					left[j] = ZERO;
 				}
 			}
 			remaining = possible[i];
@@ -145,7 +145,7 @@ void read_input(string names[PEOPLE], int happiness[PEOPLE][PEOPLE]) {
 	size_t start, len;
 	
 	names[0] = "Myself";
-	happiness[0][0] = NONE;
+	happiness[0][0] = ZERO;
 
 	while( getline(cin, input) ) {
 		happy = 0;
