@@ -13,6 +13,7 @@ using std::size_t;
 
 const int NONE = 0;
 const int PEOPLE = 10;
+const int MYVAL = 500;		// Must be >= 41 for correct answer
 
 void read_input(string names[PEOPLE], int happiness[PEOPLE][PEOPLE]);
 int which_person(string names[PEOPLE], string city);
@@ -50,7 +51,7 @@ int main()
 	
 	// We subtract 1000 to remove the +500 and +500 relationship
 	// between myself and the person next to me.
-	cout << "The longest happiness was " << (longest-1000) << endl;
+	cout << "The longest happiness was " << (longest-2*MYVAL) << endl;
 
 	return 0;
 }
@@ -197,11 +198,23 @@ void read_input(string names[PEOPLE], int happiness[PEOPLE][PEOPLE]) {
 			cout << x << ": " << names[x] << endl;
 		}
 	 */
+
+		// We use 500 to represent the happiness if someone
+		// sits next to us. This works while the problem
+		// description says there is no gain or loss.  I don't
+		// fully understand why large numbers work here but
+		// using a small number (like 1) fails to produce the
+		// correct results.
+
+		// Other large numbers (e.g 200, 1000, etc.) also work
+		// but once we get below 41 it fails.  This probably means
+		// I approached this problem in a sub-optimal way and there
+		// is a better way to include myself.
 		if ( !((n1_spot < 0) || (n2_spot < 0)) ) {
 			happiness[n1_spot][n2_spot] += happy;
-			happiness[n1_spot][0] = 500;
+			happiness[n1_spot][0] = MYVAL;
 			happiness[n2_spot][n1_spot] += happy;
-			happiness[0][n1_spot] = 500;
+			happiness[0][n1_spot] = MYVAL;
 		} else {
 			cout << "ERROR, NAME NOT FOUND\n";
 		}
