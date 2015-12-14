@@ -17,6 +17,8 @@ public:
 	void setDeer(const char *, int, int, int);
 	~Deer();
 	void tick();		// 1 second goes by
+	void awardPoint();
+	int getPoints();
 	int getTotal();		// how far has the deer gone
 	const char *getName();
 
@@ -27,6 +29,7 @@ private:
 	int rest_time;
 	int remaining;
 	int total;
+	int points;
 	bool running;
 };
 
@@ -38,6 +41,7 @@ Deer::Deer()
 	rest_time = 0;
 	remaining = 0;
 	total = 0;
+	points = 0;
 	running = false;
 }
 
@@ -55,6 +59,7 @@ void Deer::setDeer(const char *n, int s, int run, int rest)
 	rest_time = rest;
 	remaining = run;	// we have this much time before break
 	total = 0;		// start at 0 distance run
+	points = 0;
 	running = true;		// start running at zero
 }
 
@@ -79,6 +84,16 @@ void Deer::tick()
 	}
 }
 
+void Deer::awardPoint()
+{
+	points++;
+}
+
+int Deer::getPoints()
+{
+	return points;
+}
+
 // return km travelled
 int Deer::getTotal()
 {
@@ -100,6 +115,8 @@ int main()
 {
 	Deer racers[RDEER];
 
+	int farthest = INT_MIN;
+
 	getinput(racers);
 
 	// test data
@@ -110,11 +127,22 @@ int main()
 		for(int y = 0; y < RDEER; ++y) {
 			racers[y].tick();
 		}
+		farthest = racers[0].getTotal();		
+		for(int y = 1; y < RDEER; ++y) {
+			if(racers[y].getTotal() > farthest) {
+				farthest = racers[y].getTotal();
+			}
+		}
+		for(int y = 0; y < RDEER; ++y) {
+			if(racers[y].getTotal() == farthest) {
+				racers[y].awardPoint();
+			}
+		}
 	}
 
 	for(int x = 0; x < RDEER; ++x) {
-		cout << racers[x].getName() << " went "
-			<< racers[x].getTotal() <<endl;
+		cout << racers[x].getName() << " got points "
+			<< racers[x].getPoints() <<endl;
 	}
 	return 0;
 }
