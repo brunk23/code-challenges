@@ -26,9 +26,10 @@ int opcode_write(machineState *sml);
 int opcode_branch(machineState *sml);
 int opcode_branch_neg(machineState *sml);
 int opcode_branch_zero(machineState *sml);
+int opcode_nop(machineState *sml);
 int opcode_halt(machineState *sml);
 int init_machine(machineState *, opPtr[]);
-void memory_dump(const machineState *sml);
+int memory_dump(machineState *sml);
 void error_message(string message);
 bool out_of_bounds(int,int,int);
 
@@ -60,6 +61,11 @@ int main()
 	smlReal.counter = 0;
 	smlReal.running = true;
 	while ( smlReal.running ) {
+		if(smlReal.counter == MEMSIZE) {
+			error_message("COUNTER OVERRAN MEMORY");
+			returnCode = 1;
+			break;
+		}
 		smlReal.instructionRegister = smlReal.memory[smlReal.counter];
 		smlReal.operationCode = smlReal.instructionRegister / 100;
 		smlReal.operand = smlReal.instructionRegister % 100;
@@ -102,6 +108,8 @@ int init_machine(machineState *sml, opPtr inst_tble[])
 	// Extended opcodes
 	inst_tble[INC]=opcode_inc;
 	inst_tble[DEC]=opcode_dec;
+	inst_tble[DUMP]=memory_dump;
+	inst_tble[NOP]=opcode_nop;
 
 	sml->accumulator = 0;
 	sml->counter = 0;
@@ -137,7 +145,7 @@ int opcode_invalid(machineState *sml)
 	return -1;
 }
 
-void memory_dump(const machineState *sml)
+int memory_dump(machineState *sml)
 {
 	cout << "\n\nREGISTERS:" << endl
 		<< setw(20) << "Accumulator" << setw(6)
@@ -165,6 +173,9 @@ void memory_dump(const machineState *sml)
 		cout << endl;
 	}
 	cout << endl;
+
+	sml->counter++;
+	return 0;
 }
 
 // add operation
@@ -304,6 +315,13 @@ int opcode_branch_zero(machineState *sml)
 	}
 	return 0;
 }
+
+int opcode_nop(machineState *sml)
+{
+	sml->counter++;
+	return 0;
+}
+
 
 int opcode_halt(machineState *sml)
 {

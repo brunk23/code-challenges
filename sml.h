@@ -8,14 +8,15 @@
 
 /*
  * Not all these opcodes were part of the original spec.
- *   Extended Opcodes Include: INC, DEC, MOD
+ *   Extended Opcodes Include: INC, DEC, MOD, DUMP, NOP
  */
 enum OPCODES {
 	READ = 10, WRITE,
 	LOAD = 20, STORE,
 	ADD = 30, SUBTRACT, DIVIDE, MULTIPLY, MOD,
 	BRANCH = 40, BRANCHNEG, BRANCHZERO, HALT,
-	INC = 60, DEC
+	INC = 60, DEC,
+	NOP = 98, DUMP
 };
 
 struct machineState {
