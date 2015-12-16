@@ -12,7 +12,6 @@ int main()
 	size_t location;
 	int value = 0;
 	string input;
-	bool possible = true;
 
 	while( getline(cin, input) ) {
 		if( (location = input.find("children: ")) != std::string::npos) {
