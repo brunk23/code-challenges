@@ -51,6 +51,8 @@ score mix_score(int spr, int but, int cho, int can, int values[4][5])
 		+ values[3][2] * can;
 	tex = values[0][3] * spr + values[1][3] * but + values[2][3] * cho
 		+ values[3][3] * can;
+	cal = values[0][4] * spr + values[1][4] * but + values[2][4] * cho
+		+ values[3][4] * can;
 	if( cap < 0 )
 		cap = 0;
 	if( dur < 0)
@@ -59,6 +61,8 @@ score mix_score(int spr, int but, int cho, int can, int values[4][5])
 		fla = 0;
 	if( tex < 0 )
 		tex = 0;
+	if( cal != 500 )
+		return 0;
 	product = cap * dur * fla * tex;
 
 	return product;
