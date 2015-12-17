@@ -63,7 +63,7 @@ int working_combo(int numbers[MAX],int current[MAX], int count) {
   int total = 0;
 
   // Get array sum
-  for(int y = 0; y < MAX; ++y) {
+  for(int y = 0; y < count; ++y) {
       total += current[y] * numbers[y];
       // cout << current[y] * numbers[y] << " ";
   }
