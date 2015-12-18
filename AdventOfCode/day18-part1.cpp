@@ -37,8 +37,8 @@ int main()
   read_data(even);
 
   for (int i = 0; i < COUNT; ++i) {
-    // print_array(curr);
-    // sleep(1);
+    print_array(curr);
+    sleep(1);
     create_next(curr, next);
     temp = curr;
     curr = next;
