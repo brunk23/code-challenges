@@ -1,0 +1,13 @@
+#!/usr/bin/dc
+[What number? ]n?[ddn[ ]n1+3%1-_1*p+3/d1<x]dsxx1p
+
+#[What number? ]n?	# prompt for a number
+# Starts a macro later named x
+#[ddn			# make two copies of the number, print one
+#[ ]n			# print a space
+#1+ 3% 1- _1*		# add 1, modulus 3, subtract 1, * -1 [direction]
+#p+				# print the direction then add it to the number
+#3/				# divide by 3
+#d 1<x			# copy new number, is it greater than 1? loop
+#]dsxx			# copy macro, save as x, and exectute it
+#1p				# print a 1 (as required)
