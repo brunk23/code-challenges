@@ -15,46 +15,37 @@ Element *read_input(Element **);
 void generate_substrings(const Element *curr, Element *start_string,
 			 const char *goal);
 void replace(int start, int len, const char *org, const char *repl, char *mod);
-int contains(Element *a, Element *b);
+bool contains(Element *a, Element *b);
+bool start_match(char *a, char *b, index);
 void print_tree(Element *a);
 
 int main()
 {
   Element *head, *curr;
-  Element *final_string;
-  Element start_string("e"), *gens;
+  Element *start_string;
+  Element final_string("e");
   
-  head = read_input( &final_string );
+  head = read_input( &start_string );
 
   curr = head;
 
   // head and curr represent possible transformations
   // start_string and gened are the generated strings
 
-  int x = 0, depth = 0, count;
+  int x = 0;
   gens = &start_string;
-  while ( contains(&start_string, final_string) < 5) {
+  while ( !contains( start_string, &final_string)) {
     while ( curr ) {
-      depth = 0;
-      while ( gens ) {
-	depth++;
-	gens = gens->getNext();
-      }
-      cout << "Depth: " << depth << endl;
-      count = 0;
       gens = &start_string;
-      while ( gens && count <= depth ) {
-	generate_substrings(curr, gens, final_string->getName());
+      while ( gens ) {
+	generate_substrings(curr, gens);
 	gens = gens->getNext();
-	++count;
       }
       curr = curr->getNext();
     }
     ++x;			// didn't make it this time
     curr = head;		// reset the conversions
   }
-
-  print_tree(&start_string);
   
   cout << endl << "Transformations: " << x << endl;
   return 0;
@@ -70,56 +61,20 @@ void print_tree(Element *a)
 }
 
 // will tell us if the list contains this element.
-int contains(Element *a, Element *b)
+bool contains(Element *a, Element *b)
 {
   Element *curr = a;
   Element *prev = a;
-  int len = 0, total = 0;
-  int maxlen = strlen( b->getName() );
   while( curr ) {
-    if( strlen( curr->getName() ) > maxlen ) {
-      if( prev != curr ) {
-	prev->setNext( curr->getNext() );
-	delete curr;
-	curr = prev;
-      }
+    if( curr == b ) {
+      return true;
     }
-    len = 0;
-    while( (curr->getName()[len] != 0) &&
-	   (b->getName()[len] != 0) ) {
-      if( curr->getName()[len] == b->getName()[len] ) {
-	++len;
-      } else {
-	break;
-      }
-    }
-    if( len > total ) {
-      total = len;
-    }
-    prev = curr;
     curr = curr->getNext();
   }
-  return total;
+  return false;
 }
 
 const int MAXINC = 10;
-
-int score(const char *a, const char *b)
-{
-  int len = 0;
-  int total = 0;
-
-  while( (a[len] != 0) &&
-	 (b[len] != 0) ) {
-    if( a[len] == b[len] ) {
-      ++len;
-    } else {
-      break;
-    }
-  }
-  
-  return total;
-}
     
 /*
  * We don't save this, if it doesn't get us closer to the goal.
@@ -127,14 +82,11 @@ int score(const char *a, const char *b)
 void generate_substrings(const Element *curr, Element *start_string,
 			 const char *goal)
 {
-  int start_score, new_score;
   char original[ strlen(start_string->getName()) +1 ];
-  char modified[ strlen(start_string->getName()) + 1 + MAXINC ];
-  char element[ 3 ];		// elements are 2 char max
+  char modified[ strlen(start_string->getName()) + 1 ];
+  char element[ MAXINC ];		// elements are 2 char max
   char replacement[ MAXINC ];
   Element *conv = curr->getConverts();
-
-  start_score=score(start_string->getName(), goal);
   
   // copy the original string in.
   int x = 0;
@@ -175,28 +127,28 @@ void generate_substrings(const Element *curr, Element *start_string,
     // and so on.
     int index = 0;
     while( original[index] ) {
-      if( element[1] ) {
-	if( (original[index + 1 ] == element[1]) &&
-	    (original[index] == element[0]) ) {
-	  // two char match
-	  replace(index, 2, original, replacement, modified);
-	  new_score = score( modified, goal );
-	  if( new_score > start_score ) {
-	    // only add strings that bring us closer
-	    *start_string + (const char *)modified;
-	  }
-	  index += 1;
-	}
-      } else {
-	if(original[index] == element[0]) {
-	  // one char match
-	  replace(index, 1, original, replacement, modified);
+      if( start_match(original, element, index) ) {
+	  // this starts a match
+	  replace(index, strlen(element), original, replacement, modified);
 	  *start_string + (const char *)modified;
-	}
+	  index += strlen - 1;
       }
       ++index;
     }
   }
+}
+
+/*
+ * Will return true if this is the start of a match
+ */
+bool start_match(char *a, char *b, index)
+{
+  int offset = 0;
+  while( b[offset] && a[index] ) {
+    if( a[index++] != b[offset++] )
+      return false;
+  }
+  return true;
 }
 
 void replace(int start, int len, const char *org, const char *repl, char *mod)
@@ -228,6 +180,8 @@ void replace(int start, int len, const char *org, const char *repl, char *mod)
 
 /*
  * This reads the input file into the crazy structure that I have.
+ * This reads the elements backwards (because we are working backwards
+ * for part 2
  */
 Element *read_input(Element **start_string)
 {
@@ -239,12 +193,12 @@ Element *read_input(Element **start_string)
     offset = input.find(" => ");
     if( offset != std::string::npos ) {
       if( start == 0 ) {
-	start = new Element( input.substr(0,offset).c_str() );
+	start = new Element( input.substr(offset + 4).c_str() );
       } else {
 	*start + input.substr(0,offset).c_str();
       }
-      start->addConverts( input.substr(0,offset).c_str(),
-			  input.substr( offset+4 ).c_str() );
+      start->addConverts( input.substr( offset + 4 ).c_str(),
+			  input.substr( 0, offset ).c_str() );
     } else {
       if( (input[0] >='A' && input[0] <= 'Z') ||
 	  (input[0] >='a' && input[0] <= 'z') ) {
