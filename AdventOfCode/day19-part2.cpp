@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unistd.h>
 
 using std::cout;
 using std::cin;
@@ -11,9 +12,11 @@ using std::getline;
 
 // Read the starting elements and the start string.
 Element *read_input(Element **);
-void generate_substrings(const Element *curr, Element *start_string);
+void generate_substrings(const Element *curr, Element *start_string,
+			 const char *goal);
 void replace(int start, int len, const char *org, const char *repl, char *mod);
 bool contains(Element *a, Element *b);
+void print_tree(Element *a);
 
 int main()
 {
@@ -28,13 +31,21 @@ int main()
   // head and curr represent possible transformations
   // start_string and gened are the generated strings
 
-  int x = 0;
+  int x = 0, depth = 0, count;
+  gens = &start_string;
   while ( !(contains(&start_string, final_string)) ) {
     while ( curr ) {
-      gens = &start_string;
+      depth = 0;
       while ( gens ) {
-	generate_substrings(curr, gens);
+	depth++;
 	gens = gens->getNext();
+      }
+      count = 0;
+      gens = &start_string;
+      while ( gens && count <= depth ) {
+	generate_substrings(curr, gens, final_string->getName());
+	gens = gens->getNext();
+	++count;
       }
       curr = curr->getNext();
     }
@@ -46,15 +57,34 @@ int main()
   return 0;
 }
 
+void print_tree(Element *a)
+{
+  Element *curr = a;
+  while( curr ) {
+    cout << curr << endl << endl;
+    curr = curr->getNext();
+  }
+}
+
 // will tell us if the list contains this element.
 bool contains(Element *a, Element *b)
 {
   Element *curr = a;
+  Element *prev = a;
+  int maxlen = strlen( b->getName() );
   while( curr ) {
+    if( strlen( curr->getName() ) > maxlen ) {
+      if( prev != curr ) {
+	prev->setNext( curr->getNext() );
+	delete curr;
+	curr = prev;
+      }
+    }
     if( *curr == *b ) {
       cout << *curr << " == " << *b << endl;
       return true;
     }
+    prev = curr;
     curr = curr->getNext();
   }
   return false;
@@ -62,14 +92,47 @@ bool contains(Element *a, Element *b)
 
 const int MAXINC = 10;
 
-void generate_substrings(const Element *curr, Element *start_string)
+int score(const char *a, const char *b)
 {
+  int x = 0;
+  int y = 0;
+  int total = 0;
+  while( true ) {
+    if( (a[x] == 0) && (b[y] == 0) ) {
+      break;
+    }
+    if( (a[x] != 0) && (b[y] != 0) ) {
+      if( a[x] > b[y] ) {
+	total += a[x++] - b[y++];
+      } else {
+	total += b[y++] - a[x++];
+      }
+    } else {
+      if( a[x] != 0 ) {
+	total += a[x++];
+      } else {
+	total += b[y++];
+      }
+    }
+  }
+  return total;
+}
+    
+/*
+ * We don't save this, if it doesn't get us closer to the goal.
+ */
+void generate_substrings(const Element *curr, Element *start_string,
+			 const char *goal)
+{
+  int start_score, new_score;
   char original[ strlen(start_string->getName()) +1 ];
   char modified[ strlen(start_string->getName()) + 1 + MAXINC ];
   char element[ 3 ];		// elements are 2 char max
   char replacement[ MAXINC ];
   Element *conv = curr->getConverts();
 
+  start_score=score(start_string->getName(), goal);
+  
   // copy the original string in.
   int x = 0;
   while( true ) {
@@ -114,7 +177,11 @@ void generate_substrings(const Element *curr, Element *start_string)
 	    (original[index] == element[0]) ) {
 	  // two char match
 	  replace(index, 2, original, replacement, modified);
-	  *start_string + (const char *)modified;
+	  new_score = score( modified, goal );
+	  if( new_score <= start_score ) {
+	    // only add strings that bring us closer
+	    *start_string + (const char *)modified;
+	  }
 	  index += 1;
 	}
       } else {

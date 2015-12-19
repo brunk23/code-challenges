@@ -17,6 +17,8 @@ class Element {
   Element *getConverts() const;
   const char *getName() const;
   void addConverts( const char *, const char * );
+  void setNext(Element *n)
+  { next = n; }
   
   // add a new element to the list, if it doesn't exist
   // already
