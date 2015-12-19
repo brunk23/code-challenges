@@ -13,7 +13,7 @@ using std::getline;
 Element *read_input(Element **);
 void generate_substrings(const Element *curr, Element *start_string);
 void replace(int start, int len, const char *org, const char *repl, char *mod);
-bool contains(const Element *a, const Element *b);
+bool contains(Element *a, Element *b);
 
 int main()
 {
@@ -29,29 +29,30 @@ int main()
   // start_string and gened are the generated strings
 
   int x = 0;
-  while ( curr ) {
-    gens = &start_string;
-    while ( gens ) {
-      generate_substrings(curr, gens);
-      gens = gens->getNext();
+  while ( !(contains(&start_string, final_string)) ) {
+    while ( curr ) {
+      gens = &start_string;
+      while ( gens ) {
+	generate_substrings(curr, gens);
+	gens = gens->getNext();
+      }
+      curr = curr->getNext();
     }
-    ++x;
-    if( contains(&start_string, final_string) ) {
-	break;			// we found the first amount
-    }
-    curr = curr->getNext();
-  } 
+    ++x;			// didn't make it this time
+    curr = head;		// reset the conversions
+  }
   
   cout << endl << "Transformations: " << x << endl;
   return 0;
 }
 
 // will tell us if the list contains this element.
-bool contains(const Element *a, const Element *b)
+bool contains(Element *a, Element *b)
 {
   Element *curr = a;
   while( curr ) {
     if( *curr == *b ) {
+      cout << *curr << " == " << *b << endl;
       return true;
     }
     curr = curr->getNext();
