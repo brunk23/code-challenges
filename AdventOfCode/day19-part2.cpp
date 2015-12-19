@@ -12,39 +12,49 @@ using std::getline;
 
 // Read the starting elements and the start string.
 Element *read_input(Element **);
+Element *sort(Element *);
 void generate_substrings(const Element *curr, Element *start_string,
-			 const char *goal);
+			 Element **next);
 void replace(int start, int len, const char *org, const char *repl, char *mod);
 bool contains(Element *a, Element *b);
-bool start_match(char *a, char *b, index);
+bool start_match(char *a, char *b, int index);
 void print_tree(Element *a);
 
 int main()
 {
-  Element *head, *curr;
-  Element *start_string;
+  Element *head=0, *curr=0, *gens=0, *next=0;
+  Element *start_string=0, *temp=0, *temp2=0;
   Element final_string("e");
   
   head = read_input( &start_string );
-
+  
   curr = head;
 
   // head and curr represent possible transformations
-  // start_string and gened are the generated strings
+  // start_string and gens are the generated strings
 
   int x = 0;
-  gens = &start_string;
-  while ( !contains( start_string, &final_string)) {
-    while ( curr ) {
-      gens = &start_string;
-      while ( gens ) {
-	generate_substrings(curr, gens);
-	gens = gens->getNext();
+  gens = start_string;
+  temp2 = gens;
+  while ( !contains( gens, &final_string)) {
+    next = 0;
+    while ( gens > 0 ) {
+      while ( curr > 0 ) {
+	generate_substrings(curr, gens, &next);
+	curr = curr->getNext();
       }
-      curr = curr->getNext();
+      curr = head;		// reset the conversions
+      gens = gens->getNext();
     }
+    curr = head;
     ++x;			// didn't make it this time
-    curr = head;		// reset the conversions
+    cout << "Generation: " << x << endl;
+
+    temp = temp2;
+    gens = next;
+    temp2 = next;
+    next = 0;
+    delete temp;
   }
   
   cout << endl << "Transformations: " << x << endl;
@@ -64,7 +74,6 @@ void print_tree(Element *a)
 bool contains(Element *a, Element *b)
 {
   Element *curr = a;
-  Element *prev = a;
   while( curr ) {
     if( curr == b ) {
       return true;
@@ -74,13 +83,13 @@ bool contains(Element *a, Element *b)
   return false;
 }
 
-const int MAXINC = 10;
+const int MAXINC = 15;
     
 /*
  * We don't save this, if it doesn't get us closer to the goal.
  */
 void generate_substrings(const Element *curr, Element *start_string,
-			 const char *goal)
+			 Element **next)
 {
   char original[ strlen(start_string->getName()) +1 ];
   char modified[ strlen(start_string->getName()) + 1 ];
@@ -128,10 +137,14 @@ void generate_substrings(const Element *curr, Element *start_string,
     int index = 0;
     while( original[index] ) {
       if( start_match(original, element, index) ) {
-	  // this starts a match
-	  replace(index, strlen(element), original, replacement, modified);
-	  *start_string + (const char *)modified;
-	  index += strlen - 1;
+	// this starts a match
+	replace(index, strlen(element), original, replacement, modified);
+	if( *next ) {
+	  *(*next) + (const char *)modified;
+	} else {
+	  *next = new Element( (const char *)modified );
+	}
+	index += strlen(element);
       }
       ++index;
     }
@@ -141,12 +154,15 @@ void generate_substrings(const Element *curr, Element *start_string,
 /*
  * Will return true if this is the start of a match
  */
-bool start_match(char *a, char *b, index)
+bool start_match(char *a, char *b, int index)
 {
   int offset = 0;
-  while( b[offset] && a[index] ) {
-    if( a[index++] != b[offset++] )
+  while( (b[offset]>0) && (a[index]>0) ) {
+    if( a[index] != b[offset] ) {
       return false;
+    }
+    index++;
+    offset++;
   }
   return true;
 }
@@ -195,7 +211,7 @@ Element *read_input(Element **start_string)
       if( start == 0 ) {
 	start = new Element( input.substr(offset + 4).c_str() );
       } else {
-	*start + input.substr(0,offset).c_str();
+	*start + input.substr(offset + 4).c_str();
       }
       start->addConverts( input.substr( offset + 4 ).c_str(),
 			  input.substr( 0, offset ).c_str() );

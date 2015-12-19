@@ -119,6 +119,7 @@ Element &Element::operator+( const char *n )
     }
     curr = curr->next;
   }
+  return *this;
 }
 
 // comparison operators (only compares names)
