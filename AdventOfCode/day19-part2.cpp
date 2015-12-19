@@ -15,7 +15,7 @@ Element *read_input(Element **);
 void generate_substrings(const Element *curr, Element *start_string,
 			 const char *goal);
 void replace(int start, int len, const char *org, const char *repl, char *mod);
-bool contains(Element *a, Element *b);
+int contains(Element *a, Element *b);
 void print_tree(Element *a);
 
 int main()
@@ -33,13 +33,14 @@ int main()
 
   int x = 0, depth = 0, count;
   gens = &start_string;
-  while ( !(contains(&start_string, final_string)) ) {
+  while ( contains(&start_string, final_string) < 5) {
     while ( curr ) {
       depth = 0;
       while ( gens ) {
 	depth++;
 	gens = gens->getNext();
       }
+      cout << "Depth: " << depth << endl;
       count = 0;
       gens = &start_string;
       while ( gens && count <= depth ) {
@@ -52,6 +53,8 @@ int main()
     ++x;			// didn't make it this time
     curr = head;		// reset the conversions
   }
+
+  print_tree(&start_string);
   
   cout << endl << "Transformations: " << x << endl;
   return 0;
@@ -67,10 +70,11 @@ void print_tree(Element *a)
 }
 
 // will tell us if the list contains this element.
-bool contains(Element *a, Element *b)
+int contains(Element *a, Element *b)
 {
   Element *curr = a;
   Element *prev = a;
+  int len = 0, total = 0;
   int maxlen = strlen( b->getName() );
   while( curr ) {
     if( strlen( curr->getName() ) > maxlen ) {
@@ -80,41 +84,40 @@ bool contains(Element *a, Element *b)
 	curr = prev;
       }
     }
-    if( *curr == *b ) {
-      cout << *curr << " == " << *b << endl;
-      return true;
+    len = 0;
+    while( (curr->getName()[len] != 0) &&
+	   (b->getName()[len] != 0) ) {
+      if( curr->getName()[len] == b->getName()[len] ) {
+	++len;
+      } else {
+	break;
+      }
+    }
+    if( len > total ) {
+      total = len;
     }
     prev = curr;
     curr = curr->getNext();
   }
-  return false;
+  return total;
 }
 
 const int MAXINC = 10;
 
 int score(const char *a, const char *b)
 {
-  int x = 0;
-  int y = 0;
+  int len = 0;
   int total = 0;
-  while( true ) {
-    if( (a[x] == 0) && (b[y] == 0) ) {
+
+  while( (a[len] != 0) &&
+	 (b[len] != 0) ) {
+    if( a[len] == b[len] ) {
+      ++len;
+    } else {
       break;
     }
-    if( (a[x] != 0) && (b[y] != 0) ) {
-      if( a[x] > b[y] ) {
-	total += a[x++] - b[y++];
-      } else {
-	total += b[y++] - a[x++];
-      }
-    } else {
-      if( a[x] != 0 ) {
-	total += a[x++];
-      } else {
-	total += b[y++];
-      }
-    }
   }
+  
   return total;
 }
     
@@ -178,7 +181,7 @@ void generate_substrings(const Element *curr, Element *start_string,
 	  // two char match
 	  replace(index, 2, original, replacement, modified);
 	  new_score = score( modified, goal );
-	  if( new_score <= start_score ) {
+	  if( new_score > start_score ) {
 	    // only add strings that bring us closer
 	    *start_string + (const char *)modified;
 	  }
