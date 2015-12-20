@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <unistd.h>
 
 using std::cout;
 using std::cin;
@@ -12,192 +11,61 @@ using std::getline;
 
 // Read the starting elements and the start string.
 Element *read_input(Element **);
-Element *sort(Element *);
-void generate_substrings(const Element *curr, Element *start_string,
-			 Element **next);
-void replace(int start, int len, const char *org, const char *repl, char *mod);
-bool contains(Element *a, Element *b);
-bool start_match(char *a, char *b, int index);
-void print_tree(Element *a);
 
 int main()
 {
-  Element *head=0, *curr=0, *gens=0, *next=0;
-  Element *start_string=0, *temp=0, *temp2=0;
-  Element final_string("e");
+  Element *head=0;
+  Element *start_string=0;
   
   head = read_input( &start_string );
-  
-  curr = head;
 
-  // head and curr represent possible transformations
-  // start_string and gens are the generated strings
+  // ok, I needed help for this one. Brute force wasn't working
+  // for the dataset I had, and I wasn't able to see the pattern
+  // r/adventofcode/comments/3xflz8/day_19_solutions/cy4etju
+  // explained it and gives the formula
+  // (total_elements - (Rn + Ar) - 2*Y - 1)
 
   int x = 0;
-  gens = start_string;
-  temp2 = gens;
-  while ( !contains( gens, &final_string)) {
-    next = 0;
-    while ( gens > 0 ) {
-      while ( curr > 0 ) {
-	generate_substrings(curr, gens, &next);
-	curr = curr->getNext();
-      }
-      curr = head;		// reset the conversions
-      gens = gens->getNext();
-    }
-    curr = head;
-    ++x;			// didn't make it this time
-    cout << "Generation: " << x << endl;
+  int total = 0;
+  int RnAr = 0;
+  int Y = 0;
+  char curr;
 
-    temp = temp2;
-    gens = next;
-    temp2 = next;
-    next = 0;
-    delete temp;
+  // loop until the end of the string
+  while ( (curr=start_string->getName()[x]) != 0) {
+    if( (curr >= 'A') && (curr <= 'Z') ) {
+      // all elements start with capital letters
+      ++total;
+      if( curr == 'Y' ) {
+	++Y;
+      }
+      if( curr == 'R' ) {
+	++RnAr;
+      }
+      if( curr == 'A' && start_string->getName()[x+1] == 'r' ) {
+	++RnAr;
+      }
+    }
+    ++x;
   }
+
+  // implement the formula given in the reddit answer, after performing
+  // the count operation above.
+  x = total - RnAr - 2*Y - 1;
   
   cout << endl << "Transformations: " << x << endl;
   return 0;
 }
 
-void print_tree(Element *a)
-{
-  Element *curr = a;
-  while( curr ) {
-    cout << curr << endl << endl;
-    curr = curr->getNext();
-  }
-}
-
-// will tell us if the list contains this element.
-bool contains(Element *a, Element *b)
-{
-  Element *curr = a;
-  while( curr ) {
-    if( curr == b ) {
-      return true;
-    }
-    curr = curr->getNext();
-  }
-  return false;
-}
-
-const int MAXINC = 15;
-    
-/*
- * We don't save this, if it doesn't get us closer to the goal.
- */
-void generate_substrings(const Element *curr, Element *start_string,
-			 Element **next)
-{
-  char original[ strlen(start_string->getName()) +1 ];
-  char modified[ strlen(start_string->getName()) + 1 ];
-  char element[ MAXINC ];		// elements are 2 char max
-  char replacement[ MAXINC ];
-  Element *conv = curr->getConverts();
-  
-  // copy the original string in.
-  int x = 0;
-  while( true ) {
-    original[x] = start_string->getName()[x];
-    if (original[x] == 0) {
-      break;
-    }
-    ++x;
-  }
-
-  // copy the search element in
-  x = 0;
-  while ( true ) {
-    element[x] = curr->getName()[x];
-    if( element[x] == 0 ) {
-      break;
-    }
-    ++x;
-  }
-
-  // while we have different ones to convert
-  while ( conv ) {
-    // copy the new string in, and set up the next loop
-    x = 0;
-    while ( true ) {
-      replacement[x] = conv->getName()[x];
-      if( replacement[x] == 0 ) {
-	break;
-      }
-      ++x;
-    }
-    conv = conv->getConverts();
-
-    // Now, search through the old string, looking for element
-    // replacing each instance of it with replacement saving that
-    // new string, then restore original, and find next element
-    // and so on.
-    int index = 0;
-    while( original[index] ) {
-      if( start_match(original, element, index) ) {
-	// this starts a match
-	replace(index, strlen(element), original, replacement, modified);
-	if( *next ) {
-	  *(*next) + (const char *)modified;
-	} else {
-	  *next = new Element( (const char *)modified );
-	}
-	index += strlen(element);
-      }
-      ++index;
-    }
-  }
-}
-
-/*
- * Will return true if this is the start of a match
- */
-bool start_match(char *a, char *b, int index)
-{
-  int offset = 0;
-  while( (b[offset]>0) && (a[index]>0) ) {
-    if( a[index] != b[offset] ) {
-      return false;
-    }
-    index++;
-    offset++;
-  }
-  return true;
-}
-
-void replace(int start, int len, const char *org, const char *repl, char *mod)
-{
-  int x = 0;
-  int y = 0;
-  while( true ) {
-    if ( x == start ) {
-      x += len; // skip over the pattern
-      while( true ) {
-	mod[y] = repl[ y - start ];
-	if( mod[y] == 0 ) {
-	  break;
-	}
-	++y;
-      }
-    }
-    mod[y] = org[x];
-    if( mod[y] == 0 ) {
-      // we have reached the end of the string
-      break;
-    }
-    // increment our pointers
-    ++x;
-    ++y;
-  }
-}
-
 
 /*
  * This reads the input file into the crazy structure that I have.
- * This reads the elements backwards (because we are working backwards
- * for part 2
+ * This reads the elements backwards (because that was my previous
+ * attempt).  At this point, my solution does not require the conversion
+ * table any more, it just needs the start string.  This reads the table
+ * anyway, because I didn't feel like reformatting this again.  I don't
+ * use the returned value, just the start_string value, in the main
+ * function
  */
 Element *read_input(Element **start_string)
 {
