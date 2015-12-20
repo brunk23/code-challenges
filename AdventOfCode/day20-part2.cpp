@@ -5,7 +5,7 @@ using std::endl;
 
 const int GOAL = 34000000;
 // Thanks to an incorrect previous answer, we know the correct
-// answer is less than 100;
+// answer is less than 1,000,000;
 const int MAX = 1000000;
 
 int visithouses(const int n,int a[MAX]);
