@@ -18,7 +18,7 @@ bool survive_fight(Item *weapon, Item *armor, Item *ring1, Item *ring2);
 
 int main()
 {
-  int total = INT_MAX;
+  int total = 0;
   int cost;
   Item weapons[5];
   Item armor[6];
@@ -51,13 +51,13 @@ int main()
     for(int a = 0; a < 6; ++a) { // cycle though each armor
       for(int r1 = 0; r1 < 7; ++r1) {
 	for(int r2 = r1+1; r2 < 8; ++r2) {
-	  if( survive_fight( &weapons[w],
+	  if( !survive_fight( &weapons[w],
 			     &armor[a],
 			     &rings[r1],
 			     &rings[r2]) ) {
 	    cost = weapons[w].cost + armor[a].cost
 	      + rings[r1].cost + rings[r2].cost;
-	    if ( cost < total ) {
+	    if ( cost > total ) {
 	      total = cost;
 	    }
 	  }
@@ -66,7 +66,7 @@ int main()
     }
   }
 
-  cout << "The cheapest amount to survive is: " << total << endl;
+  cout << "The greatest amount to still lose is: " << total << endl;
   
   return 0;
 }
