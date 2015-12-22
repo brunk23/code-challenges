@@ -295,10 +295,17 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 	  vbase++;
 	}
 	/* These always get pushed */
-	if( curr[0] == '=' ) {
+	if( curr[0] == '=' || curr[0] == '(' ) {
 	  oper[obase] = curr[0];
 	  obase++;
 	}
+	if( curr[0] == ')' ) {
+	  while( oper[--obase] != '(' ) {
+	    vbase--;
+	    iptr = gencode(oper[obase],vals,vbase,symbolTable,
+			   core,labels,iptr,&acc);
+	  }
+	} 
 	if( curr[0] == '+' || curr[0] == '-' ) {
 	  while ( oplev( oper[obase - 1] )  >= 1 ) {
 	    vbase--;
