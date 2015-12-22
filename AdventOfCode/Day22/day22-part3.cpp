@@ -3,7 +3,6 @@
 using std::cout;
 using std::endl;
 
-#define DEAD INT_MAX
 #define VERBOSE false
 #define HARDMODE true
 #define BOSSHP 55
@@ -19,7 +18,7 @@ public:
   bool isAlive() { return alive; }
   bool bossDead() { return ( bossHP <= 0); }
   int getUsed() { return usedMana; }
-
+  
 private:
   void die();
   void startTurn(const char *);
@@ -27,7 +26,6 @@ private:
   void poison();
   void recharge();
   void tick();			// will do boss turn
-  static int gameCount;
   int ourHP;
   int ourMana;
   int usedMana;
@@ -44,10 +42,7 @@ Turn::Turn()
     poisonRemain(0), rechargeRemain(0), bossHP(BOSSHP),
     bossDamage(BOSSDM), alive(true)
 {
-  gameCount++;
-  if(VERBOSE) {
-    cout << "New game (" << gameCount << ") started." << endl;
-  }
+  // Empty
 }
 
 Turn::Turn(const Turn &old)
@@ -56,21 +51,14 @@ Turn::Turn(const Turn &old)
     rechargeRemain(old.rechargeRemain), bossHP(old.bossHP),
     bossDamage(old.bossDamage), alive(old.alive)
 {
-  gameCount++;
-  if(VERBOSE) {
-    cout << "New instance of game (" << gameCount
-	 << ") started." << endl;
-  }
+  // Empty
 }
 
 Turn::~Turn()
 {
-  if(VERBOSE) {
-    cout << "Game (" << gameCount << ") ended." << endl;
-  }
-  gameCount--;
+  // Empty
 }
-  
+
 Turn &Turn::operator=(const Turn &old)
 {
   ourHP = old.ourHP;
@@ -290,7 +278,6 @@ void Turn::tick()
   }
 }
 
-int Turn::gameCount = 0;
 int run_games(Turn &curr, int level);
 
 int main()
