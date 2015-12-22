@@ -1,13 +1,12 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-#define LINESIZE 80
 #define MEMSIZE 100
 #define MAXSYMS 1000
-#define MAXOP 100
 #define OPFACT 100
 #define MAXVAL 9999
 #define MINVAL -9999
+#define SSIZE 25
 
 /*
  * Not all these opcodes were part of the original spec.
@@ -34,5 +33,8 @@ int insert_symbol(int, char, struct tableEntry[], int);
 int emessg(int, char *);
 int output_core(char *, int[]);
 int decode_line(char *,int[],int *,struct tableEntry [],struct tableEntry[]);
+int gencode(char oper, struct tableEntry vals[], int vbase,
+	      struct tableEntry syms[MAXSYMS], int code[MEMSIZE],
+	      struct tableEntry labels[MEMSIZE], int iptr);
 
 #endif

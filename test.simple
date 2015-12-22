@@ -1,0 +1,15 @@
+10 rem   calculate the squares of several integers
+20 input j
+23 rem
+25 rem   test for sentinel value
+30 if j == -9999 goto 99
+33 rem foo
+35 rem   calculate square of j and assign result to k
+40 let k = 11 - j * j + 10
+50 print k
+53 rem
+55 rem   loop to get next j
+56 end
+60 goto 20
+65 goto 33
+99 end
