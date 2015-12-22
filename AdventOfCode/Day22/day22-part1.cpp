@@ -149,7 +149,7 @@ Turn &Turn::cast(int spell)
     
   case 2:
     // Shield
-    if( ourMana < 113 ) {
+    if( ourMana < 113 || shieldRemain > 0) {
       die();
       return *this;
     }
@@ -163,7 +163,7 @@ Turn &Turn::cast(int spell)
     
   case 3:
     // Poison
-    if( ourMana < 173 ) {
+    if( ourMana < 173 || poisonRemain > 0) {
       die();
       return *this;
     }
@@ -177,7 +177,7 @@ Turn &Turn::cast(int spell)
     
   case 4:
     // recharge
-    if( ourMana < 229 ) {
+    if( ourMana < 229 || rechargeRemain > 0) {
       die();
       return *this;
     }
@@ -277,43 +277,28 @@ void Turn::tick()
 }
 
 int Turn::gameCount = 0;
-int run_games(Turn &curr);
+int run_games(Turn &curr, int level);
 
 int main()
 {
-  Turn curr;
+  Turn start, trial;
   int temp, min = INT_MAX;
   int x;
-
-  for(x = 0; x < 5; ++x) {
-    temp = run_games(curr.cast(x));
-    if( temp < min ) {
-      min = temp;
+  
+  for( x = 0; x <= 1000000; ++x) {
+    trial = start;
+    while( trial.isAlive() && !trial.bossDead() ) {
+      trial.cast( rand() % 5 );
     }
+    if( trial.isAlive() ) {
+      if( trial.getUsed() < min ) {
+	min = trial.getUsed();
+      }
+    }
+    cout << "Trial: " << x << "\tUsed: " << min << endl;
   }
 
   cout << "The minimum mana needed is: " << min << endl;
   
   return 0;
-}
-
-int run_games(Turn &curr)
-{
-  int mana, x, min = INT_MAX;
-  Turn temp;
-  
-  if( curr.bossDead() ) {
-    return curr.getUsed();
-  }
-  if( !curr.isAlive() ) {
-    return DEAD;
-  }
-  for( x = 0; x < 5; ++x) {
-    temp = curr;
-    mana = run_games(temp.cast(x));
-    if( mana < min ) {
-      min = mana;
-    }
-  }
-  return mana;
 }
