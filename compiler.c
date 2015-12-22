@@ -267,7 +267,6 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 
     /* 
      * let == assignments
-     * XXX Does not Work XXX
      */
     if( strcmp(curr, "let") == 0 ) {
       obase = 0;
@@ -336,8 +335,22 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
       return 0;
     }
 
+    /*
+     * XXXX
+     * WORKING, I would like to support expressions on both sides
+     * This could be tricky
+     * XXXX
+     */
     if( strcmp(curr, "if") == 0 ) {
-
+      if( (curr = strtok(0, " ")) && curr[0]>='a' && curr[0]<='z') {
+	vals[vbase].symbol = curr[0];
+	vals[vbase].type = 'V';
+	vbase++;
+      } else {
+	fprintf(stderr,"ERROR: Left-Hand Side must be variable:\n");
+	*instPtr = iptr;
+	return 1;
+      }
     }
     
     if( strcmp(curr, "end") == 0 ) {
