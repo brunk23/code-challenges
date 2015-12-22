@@ -5,7 +5,7 @@
 30 if j == -9999 goto 99
 33 rem foo
 35 rem   calculate square of j and assign result to k
-40 let k = 11 - j * j + 10
+40 let k = 10 + j * j
 50 print k
 53 rem
 55 rem   loop to get next j

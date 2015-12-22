@@ -122,24 +122,24 @@ int process_source(const char *filename, int core[MEMSIZE]){
 
   /*
    * Assign all data spots to locations right after the end of
-   * our code
+   * our code and fill in the missing information. We only assign
+   * memory spots for labels we use. This avoids assigning temp
+   * spots we didn't actually use.
    */
-  for( x = 0; x < MAXSYMS; ++x ) {
-    if( symbolTable[x].type == 'V' ) {
-      symbolTable[x].location = instPtr++;
-    }
-    /* Save the constants as well */
-    if( symbolTable[x].type == 'C' ) {
-      core[instPtr] = symbolTable[x].symbol;
-      symbolTable[x].location = instPtr++;
-    }
-  }
-
   for( x = 0; x < MEMSIZE; ++x ) {
     if( labels[x].type != 0 ) {
       for( dest = 0; dest < MAXSYMS; ++dest) {
 	if( symbolTable[dest].symbol == labels[x].symbol &&
 	    symbolTable[dest].type == labels[x].type ) {
+	  if( symbolTable[dest].location == -1 ) {
+	    if( symbolTable[dest].type == 'V' ) {
+	      symbolTable[dest].location = instPtr++;
+	    }
+	    if( symbolTable[dest].type == 'C' ) {
+	      core[instPtr] = symbolTable[dest].symbol;
+	      symbolTable[dest].location = instPtr++;
+	    }
+	  }
 	  core[x] += symbolTable[dest].location;
 	}
       }
@@ -168,7 +168,7 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
   struct tableEntry vals[SSIZE];
   int obase = 0;
   int vbase = 0;
-  int level = 0;
+  int acc = 0;
   
   /*
    * First we process the line number
@@ -272,6 +272,7 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
     if( strcmp(curr, "let") == 0 ) {
       obase = 0;
       vbase = 0;
+      acc = 0;
       if( (curr = strtok(0, " ")) && curr[0]>='a' && curr[0]<='z') {
 	vals[vbase].symbol = curr[0];
 	vals[vbase].type = 'V';
@@ -297,28 +298,23 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 	if( curr[0] == '=' ) {
 	  oper[obase] = curr[0];
 	  obase++;
-	  level = 0;
 	}
 	if( curr[0] == '+' || curr[0] == '-' ) {
-	  if( level >= 1 ) {
+	  while ( oplev( oper[obase - 1] )  >= 1 ) {
 	    vbase--;
-	    printf("Calling with (%c)\n",oper[obase-1]);
 	    iptr = gencode(oper[--obase],vals,vbase,symbolTable,
-			   core,labels,iptr);
+			   core,labels,iptr,&acc);
 	  }
-	  level = 1;
 	  oper[obase] = curr[0];
 	  obase++;
 	}
 	
 	if( curr[0] == '*' || curr[0] == '/' || curr[0] == '%') {
-	  if( level >= 2 ) {
-	    printf("Mult or divide\n");
+	  while( oplev( oper[ obase -1 ] ) >= 2 ) {
 	    vbase--;
 	    iptr = gencode(oper[--obase],vals,vbase,symbolTable,
-			   core,labels,iptr);
+			   core,labels,iptr,&acc);
 	  }
-	  level = 2;
 	  oper[obase] = curr[0];
 	  obase++;
 	}
@@ -326,7 +322,7 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
       while( obase > 0 ) {
 	vbase--;
 	iptr = gencode(oper[--obase],vals,vbase,symbolTable,
-		       core,labels,iptr);
+		       core,labels,iptr,&acc);
       }
       
       *instPtr = iptr;
@@ -349,142 +345,100 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 }
 
 /*
- * This is a mess.
+ * This is a mess with too many arguments, but it is needed to keep
+ * the above function from getting even crazier
  */
 int gencode(char oper, struct tableEntry vals[], int vbase,
 	    struct tableEntry syms[MAXSYMS], int code[MEMSIZE],
-	    struct tableEntry labels[MEMSIZE], int iptr)
+	    struct tableEntry labels[MEMSIZE], int iptr, int *acc)
 {
   int left, right, temp;
   char rtype, ltype;
-  rtype = vals[vbase].type;
-  ltype = vals[vbase-1].type;
+  struct tableEntry *rPtr, *lPtr;
+  if( oper != '=' ) {
+    rPtr = &vals[vbase];
+    lPtr = &vals[vbase-1];
+  } else {
+    lPtr = &vals[vbase];
+    rPtr = &vals[vbase-1];
+  }
+  rtype = rPtr->type;
+  ltype = lPtr->type;
   
   /* If both are constants, we will do the math here */
   if( rtype != 'C' || ltype != 'C' ) {
-    right = insert_symbol(vals[vbase].symbol, rtype, syms, iptr);
-    left = insert_symbol(vals[vbase-1].symbol, ltype, syms, iptr);
-    temp = insert_symbol(TEMP, 'V', syms, iptr);
+    right = insert_symbol(rPtr->symbol, rtype, syms, iptr);
+    left = insert_symbol(lPtr->symbol, ltype, syms, iptr);
+    
+    if(left == -1) {
+      labels[iptr].symbol = lPtr->symbol;
+      labels[iptr].type = ltype;
+      left = 0;
+    }
+    if( iptr > 0 && (code[iptr - 1] / OPFACT) == STORE ) {
+      /* The last command was a store, was it storing
+       * the value we are trying to load now? If so, we can
+       * write the command there instead */
+      if( labels[ iptr - 1 ].symbol == lPtr->symbol &&
+	  labels[ iptr - 1 ].type == ltype ) {
+	if( (*acc) > 0 ) {
+	  iptr--;
+	}
+      }	else {
+	code[iptr++] = (LOAD*OPFACT) + left;
+	(*acc)++;
+      }
+    } else {
+	code[iptr++] = (LOAD*OPFACT) + left;
+	(*acc)++;
+    }
+
+    if(right == -1) {
+      labels[iptr].symbol = rPtr->symbol;
+      labels[iptr].type = rtype;
+      right = 0;
+    }
+
     TEMP++;
-       
+    temp = insert_symbol(TEMP, 'V', syms, iptr);
+    
     switch( oper ) {
     case '+': /* load left, add right store temp */
-      if(left == -1) {
-	labels[iptr].symbol = vals[vbase-1].symbol;
-	labels[iptr].type = ltype;
-	left = 0;
-      }
-      code[iptr++] = (LOAD*OPFACT) + left;
-      if(right == -1) {
-	labels[iptr].symbol = vals[vbase].symbol;
-	labels[iptr].type = rtype;
-	right = 0;
-      }
       code[iptr++] = (ADD*OPFACT) + right;
-      if( temp == -1) {
-	labels[iptr].symbol = TEMP;
-	labels[iptr].type = 'V';
-	temp = 0;
-      }
-      code[iptr++] = (STORE*OPFACT) + temp;
       break;
+
     case '-': /* load left, subtract right store temp */
-      if(left == -1) {
-	labels[iptr].symbol = vals[vbase-1].symbol;
-	labels[iptr].type = ltype;
-	left = 0;
-      }
-      code[iptr++] = (LOAD*OPFACT) + left;
-      if(right == -1) {
-	labels[iptr].symbol = vals[vbase].symbol;
-	labels[iptr].type = rtype;
-	right = 0;
-      }
       code[iptr++] = (SUBTRACT*OPFACT) + right;
-      if( temp == -1) {
-	labels[iptr].symbol = TEMP;
-	labels[iptr].type = 'V';
-	temp = 0;
-      }
-      code[iptr++] = (STORE*OPFACT) + temp;
       break;
+      
     case '*': /* load left, multiply right store temp */
-      if(left == -1) {
-	labels[iptr].symbol = vals[vbase-1].symbol;
-	labels[iptr].type = ltype;
-	left = 0;
-      }
-      code[iptr++] = (LOAD*OPFACT) + left;
-      if(right == -1) {
-	labels[iptr].symbol = vals[vbase].symbol;
-	labels[iptr].type = rtype;
-	right = 0;
-      }
       code[iptr++] = (MULTIPLY*OPFACT) + right;
-      if( temp == -1) {
-	labels[iptr].symbol = TEMP;
-	labels[iptr].type = 'V';
-	temp = 0;
-      }
-      code[iptr++] = (STORE*OPFACT) + temp;
       break;
+      
     case '/': /* load left, divide right store temp */
-      if(left == -1) {
-	labels[iptr].symbol = vals[vbase-1].symbol;
-	labels[iptr].type = ltype;
-	left = 0;
-      }
-      code[iptr++] = (LOAD*OPFACT) + left;
-      if(right == -1) {
-	labels[iptr].symbol = vals[vbase].symbol;
-	labels[iptr].type = rtype;
-	right = 0;
-      }
       code[iptr++] = (DIVIDE*OPFACT) + right;
-      if( temp == -1) {
-	labels[iptr].symbol = TEMP;
-	labels[iptr].type = 'V';
-	temp = 0;
-      }
-      code[iptr++] = (STORE*OPFACT) + temp;
       break;
+      
     case '%': /* load left, mod right store temp */
-      if(left == -1) {
-	labels[iptr].symbol = vals[vbase-1].symbol;
-	labels[iptr].type = ltype;
-	left = 0;
-      }
-      code[iptr++] = (LOAD*OPFACT) + left;
-      if(right == -1) {
-	labels[iptr].symbol = vals[vbase].symbol;
-	labels[iptr].type = rtype;
-	right = 0;
-      }
-      code[iptr++] = (MOD*OPFACT) + right;
-      if( temp == -1) {
-	labels[iptr].symbol = TEMP;
-	labels[iptr].type = 'V';
-	temp = 0;
-      }
-      code[iptr++] = (STORE*OPFACT) + temp;
+      code[iptr++] = (MOD*OPFACT) + right;;
       break;
+      
     case '=': /* load right store left */
-      if(right == -1) {
-	labels[iptr].symbol = vals[vbase].symbol;
-	labels[iptr].type = rtype;
-	right = 0;
-      }
-      code[iptr++] = (LOAD*OPFACT) + right; 
-      if(left == -1) {
-	labels[iptr].symbol = vals[vbase-1].symbol;
-	labels[iptr].type = ltype;
-	left = 0;
-      }
-      code[iptr++] = (STORE*OPFACT) + left;
+      temp = right;
       break;
+      
     default:
       break;
     }
+
+    if( temp == -1) {
+      labels[iptr].symbol = TEMP;
+      labels[iptr].type = 'V';
+      temp = 0;
+    }
+    /* Save the result */
+    code[iptr++] = (STORE*OPFACT) + temp;
+
     vals[vbase-1].symbol = TEMP;
     vals[vbase-1].type = 'V';
   } else {
@@ -551,4 +505,31 @@ int insert_symbol(int symbol, char type,
 int help_menu(char *progname) {
   fprintf(stderr,"Usage: %s {sourcefile} [destination]\n",progname);
   return 0;
+}
+
+/*
+ * Utility function to help with processing expressions
+ */
+int oplev(char n) {
+  int x = 0;
+  switch (n) {
+  case '=':
+    x = 0;
+    break;
+
+  case '+':
+  case '-':
+    x = 1;
+    break;
+
+  case '*':
+  case '/':
+  case '%':
+    x = 2;
+    break;
+
+  default:
+    break;
+  }
+  return x;
 }

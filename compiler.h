@@ -35,6 +35,7 @@ int output_core(char *, int[]);
 int decode_line(char *,int[],int *,struct tableEntry [],struct tableEntry[]);
 int gencode(char oper, struct tableEntry vals[], int vbase,
 	      struct tableEntry syms[MAXSYMS], int code[MEMSIZE],
-	      struct tableEntry labels[MEMSIZE], int iptr);
+	    struct tableEntry labels[MEMSIZE], int iptr, int *);
+int oplev(char);
 
 #endif
