@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <fstream>
 
 #include "sml.h"
 
@@ -10,30 +11,9 @@ using std::endl;
 using std::getline;
 using std::setw;
 using std::string;
+using std::ifstream;
 
-int opcode_invalid(machineState *);
-int opcode_add(machineState *);
-int opcode_inc(machineState *);
-int opcode_dec(machineState *);
-int opcode_subtract(machineState *sml);
-int opcode_multiply(machineState *sml);
-int opcode_divide(machineState *sml);
-int opcode_mod(machineState *sml);
-int opcode_load(machineState *sml);
-int opcode_store(machineState *sml);
-int opcode_read(machineState *sml);
-int opcode_write(machineState *sml);
-int opcode_branch(machineState *sml);
-int opcode_branch_neg(machineState *sml);
-int opcode_branch_zero(machineState *sml);
-int opcode_nop(machineState *sml);
-int opcode_halt(machineState *sml);
-int init_machine(machineState *, opPtr[]);
-int memory_dump(machineState *sml);
-void error_message(string message);
-bool out_of_bounds(int,int,int);
-
-int main()
+int main(int argc, char *argv[])
 {
 	int returnCode = 0;
 	int input = 0;
@@ -50,14 +30,32 @@ int main()
 		cout << "ERROR: Failed to create SML Machine." << endl;
 		return 1;
 	}
-
-	while ( input != -99999 ) { 
-		cout << smlReal.counter << ": ";
-		cin >> input;
-		if ( !out_of_bounds(input,MINVAL,MAXVAL) ) {
-			smlReal.memory[smlReal.counter++] = input;
-		}
-	}		
+	if( argc > 1 ) {
+	  ifstream filename;
+	  filename.open(argv[1], std::ios::in);
+	  cout << "Opened: " << argv[1] << endl;
+	  if( !filename.is_open() ) {
+	    cout << "Unable to open file" << endl;
+	    return 1;
+	  }
+	  while( !filename.eof() ) {
+	    filename >> input;
+	    if( !out_of_bounds(input,MINVAL,MAXVAL) ) {
+	      smlReal.memory[smlReal.counter++] = input;
+	    } else {
+	      cout << "Error in file" << endl;
+	      return 1;
+	    }
+	  }
+	} else {
+	  while ( input != -99999 ) { 
+	    cout << smlReal.counter << ": ";
+	    cin >> input;
+	    if ( !out_of_bounds(input,MINVAL,MAXVAL) ) {
+	      smlReal.memory[smlReal.counter++] = input;
+	    }
+	  }
+	}
 	smlReal.counter = 0;
 	smlReal.running = true;
 	while ( smlReal.running ) {
