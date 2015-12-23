@@ -226,8 +226,12 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
 
   case EQL:
   case DNE:
+  case GT:
+  case GTE:
     /* EQL: load right, subtract left, branch zero dest
-     * DNE: load right, subtract left, branch zero ip + 2, branch dest 
+     * DNE: load right, subtract left, branch zero ip + 2, branch dest
+     * GT: load right, subtract left, branch negative dest
+     * GTE: load right, subtract left, branch neg dest, branch zero dest
      */
     rightloc = test_symbol(&right, symbolTable, labels);
     core[iptr(1)] = (LOAD*OPFACT) + rightloc;
@@ -237,12 +241,26 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
       destloc = test_symbol(&dest, symbolTable, labels);
       core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
     } else {
-      core[iptr(1)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
-      destloc = test_symbol(&dest, symbolTable, labels);
-      core[iptr(1)] = (BRANCH*OPFACT) + destloc;
+      if( oper.symbol == DNE ) {
+	core[iptr(1)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
+	destloc = test_symbol(&dest, symbolTable, labels);
+	core[iptr(1)] = (BRANCH*OPFACT) + destloc;
+      } else {
+	if( oper.symbol == GT || oper.symbol == GTE ) {
+	  destloc = test_symbol(&dest, symbolTable, labels);
+	  core[iptr(1)] = (BRANCHNEG*OPFACT) + destloc;
+	  if( oper.symbol == GTE ) {
+	    destloc = test_symbol(&dest, symbolTable, labels);
+	    core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
+	  }
+	}
+      }
     }
     break;
 
+  case LT:
+    /* load left, subtract right, branch-neg */
+    
   default:
     break;
   }
