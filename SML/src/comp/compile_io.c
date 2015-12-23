@@ -165,6 +165,11 @@ int decode_line(char *line, int core[MEMSIZE],
     test_symbol(inptPtr, symbolTable, labels);
   }
 
+  // Just in case a previous let messed with this location.
+  labels[iptr(0)].symbol = 0;
+  labels[iptr(0)].type = 0;
+  labels[iptr(0)].location = -1;
+  
   /*
    * Process the rest of the line, one token at a time.
    */
