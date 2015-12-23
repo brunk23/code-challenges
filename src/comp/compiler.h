@@ -16,7 +16,6 @@ int help_menu(char *);
 int process_source(const char *, int[]);
 int insert_symbol(int, char, struct tableEntry[], int);
 int emessg(int, char *);
-int output_core(char *, int[]);
 int decode_line(char *,int[],struct tableEntry [],struct tableEntry[]);
 int gencode(char oper, struct tableEntry vals[], int vbase,
 	      struct tableEntry syms[MAXSYMS], int code[MEMSIZE],
