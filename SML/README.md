@@ -17,12 +17,17 @@ things to complete the project in that language.  The compiler currently support
 the following commands:
 
 rem -- a comment
+
 input -- read a value from the user
+
 print -- print a value
+
 let -- variable = expression
+
 if -- variable/constant condition variable/constant
 
 expressions can consist of: +, -, \*, /, % and ( )s
+
 conditions accepted are: ==, !=, <, <=, >, >=
 
 All variables are a single letter, everything is case-sensitive (lower-case only).
