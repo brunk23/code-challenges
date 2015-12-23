@@ -20,8 +20,8 @@ int output_core(char *filename, int core[MEMSIZE]) {
   
   if( filename ) {
     if( !( dest = fopen(filename, "w")) ) {
-      fprintf(stderr,"ERROR: could not open destination file: %s\n", filename);
-      return 1;
+      currline(filename,strlen(filename)+1,-1);
+      emessg("Could not open destination file:", 1);
     }
   } else {
     dest = stdout;
@@ -41,10 +41,9 @@ int output_core(char *filename, int core[MEMSIZE]) {
 /*
  * Open and parse the source file
  */
-int process_source(const char *filename, int core[MEMSIZE]){
+int process_source(char *filename, int core[MEMSIZE]){
   FILE *source;
-  char *line = 0, *unedited = 0, *curr = 0;
-  size_t unedited_size = 0;
+  char *line = 0, *curr = 0;
   int linenumber = 0;		/* for debugging */
   size_t bytes_read;
   ssize_t status;
@@ -56,8 +55,8 @@ int process_source(const char *filename, int core[MEMSIZE]){
   int x, dest;
 
   if( !( source = fopen(filename, "r")) ) {
-    fprintf(stderr,"ERROR: could not open source file: %s\n", filename);
-    return 1;
+    currline(filename,strlen(filename)+1,-1);
+    emessg("Could not open source file", 1);
   }
   
   /*
@@ -73,32 +72,17 @@ int process_source(const char *filename, int core[MEMSIZE]){
     symbolTable[x].type = 0;
     symbolTable[x].location = -1;
   }
-
+  
   while(( status = getline(&line, &bytes_read, source)) != -1) {
     linenumber++;
     curr = strtok(line, "\n");
-    if( unedited ) {
-      if( unedited_size < bytes_read ) {
-	free(unedited);
-	unedited = malloc(bytes_read);
-	unedited_size = bytes_read;
-      }
-    } else {
-      unedited = malloc(bytes_read);
-      unedited_size = bytes_read;
-    }
-    strncpy(unedited, curr, unedited_size);
+    currline(curr, bytes_read, linenumber);
     
     if( (retcode = decode_line(curr, core, symbolTable, labels)) ) {
-      emessg(linenumber,unedited);
-      break;
-    }
-    if( iptr(0) == -1 ) {
-      fprintf(stderr,"ERROR: Out of memory.\n");
-      emessg(linenumber,unedited);
+      emessg("Failed to decode line (nonspecific)",1);
     }
   }
-
+  
   /*
    * Assign all data spots to locations right after the end of
    * our code and fill in the missing information. We only assign
@@ -129,9 +113,6 @@ int process_source(const char *filename, int core[MEMSIZE]){
   if(line) {
     free(line);
   }
-  if(unedited) {
-    free(unedited);
-  }
   return retcode;
 }
 
@@ -155,8 +136,7 @@ int decode_line(char *line, int core[MEMSIZE],
   curr = getNextToken(curr, inptPtr);
   
   if( inpt.type != 'C' ) {
-    fprintf(stderr,"\nERROR: All lines must start with a line number.\n");
-    return 1;
+    emessg("All lines must start with a line number.",1);
   } else {
     inpt.type = 'L';
     insert_symbol(inptPtr, symbolTable);
@@ -189,8 +169,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	    }
 	    core[iptr(1)] = (READ*OPFACT) + dest;
 	  } else {
-	    fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
-	    return 1;
+	    emessg("Missing/Invalid Destination",1);
 	  }
 	}
 	break;
@@ -210,8 +189,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	    }
 	    core[iptr(1)] = (WRITE*OPFACT) + dest;
 	  } else {
-	    fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
-	    return 1;
+	    emessg("Missing/Invalid Destination",1);
 	  }
 	}
 	break;
@@ -232,8 +210,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	    }
 	    core[iptr(1)] = (BRANCH*OPFACT) + dest;
 	  } else {
-	    fprintf(stderr,"ERROR: Missing/Invalid Label:\n");
-	    return 1;
+	    emessg("Missing/Invalid Label",1);
 	  }
 	}
 	break;
@@ -255,7 +232,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	if( (curr = getNextToken(0, inptPtr) ) ) {
 	  // nothing yet.
 	} else {
-	  fprintf(stderr,"ERROR: Left-Hand Side must be variable\n");
+	  emessg("Left-Hand Side must be variable",1);
 	  
 	}
 	break;
@@ -268,7 +245,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	break;
       }
     } else {
-      fprintf(stderr,"ERROR: Expected keyword\n");
+      emessg("Expected keyword",1);
     }
   }
   return 0;

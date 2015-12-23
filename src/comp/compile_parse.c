@@ -2,6 +2,7 @@
 #include "compiler.h"
 #include "compile_parse.h"
 #include "compile_utility.h"
+#include "compile_messages.h"
 
 int TEMP = 55555;
 
@@ -26,8 +27,7 @@ char *parseLet(struct Token symbolTable[MAXSYMS],
       vals[vbase].location = inpt.location;
       vbase++;
     } else {
-      fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
-      return 0;
+      emessg("Missing/Invalid Destination",1);
     }
   }
   while( (string = getNextToken(0, inptPtr)) ) {

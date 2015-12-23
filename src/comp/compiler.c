@@ -21,19 +21,16 @@ int main(int argc, char *argv[]) {
   /* PROCESS THE FILE AND GENERATE THE OUTPUT */
   if( (retcode = process_source(argv[1], core)) ) {
     /* Something went wrong processing the source code, abort */
-    fprintf(stderr,"ERROR: Compilation failed.\n");
-    return retcode;
+    emessg("Compilation failed",retcode);
   }
 
   if( argc > 2 ) {
     if( (retcode = output_core(argv[2], core)) ) {
-      fprintf(stderr,"ERROR: Saving core failed.\n");
-      return retcode;
+      emessg("Saving core failed",retcode);
     }
   } else {
     if( (retcode = output_core(0, core)) ) {
-      fprintf(stderr,"ERROR: Saving core failed.\n");
-      return retcode;
+      emessg("Saving core failed",retcode);
     }
   }
   

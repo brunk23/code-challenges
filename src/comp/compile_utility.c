@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "compiler.h"
 #include "compile_utility.h"
+#include "compile_messages.h"
 
 /* Returns 0 on failure */
 char *getNextToken(char *string, struct Token *token) {
@@ -32,12 +33,10 @@ int iptr(int delta) {
   instructionPointer += delta;
     
   if( instructionPointer < 0 ) {
-    fprintf(stderr,"ERROR: Memory underun.\n");
-    return -1;
+    emessg("Memory underun",1);
   }
   if( instructionPointer >= MEMSIZE ) {
-    fprintf(stderr,"ERROR: Memory overrun.\n");
-    return -1;
+    emessg("Memory overrun",1);
   }
   
   return temp;
@@ -168,10 +167,6 @@ int insert_symbol(struct Token *token, struct Token symbolTable[MAXSYMS]) {
       if( symbolTable[x].type == token->type ) {
 	retcode = symbolTable[x].location;
 	break;
-      } else {
-	/* This is probably a line number and constant that are
-	   conflicting here, warn anyway
-	   fprintf(stderr,"WARNING: Duplicate symbols\n"); */
       }
     }
   }
