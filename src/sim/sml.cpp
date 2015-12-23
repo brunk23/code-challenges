@@ -4,6 +4,9 @@
 #include <fstream>
 
 #include "sml.h"
+#include "sml_math.h"
+#include "sml_control.h"
+#include "sml_memory.h"
 
 using std::cin;
 using std::cout;
@@ -135,14 +138,6 @@ void error_message(string message)
 	cout << "\n\n\n";
 }
 
-// Handle trying to run an unsupported operation
-int opcode_invalid(machineState *sml)
-{
-	error_message("INVALID OPERATION CODE: MACHINE HALTED");
-	sml->running = false;
-	return -1;
-}
-
 int memory_dump(machineState *sml)
 {
 	cout << "\n\nREGISTERS:" << endl
@@ -176,177 +171,6 @@ int memory_dump(machineState *sml)
 	return 0;
 }
 
-// add operation
-int opcode_add(machineState *sml)
-{
-	sml->counter++;		// increment the instruction counter	
-	sml->accumulator += sml->memory[sml->operand];
-	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
-	return 0;
-}
-
-// load operation
-int opcode_load(machineState *sml)
-{
-	sml->counter++;		// increment the instruction counter	
-	sml->accumulator = sml->memory[sml->operand];
-	return 0;
-}
-
-// store operation
-int opcode_store(machineState *sml)
-{
-	sml->counter++;		// increment the instruction counter	
-	sml->memory[sml->operand] = sml->accumulator;
-	return 0;
-}
-
-// subtract operation
-int opcode_subtract(machineState *sml)
-{
-	sml->counter++;		// increment the instruction counter	
-	sml->accumulator -= sml->memory[sml->operand];
-	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
-	return 0;
-}
-
 bool out_of_bounds(int n,int min, int max) {
 	return ( (n > max) || (n < min) );
-}
-
-// simple operation
-int opcode_read(machineState *sml)
-{
-	int input = -99999;
-	sml->counter++;		// increment the instruction counter	
-	while ( out_of_bounds(input, MINVAL, MAXVAL) ) {
-		cout << "? ";
-		cin >> input;
-		if (out_of_bounds(input, MINVAL, MAXVAL)) {
-			cout << "That is not a valid number.\n"
-				<< "-9999 to 9999";
-		}
-	}
-	sml->memory[sml->operand] = input;
-	// memory_dump(sml);
-	return 0;
-}
-
-int opcode_write(machineState *sml)
-{
-	sml->counter++;		// incremement the instruction counter
-	cout << sml->memory[sml->operand] << "  ";
-	return 0;
-}
-
-// simple operation
-int opcode_multiply(machineState *sml)
-{
-	sml->counter++;		// increment the instruction counter	
-	sml->accumulator *= sml->memory[sml->operand];
-	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
-	return 0;
-}
-
-// division operation
-int opcode_divide(machineState *sml)
-{
-	if ( sml->memory[sml->operand] == 0 ) {
-		error_message("DIVIDE BY ZERO: MACHINE HALTED");
-		sml->running = false;
-		return -1;
-	}
-	sml->counter++;		// increment the instruction counter	
-	sml->accumulator /= sml->memory[sml->operand];
-	return 0;
-}
-
-// provide the modulus operation
-int opcode_mod(machineState *sml)
-{
-	if ( sml->memory[sml->operand] == 0 ) {
-		error_message("DIVIDE BY ZERO: MACHINE HALTED");
-		sml->running = false;
-		return -1;
-	}
-	sml->counter++;		// increment the instruction counter	
-	sml->accumulator %= sml->memory[sml->operand];
-	return 0;
-}
-
-// branch operation
-int opcode_branch(machineState *sml)
-{
-	// Just change the counter, we're going to a different spot.
-	sml->counter = sml->operand;
-	return 0;
-}
-
-int opcode_branch_neg(machineState *sml)
-{
-	if( sml->accumulator < 0 ) {	
-		sml->counter = sml->operand;
-	} else {
-		sml->counter++;
-	}
-	return 0;
-}
-
-int opcode_branch_zero(machineState *sml)
-{
-	if( sml->accumulator == 0 ) {	
-		sml->counter = sml->operand;
-	} else {
-		sml->counter++;
-	}
-	return 0;
-}
-
-int opcode_nop(machineState *sml)
-{
-	sml->counter++;
-	return 0;
-}
-
-
-int opcode_halt(machineState *sml)
-{
-	sml->running = false;
-	return sml->memory[sml->operand];
-}
-
-int opcode_inc(machineState *sml)
-{
-	sml->counter++;
-	sml->memory[sml->operand]++;
-	if( out_of_bounds(sml->memory[sml->operand], MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
-	return 0;
-}
-
-int opcode_dec(machineState *sml)
-{
-	sml->counter++;
-	sml->memory[sml->operand]--;
-	if( out_of_bounds(sml->memory[sml->operand], MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
-	return 0;
 }
