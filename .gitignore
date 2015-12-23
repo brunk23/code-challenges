@@ -2,3 +2,5 @@
 a.out
 *.core
 *.swp
+sml_comp
+sml_sim
