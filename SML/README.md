@@ -1,6 +1,6 @@
 SML
 
-This is the SML (Simpltron Machine Language) simulator and compiler that
+This is the SML (Simpletron Machine Language) simulator and compiler that
 I have created.  It is based on the model suggested by Deital and Deital
 in their book.  I have made some extensions to the language and might make
 more.
