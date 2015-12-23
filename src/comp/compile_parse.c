@@ -233,23 +233,36 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
      * GT: load right, subtract left, branch negative dest
      * GTE: load right, subtract left, branch neg dest, branch zero dest
      */
+
+    /* load right */
     rightloc = test_symbol(&right, symbolTable, labels);
     core[iptr(1)] = (LOAD*OPFACT) + rightloc;
+
+    /* subtract left */
     leftloc = test_symbol(&left, symbolTable, labels);
     core[iptr(1)] = (SUBTRACT*OPFACT) + leftloc;
+
     if( oper.symbol == EQL ) {
+      /* if zero, we branch because they were equal */
       destloc = test_symbol(&dest, symbolTable, labels);
       core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
     } else {
+      
       if( oper.symbol == DNE ) {
+	/* here we skip one instruction, if they were equal */
 	core[iptr(1)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
+	/* if we get here, they weren't equal, so unconditional branch */
 	destloc = test_symbol(&dest, symbolTable, labels);
 	core[iptr(1)] = (BRANCH*OPFACT) + destloc;
       } else {
+	
 	if( oper.symbol == GT || oper.symbol == GTE ) {
+	  /* if the result was negative, left was greater than right */
 	  destloc = test_symbol(&dest, symbolTable, labels);
 	  core[iptr(1)] = (BRANCHNEG*OPFACT) + destloc;
+	  
 	  if( oper.symbol == GTE ) {
+	    /* if it wasn't GT, we check if they were equal */
 	    destloc = test_symbol(&dest, symbolTable, labels);
 	    core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
 	  }
@@ -259,7 +272,25 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
     break;
 
   case LT:
-    /* load left, subtract right, branch-neg */
+  case LTE:
+    /* load left value */
+    leftloc = test_symbol(&left, symbolTable, labels);
+    core[iptr(1)] = (LOAD*OPFACT) + leftloc;
+
+    /* subtract right value */
+    rightloc = test_symbol(&right, symbolTable, labels);
+    core[iptr(1)] = (SUBTRACT*OPFACT) + rightloc;
+
+    /* branch negative (left was less than right) */
+    destloc = test_symbol(&dest, symbolTable, labels);
+    core[iptr(1)] = (BRANCHNEG*OPFACT) + destloc;
+
+    /* if LTE, we also branch if zero */
+    if( oper.symbol == LTE ) {
+      destloc = test_symbol(&dest, symbolTable, labels);
+      core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
+    }
+    break;
     
   default:
     break;

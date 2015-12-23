@@ -126,7 +126,7 @@ int str2token(const char *string, struct Token *token)
       if( string[1] == '=' ) {
 	symbol = LTE;
       } else {
-	symbol = GTE;
+	symbol = LT;
       }
       break;
 
