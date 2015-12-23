@@ -72,7 +72,10 @@ int process_source(char *filename, int core[MEMSIZE]){
     symbolTable[x].type = 0;
     symbolTable[x].location = -1;
   }
-  
+
+  /*
+   * This is the first pass of the compiler.
+   */
   while(( status = getline(&line, &bytes_read, source)) != -1) {
     linenumber++;
     curr = strtok(line, "\n");
@@ -87,7 +90,8 @@ int process_source(char *filename, int core[MEMSIZE]){
    * Assign all data spots to locations right after the end of
    * our code and fill in the missing information. We only assign
    * memory spots for labels we use. This avoids assigning temp
-   * spots we didn't actually use.
+   * spots we didn't actually use.  This is the second pass of the
+   * compiler
    */
   for( x = 0; x < MEMSIZE; ++x ) {
     

@@ -12,7 +12,7 @@
 
 /* Returns 0 on failure */
 char *getNextToken(char *string, struct Token *token) {
-  if( (string = strtok( string, " " ) ) ) {
+  if( (string = strtok( string, " \t" ) ) ) {
     str2token(string, token);
   }
   return string;

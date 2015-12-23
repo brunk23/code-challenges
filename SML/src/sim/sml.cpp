@@ -72,7 +72,12 @@ int main(int argc, char *argv[])
 		smlReal.operand = smlReal.instructionRegister % OPFACT;
 		returnCode=instruction_table[smlReal.operationCode](sml);
 	}
-	memory_dump(sml);
+	if( argc == 1 ) {
+	  // we only dump the memory if we input the file by hand.
+	  memory_dump(sml);
+	} else {
+	  cout << endl << endl;
+	}
 	return returnCode;
 }
 
