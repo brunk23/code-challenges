@@ -223,18 +223,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	break;
 
       case IF:
-	/*
-	 * XXXX
-	 * WORKING, I would like to support expressions on both sides
-	 * This could be tricky
-	 * XXXX
-	 */
-	if( (curr = getNextToken(0, inptPtr) ) ) {
-	  // nothing yet.
-	} else {
-	  emessg("Left-Hand Side must be variable",1);
-	  
-	}
+	curr = parseIf(symbolTable, labels, core) {
 	break;
 
       case END:

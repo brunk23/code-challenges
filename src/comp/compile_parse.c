@@ -201,3 +201,75 @@ int gencode(char oper, struct Token vals[], int vbase,
   }
   return 0;
 }
+
+char *parseIf(struct Token symbolTable[MAXSYMS],
+	       struct Token labels[MEMSIZE], int core[MEMSIZE]) {
+  struct Token left, oper, right, gt, dest;
+  char *string;  
+
+  /*
+   * For the moment, all conitionals must be in the following
+   * format:
+   * TOKEN EQOP TOKEN goto ADDRESS
+   */
+  string = getNextToken( 0, &left);
+  string = getNextToken( 0, &oper);
+  string = getNextToken( 0, &right);
+  string = getNextToken( 0, &gt);
+  string = getNextToken( 0, &dest);
+
+  if( !string || gt.symbol != GOTO || dest.type != 'C' ) {
+    emessg("Conditional Parse Error",1);
+  }
+  dest.type = 'L';		/* Make dest a line number */
+
+  leftloc = insert_symbol(&left, symbolTable);
+  rightloc = insert_symbol(&right, symbolTable);
+  destloc = insert_symbol(&dest, symbolTable);
+  
+  switch (oper.symbol) {
+
+  case EQL:
+  case DNE:
+    /* EQL: load right, subtract left, branch zero dest
+     * DNE: load right, subtract left, branch zero ip + 2, branch dest 
+     */
+    if( rightloc == -1 ) {
+      labels[iptr(0)].symbol = right.symbol;
+      labels[iptr(0)].type = right.type;
+      labels[iptr(0)].location = -1;
+      rightloc = 0;
+    }
+    core[iptr(1)] = (LOAD*OPFACT) + rightloc;
+    if( leftloc == -1 ) {
+      labels[iptr(0)].symbol = left.symbol;
+      labels[iptr(0)].type = left.type;
+      labels[iptr(0)].location = -1;
+      leftloc = 0;
+    }
+    core[iptr(1)] = (SUBTRACT*OPFACT) + leftloc;
+    if( oper.symbol == EQL ) {
+      if( destloc == -1 ) {
+	labels[iptr(0)].symbol = dest.symbol;
+	labels[iptr(0)].type = dest.type;
+	labels[iptr(0)].location = -1;
+	destloc = 0;
+      }
+      core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
+    } else {
+      core[iptr(1)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
+      if( destloc == -1 ) {
+	labels[iptr(0)].symbol = dest.symbol;
+	labels[iptr(0)].type = dest.type;
+	labels[iptr(0)].location = -1;
+	destloc = 0;
+      }
+      core[iptr(1)] = (BRANCH*OPFACT) + destloc;
+    }
+    break;
+
+  default:
+    break;
+  }
+  return string;
+}

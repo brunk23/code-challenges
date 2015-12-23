@@ -72,23 +72,19 @@ int oplev(char n) {
 int str2token(const char *string, struct Token *token)
 {
   int symbol = 0;
-  if( (string[0] == '-' && string[1] == 0) ||
-      string[0] == '+' || string[0] == '*' ||
-      string[0] == '/' || string[0] == '%' ||
-      string[0] == '(' || string[0] == ')' ||
-      string[0] == '=' ) {
-    token->symbol = string[0];
-    token->type = 'M';		/* math operation */
-    token->location = -1;
-    return 0;
-  }
   if( (strcmp(string,"let") == 0) ||
       (strcmp(string,"rem") == 0) ||
       (strcmp(string,"goto") == 0) ||
       (strcmp(string,"input") == 0) ||
       (strcmp(string,"print") == 0) ||
       (strcmp(string,"if") == 0) ||
-      (strcmp(string,"end") == 0) ) {
+      (strcmp(string,"end") == 0) ||
+      (strcmp(string,"==") == 0) ||
+      (strcmp(string,"!=") == 0) ||
+      (strcmp(string,">=") == 0) ||
+      (strcmp(string,">") == 0) ||
+      (strcmp(string,"<=") == 0) ||
+      (strcmp(string,"<") == 0) ) {
     switch ( string[0] ) {
     case 'l':
       symbol = LET;
@@ -118,11 +114,46 @@ int str2token(const char *string, struct Token *token)
       symbol = END;
       break;
 
+    case '!':
+      symbol = DNE;
+      break;
+
+    case '=':
+      symbol = EQL;
+      break;
+
+    case '<':
+      if( string[1] == '=' ) {
+	symbol = LTE;
+      } else {
+	symbol = GTE;
+      }
+      break;
+
+    case '>':
+      if( string[1] == '=' ) {
+	symbol = GTE;
+      } else {
+	symbol = GT;
+      }
+      break;
+	 
     default:
       break;
     }
     token->symbol = symbol;
     token->type = 'K';		/* K-eyword */
+    token->location = -1;
+    return 0;
+  }
+
+  if( (string[0] == '-' && string[1] == 0) ||
+      string[0] == '+' || string[0] == '*' ||
+      string[0] == '/' || string[0] == '%' ||
+      string[0] == '(' || string[0] == ')' ||
+      string[0] == '=' ) {
+    token->symbol = string[0];
+    token->type = 'M';		/* M-ath operation */
     token->location = -1;
     return 0;
   }
