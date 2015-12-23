@@ -5,6 +5,7 @@
 #define MAXOP 100
 #define MAXVAL 9999
 #define MINVAL -9999
+#define OPFACT 100
 
 /*
  * Not all these opcodes were part of the original spec.

@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
   return retcode;
 }
 
+
 int output_core(char *filename, int core[MEMSIZE]) {
   FILE *dest = 0;
   int x = 0;
@@ -73,7 +74,7 @@ int process_source(const char *filename, int core[MEMSIZE]){
   // allow up to 10 symbols per memory spot in the machine
   struct tableEntry symbolTable[MAXSYMS];
   struct tableEntry labels[MEMSIZE];
-  int instPtr = 0, retcode = 0;
+  int retcode = 0;
   int x, symbol, dest;
 
   if( !( source = fopen(filename, "r")) ) {
@@ -110,11 +111,11 @@ int process_source(const char *filename, int core[MEMSIZE]){
     }
     strncpy(unedited, curr, unedited_size);
     
-    if( retcode = decode_line(curr, core, &instPtr, symbolTable, labels) ) {
+    if( retcode = decode_line(curr, core, symbolTable, labels) ) {
       emessg(linenumber,unedited);
       break;
     }
-    if( instPtr == MEMSIZE ) {
+    if( iptr(0) == -1 ) {
       fprintf(stderr,"ERROR: Out of memory.\n");
       emessg(linenumber,unedited);
     }
@@ -133,11 +134,11 @@ int process_source(const char *filename, int core[MEMSIZE]){
 	    symbolTable[dest].type == labels[x].type ) {
 	  if( symbolTable[dest].location == -1 ) {
 	    if( symbolTable[dest].type == 'V' ) {
-	      symbolTable[dest].location = instPtr++;
+	      symbolTable[dest].location = iptr(1);
 	    }
 	    if( symbolTable[dest].type == 'C' ) {
-	      core[instPtr] = symbolTable[dest].symbol;
-	      symbolTable[dest].location = instPtr++;
+	      core[iptr(0)] = symbolTable[dest].symbol;
+	      symbolTable[dest].location = iptr(1);
 	    }
 	  }
 	  core[x] += symbolTable[dest].location;
@@ -156,13 +157,13 @@ int process_source(const char *filename, int core[MEMSIZE]){
   return retcode;
 }
 
-int decode_line(char *line, int core[MEMSIZE], int *instPtr,
+int decode_line(char *line, int core[MEMSIZE], 
 		struct tableEntry symbolTable[MAXSYMS],
 		struct tableEntry labels[MEMSIZE])
 {
   char *curr = line;
   ssize_t status;
-  int symbol, dest, iptr = *instPtr;
+  int symbol, dest;
 
   char oper[SSIZE];
   struct tableEntry vals[SSIZE];
@@ -176,11 +177,10 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
   curr = strtok(curr, " ");
   if( !(curr[0]>='0' && (curr[0]<='9')) ) {
     fprintf(stderr,"\nERROR: All lines must start with a line number.\n");
-    *instPtr = iptr;
     return 1;
   } else {
     symbol = strtol(curr, 0, 10);
-    insert_symbol(symbol, 'L', symbolTable, iptr);      
+    insert_symbol(symbol, 'L', symbolTable, iptr(0));      
   }
 
   
@@ -193,7 +193,6 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
      * rem == comments
      */
     if( strcmp(curr, "rem") == 0 ) {
-      *instPtr = iptr;
       return 0;
     }
 
@@ -203,19 +202,17 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
     if( strcmp(curr, "input") == 0 ) {
       if( (curr = strtok(0, " ")) && curr[0]>='a' && curr[0]<='z') {
 	symbol = curr[0];
-	dest = insert_symbol(symbol, 'V', symbolTable, iptr);
+	dest = insert_symbol(symbol, 'V', symbolTable, iptr(0));
 	if( dest == -1 ) {
-	  labels[iptr].symbol = symbol;
-	  labels[iptr].type = 'V';
+	  labels[iptr(0)].symbol = symbol;
+	  labels[iptr(0)].type = 'V';
 	  dest = 0;
 	}
-	core[iptr++] = (READ*OPFACT) + dest;
+	core[iptr(1)] = (READ*OPFACT) + dest;
       } else {
 	fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
-	*instPtr = iptr;
 	return 1;
       }
-      *instPtr = iptr;
       return 0;
     }
 
@@ -225,19 +222,17 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
     if( strcmp(curr, "print") == 0 ) {
       if( (curr = strtok(0, " ")) && curr[0]>='a' && curr[0]<='z') {
 	symbol = curr[0];
-	dest = insert_symbol(symbol, 'V', symbolTable, iptr);
+	dest = insert_symbol(symbol, 'V', symbolTable, iptr(0));
 	if( dest == -1 ) {
-	  labels[iptr].symbol = symbol;
-	  labels[iptr].type = 'V';
+	  labels[iptr(0)].symbol = symbol;
+	  labels[iptr(0)].type = 'V';
 	  dest = 0;
 	}
-	core[iptr++] = (WRITE*OPFACT) + dest;
+	core[iptr(1)] = (WRITE*OPFACT) + dest;
       } else {
 	fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
-	*instPtr = iptr;
 	return 1;
       }
-      *instPtr = iptr;
       return 0;
     }
 
@@ -248,20 +243,18 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
       if( (curr = strtok(0, " ")) ) {
 	if( (curr[0]>='0') && (curr[0]<='9') ) {
 	  symbol = strtol(curr, 0, 10);
-	  dest = insert_symbol(symbol, 'L', symbolTable, iptr);
+	  dest = insert_symbol(symbol, 'L', symbolTable, iptr(0));
 	  if( dest == -1 ) {
-	    labels[iptr].symbol = symbol;
-	    labels[iptr].type = 'L';
+	    labels[iptr(0)].symbol = symbol;
+	    labels[iptr(0)].type = 'L';
 	    dest = 0;
 	  }
-	  core[iptr++] = (BRANCH*OPFACT) + dest;
+	  core[iptr(1)] = (BRANCH*OPFACT) + dest;
 	} else {
 	  fprintf(stderr,"ERROR: Missing/Invalid Label:\n");
-	  *instPtr = iptr;
 	  return 1;
 	}
       }
-      *instPtr = iptr;
       return 0;
     }
 
@@ -278,7 +271,6 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 	vbase++;
       } else {
 	fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
-	*instPtr = iptr;
 	return 1;
       }
       
@@ -301,15 +293,15 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 	if( curr[0] == ')' ) {
 	  while( oper[--obase] != '(' ) {
 	    vbase--;
-	    iptr = gencode(oper[obase],vals,vbase,symbolTable,
-			   core,labels,iptr,&acc);
+	    gencode(oper[obase],vals,vbase,symbolTable,
+			   core,labels,&acc);
 	  }
 	} 
 	if( curr[0] == '+' || curr[0] == '-' ) {
 	  while ( oplev( oper[obase - 1] )  >= 1 ) {
 	    vbase--;
-	    iptr = gencode(oper[--obase],vals,vbase,symbolTable,
-			   core,labels,iptr,&acc);
+	    gencode(oper[--obase],vals,vbase,symbolTable,
+			   core,labels,&acc);
 	  }
 	  oper[obase] = curr[0];
 	  obase++;
@@ -318,8 +310,8 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 	if( curr[0] == '*' || curr[0] == '/' || curr[0] == '%') {
 	  while( oplev( oper[ obase -1 ] ) >= 2 ) {
 	    vbase--;
-	    iptr = gencode(oper[--obase],vals,vbase,symbolTable,
-			   core,labels,iptr,&acc);
+	    gencode(oper[--obase],vals,vbase,symbolTable,
+			   core,labels,&acc);
 	  }
 	  oper[obase] = curr[0];
 	  obase++;
@@ -327,11 +319,10 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
       }
       while( obase > 0 ) {
 	vbase--;
-	iptr = gencode(oper[--obase],vals,vbase,symbolTable,
-		       core,labels,iptr,&acc);
+	gencode(oper[--obase],vals,vbase,symbolTable,
+		       core,labels,&acc);
       }
       
-      *instPtr = iptr;
       return 0;
     }
 
@@ -348,19 +339,16 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
 	vbase++;
       } else {
 	fprintf(stderr,"ERROR: Left-Hand Side must be variable:\n");
-	*instPtr = iptr;
 	return 1;
       }
     }
     
     if( strcmp(curr, "end") == 0 ) {
-      core[iptr++] = (HALT*OPFACT);
-      *instPtr = iptr;
+      core[iptr(1)] = (HALT*OPFACT);
       return 0;
     }
   }
 
-  *instPtr = iptr;
   return 0;
 }
 
@@ -370,7 +358,7 @@ int decode_line(char *line, int core[MEMSIZE], int *instPtr,
  */
 int gencode(char oper, struct tableEntry vals[], int vbase,
 	    struct tableEntry syms[MAXSYMS], int code[MEMSIZE],
-	    struct tableEntry labels[MEMSIZE], int iptr, int *acc)
+	    struct tableEntry labels[MEMSIZE], int *acc)
 {
   int left, right, temp;
   char rtype, ltype;
@@ -387,60 +375,60 @@ int gencode(char oper, struct tableEntry vals[], int vbase,
   
   /* If both are constants, we will do the math here */
   if( rtype != 'C' || ltype != 'C' ) {
-    right = insert_symbol(rPtr->symbol, rtype, syms, iptr);
-    left = insert_symbol(lPtr->symbol, ltype, syms, iptr);
+    right = insert_symbol(rPtr->symbol, rtype, syms, iptr(0));
+    left = insert_symbol(lPtr->symbol, ltype, syms, iptr(0));
     
     if(left == -1) {
-      labels[iptr].symbol = lPtr->symbol;
-      labels[iptr].type = ltype;
+      labels[iptr(0)].symbol = lPtr->symbol;
+      labels[iptr(0)].type = ltype;
       left = 0;
     }
-    if( iptr > 0 && (code[iptr - 1] / OPFACT) == STORE ) {
+    if( iptr(0) > 0 && (code[iptr(0) - 1] / OPFACT) == STORE ) {
       /* The last command was a store, was it storing
        * the value we are trying to load now? If so, we can
        * write the command there instead */
-      if( labels[ iptr - 1 ].symbol == lPtr->symbol &&
-	  labels[ iptr - 1 ].type == ltype ) {
+      if( labels[ iptr(0) - 1 ].symbol == lPtr->symbol &&
+	  labels[ iptr(0) - 1 ].type == ltype ) {
 	if( (*acc) > 0 ) {
-	  iptr--;
+	  iptr(-1);
 	}
       }	else {
-	code[iptr++] = (LOAD*OPFACT) + left;
+	code[iptr(1)] = (LOAD*OPFACT) + left;
 	(*acc)++;
       }
     } else {
-	code[iptr++] = (LOAD*OPFACT) + left;
+	code[iptr(1)] = (LOAD*OPFACT) + left;
 	(*acc)++;
     }
 
     if(right == -1) {
-      labels[iptr].symbol = rPtr->symbol;
-      labels[iptr].type = rtype;
+      labels[iptr(0)].symbol = rPtr->symbol;
+      labels[iptr(0)].type = rtype;
       right = 0;
     }
 
     TEMP++;
-    temp = insert_symbol(TEMP, 'V', syms, iptr);
+    temp = insert_symbol(TEMP, 'V', syms, iptr(0));
     
     switch( oper ) {
     case '+': /* load left, add right store temp */
-      code[iptr++] = (ADD*OPFACT) + right;
+      code[iptr(1)] = (ADD*OPFACT) + right;
       break;
 
     case '-': /* load left, subtract right store temp */
-      code[iptr++] = (SUBTRACT*OPFACT) + right;
+      code[iptr(1)] = (SUBTRACT*OPFACT) + right;
       break;
       
     case '*': /* load left, multiply right store temp */
-      code[iptr++] = (MULTIPLY*OPFACT) + right;
+      code[iptr(1)] = (MULTIPLY*OPFACT) + right;
       break;
       
     case '/': /* load left, divide right store temp */
-      code[iptr++] = (DIVIDE*OPFACT) + right;
+      code[iptr(1)] = (DIVIDE*OPFACT) + right;
       break;
       
     case '%': /* load left, mod right store temp */
-      code[iptr++] = (MOD*OPFACT) + right;;
+      code[iptr(1)] = (MOD*OPFACT) + right;;
       break;
       
     case '=': /* load right store left */
@@ -452,12 +440,12 @@ int gencode(char oper, struct tableEntry vals[], int vbase,
     }
 
     if( temp == -1) {
-      labels[iptr].symbol = TEMP;
-      labels[iptr].type = 'V';
+      labels[iptr(0)].symbol = TEMP;
+      labels[iptr(0)].type = 'V';
       temp = 0;
     }
     /* Save the result */
-    code[iptr++] = (STORE*OPFACT) + temp;
+    code[iptr(1)] = (STORE*OPFACT) + temp;
 
     vals[vbase-1].symbol = TEMP;
     vals[vbase-1].type = 'V';
@@ -482,7 +470,7 @@ int gencode(char oper, struct tableEntry vals[], int vbase,
       break;
     }
   }
-  return iptr;
+  return 0;
 }
   
 int emessg(int linenumber, char *unedited) {
@@ -493,7 +481,7 @@ int emessg(int linenumber, char *unedited) {
  * returns location if symbol exists
  */
 int insert_symbol(int symbol, char type,
-		  struct tableEntry symbolTable[MAXSYMS], int instPtr) {
+		  struct tableEntry symbolTable[MAXSYMS], int not) {
   int x, retcode;
   for( x = 0; x < MAXSYMS; ++x ) {
     if( symbolTable[x].type == 0 ) {
@@ -501,7 +489,7 @@ int insert_symbol(int symbol, char type,
       symbolTable[x].symbol = symbol;
       symbolTable[x].type = type;
       if( type == 'L' ) {
-	symbolTable[x].location = instPtr;
+	symbolTable[x].location = iptr(0);
       } else {
 	symbolTable[x].location = -1;
       }

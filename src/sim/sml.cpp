@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
 			break;
 		}
 		smlReal.instructionRegister = smlReal.memory[smlReal.counter];
-		smlReal.operationCode = smlReal.instructionRegister / 100;
-		smlReal.operand = smlReal.instructionRegister % 100;
+		smlReal.operationCode = smlReal.instructionRegister / OPFACT;
+		smlReal.operand = smlReal.instructionRegister % OPFACT;
 		returnCode=instruction_table[smlReal.operationCode](sml);
 	}
 	memory_dump(sml);
