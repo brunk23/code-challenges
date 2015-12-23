@@ -10,11 +10,11 @@ int opcode_add(machineState *sml)
 {
 	sml->counter++;		// increment the instruction counter	
 	sml->accumulator += sml->memory[sml->operand];
-	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
+	//if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
+	//	sml->running = false;
+	//	error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
+	//	return 1;
+	//}
 	return 0;
 }
 
@@ -23,11 +23,11 @@ int opcode_subtract(machineState *sml)
 {
 	sml->counter++;		// increment the instruction counter	
 	sml->accumulator -= sml->memory[sml->operand];
-	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
+	//	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
+	//	sml->running = false;
+	//	error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
+	//	return 1;
+	//}
 	return 0;
 }
 
@@ -36,11 +36,11 @@ int opcode_multiply(machineState *sml)
 {
 	sml->counter++;		// increment the instruction counter	
 	sml->accumulator *= sml->memory[sml->operand];
-	if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
+	//if( out_of_bounds(sml->accumulator, MINVAL, MAXVAL) ) {
+	//	sml->running = false;
+	//	error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
+	//	return 1;
+	//}
 	return 0;
 }
 
@@ -74,11 +74,11 @@ int opcode_inc(machineState *sml)
 {
 	sml->counter++;
 	sml->memory[sml->operand]++;
-	if( out_of_bounds(sml->memory[sml->operand], MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
+	//if( out_of_bounds(sml->memory[sml->operand], MINVAL, MAXVAL) ) {
+	//	sml->running = false;
+	//	error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
+	//	return 1;
+	//}
 	return 0;
 }
 
@@ -86,10 +86,10 @@ int opcode_dec(machineState *sml)
 {
 	sml->counter++;
 	sml->memory[sml->operand]--;
-	if( out_of_bounds(sml->memory[sml->operand], MINVAL, MAXVAL) ) {
-		sml->running = false;
-		error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
-		return 1;
-	}
+	//if( out_of_bounds(sml->memory[sml->operand], MINVAL, MAXVAL) ) {
+	//	sml->running = false;
+	//	error_message("RESULT OUT OF BOUNDS: MACHINE HALTED");
+	//	return 1;
+	//}
 	return 0;
 }

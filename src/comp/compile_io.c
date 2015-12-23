@@ -90,19 +90,41 @@ int process_source(char *filename, int core[MEMSIZE]){
    * spots we didn't actually use.
    */
   for( x = 0; x < MEMSIZE; ++x ) {
+    
+    /* If the type isn't 0, we need to find the symbol */
     if( labels[x].type != 0 ) {
+
+      /* Walk through the symbol tree looking for symbol */
       for( dest = 0; dest < MAXSYMS; ++dest) {
+
+	/* Check if the symbol and type are equal */
 	if( symbolTable[dest].symbol == labels[x].symbol &&
 	    symbolTable[dest].type == labels[x].type ) {
+
+	  /* If this is our symbol, but the location is not defined
+	   * we need to assign it to an area after memory (if it is
+	   * a variable or constant). If it is a line number, we
+	   * jump to a non-existant location, a fatal error.*/
 	  if( symbolTable[dest].location == -1 ) {
 	    if( symbolTable[dest].type == 'V' ) {
+	      /* All variables are uninitialized by default and should 
+	       * be zero */
 	      symbolTable[dest].location = iptr(1);
 	    }
 	    if( symbolTable[dest].type == 'C' ) {
+	      /* A constant is the value of its symbol and needs to be
+	       * saved in core */
 	      core[iptr(0)] = symbolTable[dest].symbol;
 	      symbolTable[dest].location = iptr(1);
 	    }
+	    if( symbolTable[dest].type == 'L' ) {
+	      /* The line number printed with this error is wrong */
+	      emessg("Jump to Never-Never Land",1);
+	    }
 	  }
+
+	  /* Now that we know the location of this symbol, add it to
+	   * the core location, so the machine code is correct */
 	  core[x] += symbolTable[dest].location;
 	}
       }
@@ -139,7 +161,8 @@ int decode_line(char *line, int core[MEMSIZE],
     emessg("All lines must start with a line number.",1);
   } else {
     inpt.type = 'L';
-    insert_symbol(inptPtr, symbolTable);
+    inpt.location = iptr(0);	/* Make sure we set the location */
+    test_symbol(inptPtr, symbolTable, labels);
   }
 
   /*
@@ -151,6 +174,7 @@ int decode_line(char *line, int core[MEMSIZE],
       case REM:
 	/*
 	 * rem == comments
+	 * don't process the rest of this line
 	 */
 	break;
 	
@@ -160,13 +184,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	 */
 	if( (curr = getNextToken(0, inptPtr)) ) {
 	  if( inpt.type == 'V' ) {
-	    dest = insert_symbol(inptPtr, symbolTable);
-	    if( dest == -1 ) {
-	      labels[iptr(0)].symbol = inpt.symbol;
-	      labels[iptr(0)].type = inpt.type;
-	      labels[iptr(0)].location = -1;
-	      dest = 0;
-	    }
+	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (READ*OPFACT) + dest;
 	  } else {
 	    emessg("Missing/Invalid Destination",1);
@@ -180,13 +198,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	 */
 	if( (curr = getNextToken(0, inptPtr))) {
 	  if( inpt.type == 'V' ) {
-	    dest = insert_symbol(inptPtr, symbolTable);
-	    if( dest == -1 ) {
-	      labels[iptr(0)].symbol = inpt.symbol;
-	      labels[iptr(0)].type = inpt.type;
-	      labels[iptr(0)].location = -1;
-	      dest = 0;
-	    }
+	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (WRITE*OPFACT) + dest;
 	  } else {
 	    emessg("Missing/Invalid Destination",1);
@@ -200,14 +212,8 @@ int decode_line(char *line, int core[MEMSIZE],
 	 */
 	if( (curr = getNextToken(0,inptPtr)) ) {
 	  if( inpt.type == 'C' ) {
-	    inpt.type = 'L';	/* Make it a line */
-	    dest = insert_symbol(inptPtr, symbolTable);
-	    if( dest == -1 ) {
-	      labels[iptr(0)].symbol = inpt.symbol;
-	      labels[iptr(0)].type = inpt.type;
-	      labels[iptr(0)].location = -1;
-	      dest = 0;
-	    }
+	    inpt.type = 'L';
+	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (BRANCH*OPFACT) + dest;
 	  } else {
 	    emessg("Missing/Invalid Label",1);
@@ -223,7 +229,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	break;
 
       case IF:
-	curr = parseIf(symbolTable, labels, core) {
+	curr = parseIf(symbolTable, labels, core);
 	break;
 
       case END:

@@ -101,14 +101,9 @@ int gencode(char oper, struct Token vals[], int vbase,
   
   /* If both are constants, we will do the math here */
   if( rtype != 'C' || ltype != 'C' ) {
-    right = insert_symbol(rPtr, syms);
-    left = insert_symbol(lPtr, syms);
+    right = test_symbol(rPtr, syms, labels);
+    left = test_symbol(lPtr, syms, labels);
     
-    if(left == -1) {
-      labels[iptr(0)].symbol = lPtr->symbol;
-      labels[iptr(0)].type = ltype;
-      left = 0;
-    }
     if( iptr(0) > 0 && (code[iptr(0) - 1] / OPFACT) == STORE ) {
       /* The last command was a store, was it storing
        * the value we are trying to load now? If so, we can
@@ -127,17 +122,16 @@ int gencode(char oper, struct Token vals[], int vbase,
 	(*acc)++;
     }
 
-    if(right == -1) {
-      labels[iptr(0)].symbol = rPtr->symbol;
-      labels[iptr(0)].type = rtype;
-      right = 0;
-    }
+    right = test_symbol(rPtr, syms, labels);
 
     TEMP++;
     tempToken.symbol = TEMP;
     tempToken.type = 'V';
     tempToken.location = -1;
-    temp = insert_symbol(&tempToken, syms);
+    
+    /* We can't use test_symbol, because we split the check and
+     * the attempt to add it to the unknown values */
+    temp = insert_symbol( &tempToken, syms);
     
     switch( oper ) {
     case '+': /* load left, add right store temp */
@@ -168,11 +162,15 @@ int gencode(char oper, struct Token vals[], int vbase,
       break;
     }
 
+    /* We can't use test_symbol, because we split the check and
+     * the attempt to add it to the unknown values */
     if( temp == -1) {
       labels[iptr(0)].symbol = TEMP;
       labels[iptr(0)].type = 'V';
+      labels[iptr(0)].location = -1;
       temp = 0;
     }
+
     /* Save the result */
     code[iptr(1)] = (STORE*OPFACT) + temp;
 
@@ -205,6 +203,7 @@ int gencode(char oper, struct Token vals[], int vbase,
 char *parseIf(struct Token symbolTable[MAXSYMS],
 	       struct Token labels[MEMSIZE], int core[MEMSIZE]) {
   struct Token left, oper, right, gt, dest;
+  int leftloc, rightloc, destloc;
   char *string;  
 
   /*
@@ -222,10 +221,6 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
     emessg("Conditional Parse Error",1);
   }
   dest.type = 'L';		/* Make dest a line number */
-
-  leftloc = insert_symbol(&left, symbolTable);
-  rightloc = insert_symbol(&right, symbolTable);
-  destloc = insert_symbol(&dest, symbolTable);
   
   switch (oper.symbol) {
 
@@ -234,36 +229,16 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
     /* EQL: load right, subtract left, branch zero dest
      * DNE: load right, subtract left, branch zero ip + 2, branch dest 
      */
-    if( rightloc == -1 ) {
-      labels[iptr(0)].symbol = right.symbol;
-      labels[iptr(0)].type = right.type;
-      labels[iptr(0)].location = -1;
-      rightloc = 0;
-    }
+    rightloc = test_symbol(&right, symbolTable, labels);
     core[iptr(1)] = (LOAD*OPFACT) + rightloc;
-    if( leftloc == -1 ) {
-      labels[iptr(0)].symbol = left.symbol;
-      labels[iptr(0)].type = left.type;
-      labels[iptr(0)].location = -1;
-      leftloc = 0;
-    }
+    leftloc = test_symbol(&left, symbolTable, labels);
     core[iptr(1)] = (SUBTRACT*OPFACT) + leftloc;
     if( oper.symbol == EQL ) {
-      if( destloc == -1 ) {
-	labels[iptr(0)].symbol = dest.symbol;
-	labels[iptr(0)].type = dest.type;
-	labels[iptr(0)].location = -1;
-	destloc = 0;
-      }
+      destloc = test_symbol(&dest, symbolTable, labels);
       core[iptr(1)] = (BRANCHZERO*OPFACT) + destloc;
     } else {
       core[iptr(1)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
-      if( destloc == -1 ) {
-	labels[iptr(0)].symbol = dest.symbol;
-	labels[iptr(0)].type = dest.type;
-	labels[iptr(0)].location = -1;
-	destloc = 0;
-      }
+      destloc = test_symbol(&dest, symbolTable, labels);
       core[iptr(1)] = (BRANCH*OPFACT) + destloc;
     }
     break;

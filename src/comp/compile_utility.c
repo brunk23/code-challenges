@@ -180,26 +180,41 @@ int str2token(const char *string, struct Token *token)
  * returns location if symbol exists
  */
 int insert_symbol(struct Token *token, struct Token symbolTable[MAXSYMS]) {
-  int x, retcode;
+  int x;
   for( x = 0; x < MAXSYMS; ++x ) {
     if( symbolTable[x].type == 0 ) {
       /* New symbol to be added */
       symbolTable[x].symbol = token->symbol;
       symbolTable[x].type = token->type;
-      if( token->type == 'L' ) {
-	symbolTable[x].location = iptr(0);
-      } else {
-	symbolTable[x].location = -1;
-      }
-      retcode = -1;
+      symbolTable[x].location = token->location;
       break;
     }
     if( symbolTable[x].symbol == token->symbol ) {
       if( symbolTable[x].type == token->type ) {
-	retcode = symbolTable[x].location;
+	if( symbolTable[x].location < 0 ) {
+	  symbolTable[x].location = token->location;
+	}
 	break;
       }
     }
   }
-  return retcode;
+  return symbolTable[x].location;
+}
+
+/*
+ * Test if we know where a token is. If so, return the memory location.
+ * If not, make this location (in labels) one we need to check later
+ */
+int test_symbol(struct Token *token, struct Token syms[MAXSYMS],
+		struct Token labels[MEMSIZE]) {
+  int loc;
+
+  loc = insert_symbol(token, syms);
+  if( loc == -1 ) {
+    labels[iptr(0)].symbol = token->symbol;
+    labels[iptr(0)].type = token->type;
+    labels[iptr(0)].location = -1;
+    loc = 0;
+  }
+  return loc;
 }
