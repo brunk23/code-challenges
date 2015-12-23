@@ -1,19 +1,17 @@
 # This will make both the programs
 
-sml_sim: sml.o sml_control.o sml_math.o sml_memory.o
-	c++ -Wall -o sml_sim sml.o sml_control.o sml_math.o sml_memory.o
+COMPC = comp/*.c
+COMPH = comp/*.h shared/*.h
+SIMC = sim/*.cpp
+SIMH = sim/*.h shared/*.h
 
-sml.o: shared/sml_shared.h sim/sml.h sim/sml.cpp
-	c++ -Wall -c sim/sml.cpp
+all: sml_sim sml_comp
 
-sml_math.o: shared/sml_shared.h sim/sml_math.h sim/sml_math.cpp
-	c++ -Wall -c sim/sml_math.cpp
+sml_comp: $(COMPC) $(COMPH)
+	gcc -Wall -o sml_comp $(COMPC)
 
-sml_memory.o: shared/sml_shared.h sim/sml_memory.h sim/sml_memory.cpp
-	c++ -Wall -c sim/sml_memory.cpp
-
-sml_control.o: shared/sml_shared.h sim/sml_control.h sim/sml_control.cpp
-	c++ -Wall -c sim/sml_control.cpp
+sml_sim: $(SIMC) $(SIMH)
+	c++ -Wall -o sml_sim $(SIMC)
 
 clean:
 	rm *.o
