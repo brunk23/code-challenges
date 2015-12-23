@@ -3,8 +3,13 @@
  */
 
 #include <stdio.h>
-#include "../shared/sml_shared.h"
+#include <string.h>
+#include <stdlib.h>
+#include "compiler.h"
+#include "compile_utility.h"
 #include "compile_io.h"
+#include "compile_messages.h"
+#include "compile_parse.h"
 
 /*
  * Write memory out to a core file.
@@ -29,5 +34,242 @@ int output_core(char *filename, int core[MEMSIZE]) {
     }
   }
 
+  fclose(dest);
+  return 0;
+}
+
+/*
+ * Open and parse the source file
+ */
+int process_source(const char *filename, int core[MEMSIZE]){
+  FILE *source;
+  char *line = 0, *unedited = 0, *curr = 0;
+  size_t unedited_size = 0;
+  int linenumber = 0;		/* for debugging */
+  size_t bytes_read;
+  ssize_t status;
+  
+  // allow up to 10 symbols per memory spot in the machine
+  struct Token symbolTable[MAXSYMS];
+  struct Token labels[MEMSIZE];
+  int retcode = 0;
+  int x, dest;
+
+  if( !( source = fopen(filename, "r")) ) {
+    fprintf(stderr,"ERROR: could not open source file: %s\n", filename);
+    return 1;
+  }
+  
+  /*
+   * An unresolved label is saved over the -1
+   * core memory is 0'd out
+   */
+  for(x = 0; x < MEMSIZE; ++x) {
+    labels[x].type = 0;
+    core[x] = 0;
+  }
+  for(x = 0; x < MAXSYMS; ++x) {
+    symbolTable[x].symbol = 0;
+    symbolTable[x].type = 0;
+    symbolTable[x].location = -1;
+  }
+
+  while(( status = getline(&line, &bytes_read, source)) != -1) {
+    linenumber++;
+    curr = strtok(line, "\n");
+    if( unedited ) {
+      if( unedited_size < bytes_read ) {
+	free(unedited);
+	unedited = malloc(bytes_read);
+	unedited_size = bytes_read;
+      }
+    } else {
+      unedited = malloc(bytes_read);
+      unedited_size = bytes_read;
+    }
+    strncpy(unedited, curr, unedited_size);
+    
+    if( (retcode = decode_line(curr, core, symbolTable, labels)) ) {
+      emessg(linenumber,unedited);
+      break;
+    }
+    if( iptr(0) == -1 ) {
+      fprintf(stderr,"ERROR: Out of memory.\n");
+      emessg(linenumber,unedited);
+    }
+  }
+
+  /*
+   * Assign all data spots to locations right after the end of
+   * our code and fill in the missing information. We only assign
+   * memory spots for labels we use. This avoids assigning temp
+   * spots we didn't actually use.
+   */
+  for( x = 0; x < MEMSIZE; ++x ) {
+    if( labels[x].type != 0 ) {
+      for( dest = 0; dest < MAXSYMS; ++dest) {
+	if( symbolTable[dest].symbol == labels[x].symbol &&
+	    symbolTable[dest].type == labels[x].type ) {
+	  if( symbolTable[dest].location == -1 ) {
+	    if( symbolTable[dest].type == 'V' ) {
+	      symbolTable[dest].location = iptr(1);
+	    }
+	    if( symbolTable[dest].type == 'C' ) {
+	      core[iptr(0)] = symbolTable[dest].symbol;
+	      symbolTable[dest].location = iptr(1);
+	    }
+	  }
+	  core[x] += symbolTable[dest].location;
+	}
+      }
+    }
+  }
+  
+  fclose(source);
+  if(line) {
+    free(line);
+  }
+  if(unedited) {
+    free(unedited);
+  }
+  return retcode;
+}
+
+int decode_line(char *line, int core[MEMSIZE], 
+		struct Token symbolTable[MAXSYMS],
+		struct Token labels[MEMSIZE])
+{
+  struct Token inpt, *inptPtr = 0;
+  char *curr = line;
+  int dest;
+
+  /* We use this for getting our new token */
+  inpt.symbol = 0;
+  inpt.type = 0;
+  inpt.location = -1;
+  inptPtr = &inpt;
+  
+  /*
+   * First we process the line number
+   */
+  curr = getNextToken(curr, inptPtr);
+  
+  if( inpt.type != 'C' ) {
+    fprintf(stderr,"\nERROR: All lines must start with a line number.\n");
+    return 1;
+  } else {
+    inpt.type = 'L';
+    insert_symbol(inptPtr, symbolTable);
+  }
+
+  /*
+   * Process the rest of the line, one token at a time.
+   */
+  if ( (curr = getNextToken(0, inptPtr)) ) {
+    if( inpt.type == 'K' ) {
+      switch ( inpt.symbol ) {
+      case REM:
+	/*
+	 * rem == comments
+	 */
+	break;
+	
+      case INPUT:
+	/*
+	 * input == read a value
+	 */
+	if( (curr = getNextToken(0, inptPtr)) ) {
+	  if( inpt.type == 'V' ) {
+	    dest = insert_symbol(inptPtr, symbolTable);
+	    if( dest == -1 ) {
+	      labels[iptr(0)].symbol = inpt.symbol;
+	      labels[iptr(0)].type = inpt.type;
+	      labels[iptr(0)].location = -1;
+	      dest = 0;
+	    }
+	    core[iptr(1)] = (READ*OPFACT) + dest;
+	  } else {
+	    fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
+	    return 1;
+	  }
+	}
+	break;
+	
+      case PRINT:
+	/*
+	 * print == display a value
+	 */
+	if( (curr = getNextToken(0, inptPtr))) {
+	  if( inpt.type == 'V' ) {
+	    dest = insert_symbol(inptPtr, symbolTable);
+	    if( dest == -1 ) {
+	      labels[iptr(0)].symbol = inpt.symbol;
+	      labels[iptr(0)].type = inpt.type;
+	      labels[iptr(0)].location = -1;
+	      dest = 0;
+	    }
+	    core[iptr(1)] = (WRITE*OPFACT) + dest;
+	  } else {
+	    fprintf(stderr,"ERROR: Missing/Invalid Destination:\n");
+	    return 1;
+	  }
+	}
+	break;
+
+      case GOTO:
+	/*
+	 * goto == unconditional jump
+	 */
+	if( (curr = getNextToken(0,inptPtr)) ) {
+	  if( inpt.type == 'C' ) {
+	    inpt.type = 'L';	/* Make it a line */
+	    dest = insert_symbol(inptPtr, symbolTable);
+	    if( dest == -1 ) {
+	      labels[iptr(0)].symbol = inpt.symbol;
+	      labels[iptr(0)].type = inpt.type;
+	      labels[iptr(0)].location = -1;
+	      dest = 0;
+	    }
+	    core[iptr(1)] = (BRANCH*OPFACT) + dest;
+	  } else {
+	    fprintf(stderr,"ERROR: Missing/Invalid Label:\n");
+	    return 1;
+	  }
+	}
+	break;
+
+      case LET:
+	/* 
+	 * let == assignments
+	 */
+	curr = parseLet(symbolTable, labels, core);
+	break;
+
+      case IF:
+	/*
+	 * XXXX
+	 * WORKING, I would like to support expressions on both sides
+	 * This could be tricky
+	 * XXXX
+	 */
+	if( (curr = getNextToken(0, inptPtr) ) ) {
+	  // nothing yet.
+	} else {
+	  fprintf(stderr,"ERROR: Left-Hand Side must be variable\n");
+	  
+	}
+	break;
+
+      case END:
+	core[iptr(1)] = (HALT*OPFACT);
+	break;
+
+      default:
+	break;
+      }
+    } else {
+      fprintf(stderr,"ERROR: Expected keyword\n");
+    }
+  }
   return 0;
 }
