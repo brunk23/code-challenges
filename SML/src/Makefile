@@ -8,10 +8,10 @@ SIMH = sim/*.h shared/*.h
 all: sml_sim sml_comp
 
 sml_comp: $(COMPC) $(COMPH)
-	gcc -Wall -o sml_comp $(COMPC)
+	gcc -g -Wall -o sml_comp $(COMPC)
 
 sml_sim: $(SIMC) $(SIMH)
-	c++ -Wall -o sml_sim $(SIMC)
+	c++ -g -Wall -o sml_sim $(SIMC)
 
 clean:
 	rm *.o

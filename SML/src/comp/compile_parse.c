@@ -36,37 +36,38 @@ char *parseLet(struct Token symbolTable[MAXSYMS],
       vals[vbase].type = inpt.type;
       vals[vbase].location = inpt.location;
       vbase++;
-    }
-    /* These always get pushed */
-    if( inpt.symbol == '=' || inpt.symbol == '(' ) {
-      oper[obase] = inpt.symbol;
-      obase++;
-    }
-    if( inpt.symbol == ')' ) {
-      while( oper[--obase] != '(' ) {
-	vbase--;
-	gencode(oper[obase],vals,vbase,symbolTable,
-		core,labels,&acc);
+    } else {
+      /* These always get pushed */
+      if( inpt.symbol == '=' || inpt.symbol == '(' ) {
+	oper[obase] = inpt.symbol;
+	obase++;
       }
-    } 
-    if( inpt.symbol == '+' || inpt.symbol == '-' ) {
-      while ( oplev( oper[obase - 1] )  >= 1 ) {
-	vbase--;
-	gencode(oper[--obase],vals,vbase,symbolTable,
-		core,labels,&acc);
+      if( inpt.symbol == ')' ) {
+	while( oper[--obase] != '(' ) {
+	  vbase--;
+	  gencode(oper[obase],vals,vbase,symbolTable,
+		  core,labels,&acc);
+	}
+      } 
+      if( inpt.symbol == '+' || inpt.symbol == '-' ) {
+	while ( oplev( oper[obase - 1] )  >= 1 ) {
+	  vbase--;
+	  gencode(oper[--obase],vals,vbase,symbolTable,
+		  core,labels,&acc);
+	}
+	oper[obase] = inpt.symbol;
+	obase++;
       }
-      oper[obase] = inpt.symbol;
-      obase++;
-    }
     
-    if( inpt.symbol == '*' || inpt.symbol == '/' || inpt.symbol == '%') {
-      while( oplev( oper[ obase -1 ] ) >= 2 ) {
-	vbase--;
-	gencode(oper[--obase],vals,vbase,symbolTable,
-		core,labels,&acc);
+      if( inpt.symbol == '*' || inpt.symbol == '/' || inpt.symbol == '%') {
+	while( oplev( oper[ obase -1 ] ) >= 2 ) {
+	  vbase--;
+	  gencode(oper[--obase],vals,vbase,symbolTable,
+		  core,labels,&acc);
+	}
+	oper[obase] = inpt.symbol;
+	obase++;
       }
-      oper[obase] = inpt.symbol;
-      obase++;
     }
   }
   while( obase > 0 ) {

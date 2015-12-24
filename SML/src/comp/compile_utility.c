@@ -198,6 +198,9 @@ int insert_symbol(struct Token *token, struct Token symbolTable[MAXSYMS]) {
       }
     }
   }
+  if(x == MAXSYMS) {
+    emessg("Enough is never enough",1);
+  }
   return symbolTable[x].location;
 }
 
