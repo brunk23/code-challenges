@@ -1,5 +1,5 @@
 This is a random assortment of my solutions, or attempted solutions, for
-various coding challenges I have found and attepted.
+various coding challenges I have found and attempted.
 
 The languages used vary. Often, I decide to do a challenge in a specific
 language only because I am playing with that language at the time.
