@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "compiler.h"
 #include "compile_utility.h"
 #include "compile_messages.h"
@@ -73,9 +74,15 @@ int oplev(char n) {
   return x;
 }
 
-int str2token(const char *string, struct Token *token)
+int str2token(char *string, struct Token *token)
 {
-  int symbol = 0;
+  int symbol = 0, x = 0;
+  while( string[x] != 0 ) {
+    if( (string[x] >= 'A') && (string[x] <= 'Z') ) {
+      string[x] = tolower(string[x]);
+    }
+    ++x;
+  }
   if( (strcmp(string,"let") == 0) ||
       (strcmp(string,"rem") == 0) ||
       (strcmp(string,"goto") == 0) ||

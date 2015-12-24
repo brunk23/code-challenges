@@ -1,0 +1,13 @@
+5 REM 		sum 1 to x
+10 inPUT x 
+15 REM 		check Y == x
+20 if Y == x goto 60
+25 Rem 		increment y
+30 let y = y + 1
+35 reM 		add y to total
+40 LEt t = t + Y
+45 rem 		loop y
+50 goto 20
+55 rem 		output result
+60 prINT t
+99 ENd

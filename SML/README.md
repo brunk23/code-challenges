@@ -26,8 +26,11 @@ let -- variable = expression
 
 if -- variable/constant condition variable/constant
 
+inc/dec -- increment/decrement a variable
+
 expressions can consist of: +, -, \*, /, % and ( )s
 
 conditions accepted are: ==, !=, <, <=, >, >=
 
-All variables are a single letter, everything is case-sensitive (lower-case only).
+All variables are a single letter, everything is case-insensitive. It will
+be forced to lower-case.
