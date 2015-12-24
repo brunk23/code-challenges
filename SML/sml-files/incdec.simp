@@ -1,0 +1,11 @@
+1 rem	Increment and decrement things
+
+10 inc a
+
+19 rem This should produce a warning
+20 inc 5
+30 dec b
+
+39 rem These should both produce warnings also
+40 dec 6
+50 dec 5

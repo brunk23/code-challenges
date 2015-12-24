@@ -13,7 +13,8 @@ struct Token {
 };
 
 enum KEYWORDS {
-  LET = 1, REM, GOTO, INPUT, IF, PRINT, END, DNE, EQL, GT, GTE, LT, LTE
+  LET = 1, REM, GOTO, INPUT, IF, PRINT, INCM, DECM, END, DNE,
+  EQL, GT, GTE, LT, LTE
 };
 
 #endif

@@ -15,6 +15,27 @@ int help_menu(char *progname) {
 }
 
 /*
+ * Just print warnings, don't fail.
+ */
+int wmessg(char *messg) {
+  int linenumber = 0;
+  char *cline = 0;
+
+  linenumber = lineno(0);
+  cline = currline(0, 0, 0); 
+  fprintf(stderr,"WARNING: %s:\n",messg);
+  if(linenumber) {
+    fprintf(stderr,"ON LINE #%i: ",linenumber);
+    if(cline) {
+      fprintf(stderr,"%s", cline);
+    }
+    fprintf(stderr,"\n");
+  }
+  return 0;
+}
+
+
+/*
  * Print error message and fail.
  */
 int emessg(char *messg, int returncode) {

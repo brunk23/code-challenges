@@ -225,6 +225,34 @@ int decode_line(char *line, int core[MEMSIZE],
 	}
 	break;
 
+      case INCM:
+	if( (curr = getNextToken(0, inptPtr)) ) {
+	  if( inpt.type == 'V' || inpt.type == 'C' ) {
+	    if( inpt.type == 'C' ) {
+	      wmessg("Why should things remain the same");
+	    }
+	    dest = test_symbol(inptPtr, symbolTable, labels);
+	    core[iptr(1)] = (INC*OPFACT) + dest;
+	  } else {
+	    emessg("Missing/Invalid Destination",1);
+	  }
+	}
+	break;
+
+      case DECM:
+	if( (curr = getNextToken(0, inptPtr)) ) {
+	  if( inpt.type == 'V' || inpt.type == 'C' ) {
+	    if( inpt.type == 'C' ) {
+	      wmessg("Why should things remain the same");
+	    }
+	    dest = test_symbol(inptPtr, symbolTable, labels);
+	    core[iptr(1)] = (DEC*OPFACT) + dest;
+	  } else {
+	    emessg("Missing/Invalid Destination",1);
+	  }
+	}
+	break;
+
       case GOTO:
 	/*
 	 * goto == unconditional jump

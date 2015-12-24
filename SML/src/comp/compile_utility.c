@@ -82,6 +82,8 @@ int str2token(const char *string, struct Token *token)
       (strcmp(string,"input") == 0) ||
       (strcmp(string,"print") == 0) ||
       (strcmp(string,"if") == 0) ||
+      (strcmp(string,"inc") == 0) ||
+      (strcmp(string,"dec") == 0) ||
       (strcmp(string,"end") == 0) ||
       (strcmp(string,"==") == 0) ||
       (strcmp(string,"!=") == 0) ||
@@ -105,6 +107,9 @@ int str2token(const char *string, struct Token *token)
     case 'i':
       if( string[1] == 'n' ) {
 	symbol = INPUT;
+	if( string[2] == 'c' ) {
+	  symbol = INCM;
+	}
       } else {
 	symbol = IF;
       }
@@ -116,6 +121,10 @@ int str2token(const char *string, struct Token *token)
 
     case 'e':
       symbol = END;
+      break;
+
+    case 'd':
+      symbol = DECM;
       break;
 
     case '!':
