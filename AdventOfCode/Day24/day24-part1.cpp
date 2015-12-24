@@ -10,111 +10,100 @@ using std::setw;
 
 #define TOT 29
 
-int find_min(int numbers[TOT], int goal);
-long min_QE(int numbers[TOT], int goal, int maxd, int depth, long prod, int sum);
+int countnumb(int tried[TOT]);
+bool sumarrays(int tried[TOT], int numbers[TOT], int foo);
+long prod(int tried[TOT], int numbers[TOT]);
+int incarray(int tried[TOT]);
 
 int main()
 {
   int numbers[TOT];
-  int foo;
-  int x = 0, total = 0;
+  int tried[TOT];
+  int foo, xmax = 0;
+  int x = TOT-1, total = 0;
+  long temp, min = LONG_MAX, minprod = LONG_MAX;
   
   while( !cin.eof() ) {
     cin >> foo;
     if( cin.eof() ) {
       break;
     }
-    numbers[x++] = foo;
+    numbers[x--] = foo;
     total += foo;
   }
 
+  for(x = 0; x != TOT; ++x) {
+    tried[x] = 0;
+  }
+
   foo = total/3;
-
-  x = find_min(numbers, foo);
-
-  cout << "Min number of presents is: " << x << endl;
-
+  x = 0;
+  while( x < TOT ) {
+    if( sumarrays(tried,numbers,foo) ) {
+      temp = countnumb(tried);
+      if( temp <= min ) {
+	min = temp;
+	temp = prod(tried,numbers);
+	if( temp < minprod ) {
+	  minprod = temp;
+	  cout << "Current minproduct [" << xmax << "]: " << minprod << endl;
+	}
+      }
+    }
+    x = incarray(tried);
+    if( x > xmax ) {
+      xmax = x;
+    }
+  }
+  
+  cout << min << " numbers\n" << minprod << " product." << endl;
   return 0;
 }
 
-int find_min(int numbers[TOT], int goal)
+int incarray(int tried[TOT])
 {
-  int y, n[TOT], sum = 0, packs = 0;
-  long product = 1;
-  
-  for(y = TOT-1; y >=0 ; --y) {
-    n[y] = 0;
-  }
-    
-  for(y = 0; y < TOT ; ++y) {
-    if( (sum + numbers[y]) <= goal ) {
-      sum += numbers[y];
-      n[y] = numbers[y];
-      packs++;
-    } else {
-      n[y] = 0;
-    }
-    if( sum == goal ) {
+  int x;
+  for(x = 0; x < TOT; ++x ) {
+    if( tried[x] == 0 ) {
+      tried[x] = 1;
       break;
     }
-    if(y == 0) {
-      // Still not found... go back up and get rid of
-      // highest number used
-      while( n[y] == 0 ) {
-	y--;
-      }
-      n[y] = 0;
-    }
+    tried[x] = 0;
   }
-
-  for(y = 0; y < TOT; ++y) {
-    if(n[y]) {
-      cout << n[y] << " ";
-    }
-  }
-  cout << endl;
-  
-  return packs;
+  return x;
 }
 
-long min_QE(int numbers[TOT], int goal, int maxd, int depth, long prod, int sum)
+int countnumb(int tried[TOT])
 {
-  int y;
-  long pr = LONG_MAX, prtemp;
-  /* Quit after maxd */
-  if( depth > maxd || sum > goal ) {
-    return pr;
+  int total = 0, n;
+  for( n = 0; n < TOT; n++ ) {
+    total += tried[n];
   }
-
-  cout << sum << "\t";
-  prtemp = pr;
-  int n[TOT];
   
-  for( y = 0; y < TOT; ++y ) {
-    n[y] = numbers[y];
+  return total;
+}
+
+bool sumarrays(int tried[TOT], int numbers[TOT], int foo)
+{
+  int total = 0, n;
+  for( n = 0; n < TOT; n++ ) {
+    total += tried[n]*numbers[n];
   }
 
-  if( depth < maxd ) {
-    for( y = TOT-1; y >=0; --y ) {
-      if( n[y] != 0 ) {
-	n[y] = 0;
-	prtemp = min_QE(n, goal, maxd, depth+1, prod*numbers[y], sum+numbers[y]);
-	n[y] = numbers[y];
-	if( prtemp < pr ) {
-	  pr = prtemp;
-	}
-      }
-    }
-  } else {
-    for( y = TOT-1; y >= 0; --y) {
-      if( sum+numbers[y] == goal ) {
-	prtemp = prod * numbers[y];
-	if( prtemp < pr ) {
-	  pr = prtemp;
-	}
-      }
+  return (total == foo);
+}
+
+long prod(int tried[TOT], int numbers[TOT])
+{
+  long total = 1, n;
+  for( n = 0; n < TOT; n++ ) {
+    if( tried[n] ) {
+      total *= numbers[n];
     }
   }
 
-  return pr;
+  if( total < 0 ) {
+    total = LONG_MAX;
+  }
+  return total;
 }
