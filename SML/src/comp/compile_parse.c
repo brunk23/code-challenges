@@ -254,7 +254,8 @@ char *parseIf(struct Token symbolTable[MAXSYMS],
       
       if( oper.symbol == DNE ) {
 	/* here we skip one instruction, if they were equal */
-	core[iptr(1)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
+	core[iptr(0)] = (BRANCHZERO*OPFACT) + iptr(0) + 2;
+	iptr(1);
 	/* if we get here, they weren't equal, so unconditional branch */
 	destloc = test_symbol(&dest, symbolTable, labels);
 	core[iptr(1)] = (BRANCH*OPFACT) + destloc;

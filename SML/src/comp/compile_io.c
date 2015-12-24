@@ -160,6 +160,10 @@ int decode_line(char *line, int core[MEMSIZE],
    * First we process the line number
    */
   curr = getNextToken(curr, inptPtr);
+  if( !curr ) {
+    /* Ignore blank lines */
+    return 0;
+  }
   
   if( inpt.type != 'C' ) {
     emessg("All lines must start with a line number.",1);
