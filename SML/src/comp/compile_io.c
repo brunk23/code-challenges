@@ -27,8 +27,10 @@ int output_core(char *filename, int core[MEMSIZE]) {
     dest = stdout;
   }
 
+  /* Read through the core memory, a number at a time, and print
+   * it out, with 4 digit integers padded */
   for( x = 0; x < MEMSIZE; ++x ) {
-    fprintf(dest,"%4i ", core[x]);
+    fprintf(dest,"%04i ", core[x]);
     if( (x + 1) % 10 == 0 ) {
       fprintf(dest,"\n");
     }
@@ -125,11 +127,15 @@ int process_source(char *filename, int core[MEMSIZE]){
 	      /* The line number printed with this error is wrong */
 	      emessg("Jump to Never-Never Land",1);
 	    }
+	    /* Sometimes let will have marked this memory location
+	     * unresolved, it isn't, so clear the flag (just in case */
+	    labels[symbolTable[dest].location].type = 0;
 	  }
 
 	  /* Now that we know the location of this symbol, add it to
 	   * the core location, so the machine code is correct */
 	  core[x] += symbolTable[dest].location;
+	  break;
 	}
       }
     }

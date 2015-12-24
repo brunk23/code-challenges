@@ -37,30 +37,20 @@ char *parseLet(struct Token symbolTable[MAXSYMS],
       vals[vbase].location = inpt.location;
       vbase++;
     } else {
-      /* These always get pushed */
-      if( inpt.symbol == '=' || inpt.symbol == '(' ) {
-	oper[obase] = inpt.symbol;
-	obase++;
-      }
+      /* If this is a ')', we don't push it, pop until we find '(' */
       if( inpt.symbol == ')' ) {
 	while( oper[--obase] != '(' ) {
 	  vbase--;
 	  gencode(oper[obase],vals,vbase,symbolTable,
 		  core,labels,&acc);
 	}
-      } 
-      if( inpt.symbol == '+' || inpt.symbol == '-' ) {
-	while ( oplev( oper[obase - 1] )  >= 1 ) {
-	  vbase--;
-	  gencode(oper[--obase],vals,vbase,symbolTable,
-		  core,labels,&acc);
+      } else {
+	/* Handle everything but ')' */
+	if( (inpt.symbol == '=') && ((obase != 0) || (vbase != 1)) ) {
+	  emessg("I am not sure what you mean by that",1);
 	}
-	oper[obase] = inpt.symbol;
-	obase++;
-      }
-    
-      if( inpt.symbol == '*' || inpt.symbol == '/' || inpt.symbol == '%') {
-	while( oplev( oper[ obase -1 ] ) >= 2 ) {
+	while ( (inpt.symbol != '(') &&
+		(oplev( oper[obase - 1] ) >= oplev( inpt.symbol )) ) {
 	  vbase--;
 	  gencode(oper[--obase],vals,vbase,symbolTable,
 		  core,labels,&acc);

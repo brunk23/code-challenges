@@ -48,19 +48,23 @@ int iptr(int delta) {
 int oplev(char n) {
   int x = 0;
   switch (n) {
-  case '=':
+  case '(':
     x = 0;
+    break;
+
+  case '=':
+    x = 3;
     break;
 
   case '+':
   case '-':
-    x = 1;
+    x = 6;
     break;
 
   case '*':
   case '/':
   case '%':
-    x = 2;
+    x = 9;
     break;
 
   default:
