@@ -1,0 +1,5 @@
+10 rem More than one value on the left, this still isn't handled correctly
+11 rem and bad code is generated. I need to produce code to test for this
+12 rem situation.
+20 let a 5 = 45
+30 let b 6 = a
