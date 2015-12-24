@@ -216,7 +216,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	 * print == display a value
 	 */
 	if( (curr = getNextToken(0, inptPtr))) {
-	  if( inpt.type == 'V' ) {
+	  if( inpt.type == 'V' || inpt.type == 'C' ) {
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (WRITE*OPFACT) + dest;
 	  } else {
@@ -229,7 +229,8 @@ int decode_line(char *line, int core[MEMSIZE],
 	if( (curr = getNextToken(0, inptPtr)) ) {
 	  if( inpt.type == 'V' || inpt.type == 'C' ) {
 	    if( inpt.type == 'C' ) {
-	      wmessg("Why should things remain the same");
+	      wmessg("Why should constants remain the same",1);
+	      wmessg("This changes ALL references to this number",0);
 	    }
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (INC*OPFACT) + dest;
@@ -243,7 +244,8 @@ int decode_line(char *line, int core[MEMSIZE],
 	if( (curr = getNextToken(0, inptPtr)) ) {
 	  if( inpt.type == 'V' || inpt.type == 'C' ) {
 	    if( inpt.type == 'C' ) {
-	      wmessg("Why should things remain the same");
+	      wmessg("Why should constants remain the same",1);
+	      wmessg("This changes ALL references to this number",0);
 	    }
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (DEC*OPFACT) + dest;

@@ -17,19 +17,21 @@ int help_menu(char *progname) {
 /*
  * Just print warnings, don't fail.
  */
-int wmessg(char *messg) {
+int wmessg(char *messg, int continued) {
   int linenumber = 0;
   char *cline = 0;
 
   linenumber = lineno(0);
   cline = currline(0, 0, 0); 
   fprintf(stderr,"WARNING: %s:\n",messg);
-  if(linenumber) {
-    fprintf(stderr,"ON LINE #%i: ",linenumber);
-    if(cline) {
-      fprintf(stderr,"%s", cline);
+  if( !continued ) {
+    if(linenumber) {
+      fprintf(stderr,"ON LINE #%i: ",linenumber);
+      if(cline) {
+	fprintf(stderr,"%s", cline);
+      }
+      fprintf(stderr,"\n\n");
     }
-    fprintf(stderr,"\n");
   }
   return 0;
 }
