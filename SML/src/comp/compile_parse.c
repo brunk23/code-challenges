@@ -90,6 +90,9 @@ int gencode(char oper, struct Token vals[], int vbase,
   int left, right, temp;
   char rtype, ltype;
   struct Token *rPtr, *lPtr, tempToken;
+  if( vbase < 1 ) {
+    emessg("Hey bud, can you spare another variable",1);
+  }
   if( oper != '=' ) {
     rPtr = &vals[vbase];
     lPtr = &vals[vbase-1];
