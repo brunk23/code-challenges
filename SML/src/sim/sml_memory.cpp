@@ -101,7 +101,7 @@ int opcode_swrite(machineState *sml)
   int x, length;
   sml->counter++;
   x = 0;
-  length = sml->memory[sml->operand] / 100;
+  length = sml->memory[sml->operand] / OPFACT;
   while( length ) {
     if( x%2 == 0) {
       cout << static_cast< char >(sml->memory[sml->operand + x/2] % OPFACT);
