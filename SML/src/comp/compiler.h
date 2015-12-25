@@ -3,13 +3,13 @@
 
 #include "../shared/sml_shared.h"
 
-#define MAXSYMS 1000
+#define MAXSYMS MEMSIZE * 10
 #define SSIZE 25
 
 struct Token {
   int symbol;
-  char type;			// 'C', 'L', 'V'
-  int location;			// 00 to 99
+  char type;			/* 'C', 'L', 'V', 'K', 'E' */
+  int location;			/* 00 to MEMSIZE-1 */
 };
 
 enum KEYWORDS {

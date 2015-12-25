@@ -9,7 +9,7 @@
 #include "compile_parse.h"
 
 int main(int argc, char *argv[]) {
-  int core[MEMSIZE];		// The memory in the SML machine
+  int core[MEMSIZE];		/* The memory in the SML machine */
   int retcode = 0;
   
   /* COMMAND LINE ARGUMENTS */

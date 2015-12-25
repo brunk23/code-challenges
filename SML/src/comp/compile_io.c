@@ -53,7 +53,7 @@ int process_source(char *filename, int core[MEMSIZE]){
   size_t bytes_read;
   ssize_t status;
   
-  // allow up to 10 symbols per memory spot in the machine
+  /* allow up to 10 symbols per memory spot in the machine */
   struct Token symbolTable[MAXSYMS];
   struct Token labels[MEMSIZE];
   int retcode = 0;
@@ -65,7 +65,7 @@ int process_source(char *filename, int core[MEMSIZE]){
   }
   
   /*
-   * An unresolved label is saved over the -1
+   * An unresolved label will have a non-zero type
    * core memory is 0'd out
    */
   for(x = 0; x < MEMSIZE; ++x) {
@@ -182,7 +182,7 @@ int decode_line(char *line, int core[MEMSIZE],
     test_symbol(inptPtr, symbolTable, labels);
   }
 
-  // Just in case a previous let messed with this location.
+  /* Just in case a previous let messed with this location. */
   labels[iptr(0)].symbol = 0;
   labels[iptr(0)].type = 0;
   labels[iptr(0)].location = -1;
@@ -229,6 +229,15 @@ int decode_line(char *line, int core[MEMSIZE],
 	break;
 
       case INCM:
+	/*
+	 * Inc == increment a variable.
+	 * I allow constants to be incremented and decremented
+	 * although this is highly discouraged and will likely
+	 * lead to really obscure errors. It basically creates
+	 * a variable with the same name as the number. If you
+	 * choose to do this, you can't use the same number in
+	 * the program (as a const). This changes it globally.
+	 */
 	if( (curr = getNextToken(0, inptPtr)) ) {
 	  if( inpt.type == 'V' || inpt.type == 'C' ) {
 	    if( inpt.type == 'C' ) {
@@ -244,6 +253,11 @@ int decode_line(char *line, int core[MEMSIZE],
 	break;
 
       case DECM:
+	/*
+	 * dec == decrement a variable
+	 * The same warnings about changing a constant apply
+	 * here as they do above.
+	 */
 	if( (curr = getNextToken(0, inptPtr)) ) {
 	  if( inpt.type == 'V' || inpt.type == 'C' ) {
 	    if( inpt.type == 'C' ) {
@@ -281,10 +295,16 @@ int decode_line(char *line, int core[MEMSIZE],
 	break;
 
       case IF:
+	/*
+	 * if == simply conditional testing
+	 */
 	curr = parseIf(symbolTable, labels, core);
 	break;
 
       case END:
+	/*
+	 * end == halt the program
+	 */
 	core[iptr(1)] = (HALT*OPFACT);
 	break;
 
