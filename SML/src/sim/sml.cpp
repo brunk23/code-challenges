@@ -57,8 +57,12 @@ int main(int argc, char *argv[])
 	return 1;
       }
     }
+    if( debug ) {
+      memory_dump(sml);
+    }
   } else {
-    while ( input != EINPUT ) { 
+    while ( input != EINPUT ) {
+      debug = true;
       cout << smlReal.counter << ": ";
       cin >> input;
       if ( !out_of_bounds(input,MINVAL,MAXVAL) ) {
@@ -79,9 +83,9 @@ int main(int argc, char *argv[])
     smlReal.operand = smlReal.instructionRegister % OPFACT;
     returnCode=instruction_table[smlReal.operationCode](sml);
   }
-  if( argc == 1 || argc == 3) {
-    // we only dump the memory if we input the file by hand. or
-    // we have a third argument
+  if( debug ) {
+    // we only dump the memory if we input the file by hand
+    // or we request it
     memory_dump(sml);
   } else {
     cout << endl << endl;
