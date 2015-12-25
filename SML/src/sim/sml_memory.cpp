@@ -107,6 +107,5 @@ int opcode_swrite(machineState *sml)
     length--;
     x++;
   }
-  cout << " ";
   return 0;
 }

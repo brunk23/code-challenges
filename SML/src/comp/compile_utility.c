@@ -86,6 +86,8 @@ int str2token(char *string, struct Token *token)
   if( (strcmp(string,"let") == 0) ||
       (strcmp(string,"rem") == 0) ||
       (strcmp(string,"goto") == 0) ||
+      (strcmp(string,"sinput") == 0) ||
+      (strcmp(string,"sprint") == 0) ||
       (strcmp(string,"input") == 0) ||
       (strcmp(string,"print") == 0) ||
       (strcmp(string,"if") == 0) ||
@@ -111,6 +113,14 @@ int str2token(char *string, struct Token *token)
       symbol = GOTO;
       break;
 
+    case 's':
+      if( string[1] == 'i' ) {
+	symbol = SINPUT;
+      } else {
+	symbol = SPRINT;
+      }
+      break;
+      
     case 'i':
       if( string[1] == 'n' ) {
 	symbol = INPUT;

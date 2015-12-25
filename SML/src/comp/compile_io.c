@@ -213,6 +213,21 @@ int decode_line(char *line, int core[MEMSIZE],
 	  }
 	}
 	break;
+
+      case SINPUT:
+	/*
+	 * input == read a value
+	 */
+	if( (curr = getNextToken(0, inptPtr)) ) {
+	  if( inpt.type == 'V' || inpt.type == 'S' ) {
+	    inpt.type == 'S';
+	    dest = test_symbol(inptPtr, symbolTable, labels);
+	    core[iptr(1)] = (SREAD*OPFACT) + dest;
+	  } else {
+	    emessg("Missing/Invalid Destination",1);
+	  }
+	}
+	break;
 	
       case PRINT:
 	/*
@@ -222,6 +237,21 @@ int decode_line(char *line, int core[MEMSIZE],
 	  if( inpt.type == 'V' || inpt.type == 'C' ) {
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (WRITE*OPFACT) + dest;
+	  } else {
+	    emessg("Missing/Invalid Destination",1);
+	  }
+	}
+	break;
+
+      case SPRINT:
+	/*
+	 * print == display a value
+	 */
+	if( (curr = getNextToken(0, inptPtr))) {
+	  if( inpt.type == 'V' || inpt.type == 'S' ) {
+	    inpt.type == 'S';
+	    dest = test_symbol(inptPtr, symbolTable, labels);
+	    core[iptr(1)] = (SWRITE*OPFACT) + dest;
 	  } else {
 	    emessg("Missing/Invalid Destination",1);
 	  }
