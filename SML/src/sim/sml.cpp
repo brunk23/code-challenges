@@ -118,8 +118,15 @@ int main(int argc, char *argv[])
     smlReal.operationCode = smlReal.instructionRegister / OPFACT;
     smlReal.operand = smlReal.instructionRegister % OPFACT;
     if( smlReal.operationCode >= MAXOP ) {
+      smlReal.operationCode -= MAXOP;
+      if(smlReal.operationCode >= MAXOP ) {
+	smlReal.operationCode += MAXOP;
+	smlReal.indirect = false;
+	opcode_invalid(sml);
+	smlReal.running = false;
+	continue;
+      }
       smlReal.indirect = true;
-      smlReal.operationCode %= MAXOP;
       x = sml->memory[sml->operand] / OPFACT;
       x += sml->memory[sml->operand] % OPFACT;
       if( out_of_bounds( x, 0, MEMSIZE-1) ) {
@@ -166,6 +173,8 @@ int init_machine(machineState *sml, opPtr inst_tble[])
   // i/o
   inst_tble[READ]=opcode_read;
   inst_tble[WRITE]=opcode_write;
+  inst_tble[SREAD]=opcode_sread;
+  inst_tble[SWRITE]=opcode_swrite;
 
   // flow control
   inst_tble[BRANCH]=opcode_branch;

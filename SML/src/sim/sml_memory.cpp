@@ -59,9 +59,54 @@ int opcode_read(machineState *sml)
   return 0;
 }
 
+int opcode_sread(machineState *sml)
+{
+  unsigned int length, x;
+  string line;
+  int *buff;
+  sml->counter++;
+  getline(cin, line);
+  buff = new int[ (line.size()+2)/2 ];
+  for( x = 0; x < (line.size()+2)/2; ++x) {
+    buff[x] = 0;
+  }
+  for( length = 1; length <= line.size(); ++length ) {
+    if( (length%2) == 0 ) {
+      buff[length/2] = line[length-1]*OPFACT; // store in top half
+    } else {
+      buff[length/2] += line[length-1];
+    }
+  }
+  buff[0] += (length-1)*OPFACT;
+  for( x = 0; x < (line.size()+2)/2; ++x) {
+    sml->memory[sml->operand + x] = buff[x];
+  }
+  delete buff;
+  return 0;
+}
+  
 int opcode_write(machineState *sml)
 {
   sml->counter++;		// incremement the instruction counter
   cout << sml->memory[sml->operand] << "  ";
+  return 0;
+}
+
+int opcode_swrite(machineState *sml)
+{
+  int x, length;
+  sml->counter++;
+  x = 0;
+  length = sml->memory[sml->operand] / 100;
+  while( length ) {
+    if( x%2 == 0) {
+      cout << static_cast< char >(sml->memory[sml->operand + x/2] % OPFACT);
+    } else {
+      cout << static_cast< char >(sml->memory[sml->operand + (x+1)/2] / OPFACT);
+    }
+    length--;
+    x++;
+  }
+  cout << " ";
   return 0;
 }
