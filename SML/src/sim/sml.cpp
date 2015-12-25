@@ -22,6 +22,8 @@ int main(int argc, char *argv[])
 {
   int returnCode = 0;
   int input = 0;
+  string line;
+  char *parse, *pfull, *before;
   machineState smlReal;
   machineState *sml = &smlReal;
   bool debug = false;
@@ -49,29 +51,59 @@ int main(int argc, char *argv[])
       return 1;
     }
     cout << "Opened file: " << argv[x] << endl;
-    while( true ) {
-      filename >> input;
-      if( filename.eof() ) {
-	break;
+    while( getline(filename, line) ) {
+      parse = 0;
+      pfull = new char[line.size()];
+      strncpy(pfull, line.c_str(), line.size());
+      parse = pfull;
+      while( true ) {
+	before = parse;
+	input = strtol(parse, &parse, 10);
+	if( parse == before || parse == 0 ) {
+	  break;
+	}
+	if( !out_of_bounds(input,MINVAL,MAXVAL) ) {
+	  smlReal.memory[smlReal.counter++] = input;
+	} else {
+	  cout << "Error in file" << endl;
+	  return 1;
+	}
       }
-      if( !out_of_bounds(input,MINVAL,MAXVAL) ) {
-	smlReal.memory[smlReal.counter++] = input;
-      } else {
-	cout << "Error in file" << endl;
-	return 1;
-      }
+      delete pfull;
     }
     if( debug ) {
       memory_dump(sml);
     }
   } else {
-    while ( input != EINPUT ) {
-      debug = true;
-      cout << smlReal.counter << ": ";
-      cin >> input;
-      if ( !out_of_bounds(input,MINVAL,MAXVAL) ) {
-	smlReal.memory[smlReal.counter++] = input;
+    debug = true;
+    cout << smlReal.counter << ": ";
+    while( getline(cin, line) ) {
+      parse = 0;
+      pfull = new char[line.size()];
+      strncpy(pfull, line.c_str(), line.size());
+      parse = pfull;
+      while( true ) {
+	before = parse;
+	input = strtol(parse, &parse, 10);
+	if( parse == before || parse == 0 ) {
+	  break;
+	}
+	if( !out_of_bounds(input,MINVAL,MAXVAL) ) {
+	  smlReal.memory[smlReal.counter++] = input;
+	} else {
+	  if( input != EINPUT ) {
+	    cout << "Error in file" << endl;
+	    return 1;
+	  } else {
+	    break;
+	  }
+	}
       }
+      delete pfull;
+      if( input == EINPUT ) {
+	break;
+      }
+      cout << smlReal.counter << ": ";
     }
   }
   smlReal.counter = 0;

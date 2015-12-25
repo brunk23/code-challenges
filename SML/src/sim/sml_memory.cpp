@@ -3,10 +3,13 @@
  */
 
 #include <iostream>
+#include <string>
 
 using std::cin;
 using std::cout;
 using std::endl;
+using std::getline;
+using std::string;
 
 #include "sml.h"
 #include "sml_memory.h"
@@ -30,18 +33,29 @@ int opcode_store(machineState *sml)
 // simple operation
 int opcode_read(machineState *sml)
 {
+  string line;
+  char *pfull, *parse, *before;
   int input = MAXVAL+1;
   sml->counter++;		// increment the instruction counter	
-  while ( out_of_bounds(input, MINVAL, MAXVAL) ) {
-    cout << "? ";
-    cin >> input;;
-    if (out_of_bounds(input, MINVAL, MAXVAL)) {
+  cout << "? ";
+  while( getline(cin, line) ) {
+    pfull = new char[line.size()];
+    parse = before = pfull;
+    strncpy(pfull, line.c_str(), line.size());
+    input = strtol(parse, &parse, 10);
+    if( parse == before || parse == 0 ||
+	out_of_bounds(input,MINVAL,MAXVAL) ) {
       cout << "That is not a valid number.\n"
 	   << MINVAL << " to " << MAXVAL << endl;
+      cout << "? ";
+      delete pfull;
+      continue;
+    } else {
+      sml->memory[sml->operand] = input;
+      delete pfull;
+      break;
     }
   }
-  sml->memory[sml->operand] = input;
-  // memory_dump(sml);
   return 0;
 }
 
