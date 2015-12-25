@@ -48,8 +48,11 @@ int main(int argc, char *argv[])
       return 1;
     }
     cout << "Opened file: " << argv[x] << endl;
-    while( !filename.eof() ) {
+    while( true ) {
       filename >> input;
+      if( filename.eof() ) {
+	break;
+      }
       if( !out_of_bounds(input,MINVAL,MAXVAL) ) {
 	smlReal.memory[smlReal.counter++] = input;
       } else {
@@ -81,6 +84,20 @@ int main(int argc, char *argv[])
     smlReal.instructionRegister = smlReal.memory[smlReal.counter];
     smlReal.operationCode = smlReal.instructionRegister / OPFACT;
     smlReal.operand = smlReal.instructionRegister % OPFACT;
+    if( smlReal.operationCode >= MAXOP ) {
+      smlReal.indirect = true;
+      smlReal.operationCode %= MAXOP;
+      x = sml->memory[sml->operand] / OPFACT;
+      x += sml->memory[sml->operand] % OPFACT;
+      if( out_of_bounds( x, 0, MEMSIZE-1) ) {
+	sml->running = false;
+	error_message("INDIRECT ADDRESS INVALID");
+	continue;
+      }
+      sml->operand = x;
+    } else {
+      smlReal.indirect = false;
+    }
     returnCode=instruction_table[smlReal.operationCode](sml);
   }
   if( debug ) {
@@ -135,6 +152,7 @@ int init_machine(machineState *sml, opPtr inst_tble[])
   sml->operationCode = 0;
   sml->operand = 0;
   sml->running = false;
+  sml->indirect = false;
   for(int i = 0; i < MEMSIZE; ++i) {
     sml->memory[i] = 0;
   }
@@ -158,21 +176,24 @@ void error_message(string message)
 int memory_dump(machineState *sml)
 {
   cout << "\n\nREGISTERS:" << endl
-       << setfill(' ') << setw(20) << "Accumulator" << setw(7)
+       << setfill(' ') << setw(20) << "Accumulator" << setw(8)
        << setfill(' ') << sml->accumulator << endl
-       << setfill(' ') << setw(20) << "counter" << setw(7)
+       << setfill(' ') << setw(20) << "counter" << setw(8)
        << setfill(' ') << sml->counter << endl
-       << setfill(' ') << setw(20) << "instructionRegister" << setw(7)
+       << setfill(' ') << setw(20) << "instructionRegister" << setw(8)
        << setfill(' ') << sml->instructionRegister << endl
-       << setfill(' ') << setw(20) << "operationCode" << setw(7)
+       << setfill(' ') << setw(20) << "operationCode" << setw(8)
        << setfill(' ') << sml->operationCode << endl
-       << setfill(' ') << setw(20) << "operand" << setw(7)
-       << setfill(' ') << sml->operand << endl << endl;
-
+       << setfill(' ') << setw(20) << "operand" << setw(8)
+       << setfill(' ') << sml->operand << endl
+       << setfill(' ') << setw(20) << "indirect" << setw(8)
+       << setfill(' ') << (sml->indirect ? "true" : "false")
+       << endl << endl;
+  
   cout << "MEMORY:" << endl;
-  cout << setw(8);
+  cout << setw(10);
   for(int i = 0; i < 10; ++ i) {
-    cout << i << setw(5) << "  ";
+    cout << i << setw(7) << "  ";
   }
   cout << endl;
   for(int i = 0; i < MEMSIZE/10 ; ++i) {
@@ -186,7 +207,7 @@ int memory_dump(machineState *sml)
     if( used ) {
       cout << setw(3) << i*10 << " ";
       for(int j = 0; j < 10; ++j) {
-	cout << setw(5) << sml->memory[i*10+j] << " ";
+	cout << setw(7) << sml->memory[i*10+j] << " ";
       }
       cout << endl;
     }

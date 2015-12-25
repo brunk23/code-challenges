@@ -4,7 +4,7 @@
 #include <string>
 #include "../shared/sml_shared.h"
 
-#define EINPUT -99999
+#define EINPUT -9999999
 
 using std::string;
 
@@ -15,6 +15,7 @@ struct machineState {
   int operationCode;
   int operand;
   int memory[MEMSIZE];
+  bool indirect;
   bool running;
 };
 

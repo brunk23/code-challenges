@@ -51,5 +51,3 @@ int opcode_write(machineState *sml)
   cout << sml->memory[sml->operand] << "  ";
   return 0;
 }
-
-
