@@ -83,99 +83,78 @@ int str2token(char *string, struct Token *token)
     }
     ++x;
   }
-  if( (strcmp(string,"let") == 0) ||
-      (strcmp(string,"rem") == 0) ||
-      (strcmp(string,"goto") == 0) ||
-      (strcmp(string,"sinput") == 0) ||
-      (strcmp(string,"sprint") == 0) ||
-      (strcmp(string,"input") == 0) ||
-      (strcmp(string,"print") == 0) ||
-      (strcmp(string,"if") == 0) ||
-      (strcmp(string,"inc") == 0) ||
-      (strcmp(string,"dec") == 0) ||
-      (strcmp(string,"end") == 0) ||
-      (strcmp(string,"==") == 0) ||
-      (strcmp(string,"!=") == 0) ||
-      (strcmp(string,">=") == 0) ||
-      (strcmp(string,">") == 0) ||
-      (strcmp(string,"<=") == 0) ||
-      (strcmp(string,"<") == 0) ) {
-    switch ( string[0] ) {
-    case 'l':
-      symbol = LET;
-      break;
 
-    case 'r':
-      symbol = REM;
-      break;
-
-    case 'g':
-      symbol = GOTO;
-      break;
-
-    case 's':
-      if( string[1] == 'i' ) {
-	symbol = SINPUT;
-      } else {
-	symbol = SPRINT;
-      }
-      break;
-      
-    case 'i':
-      if( string[1] == 'n' ) {
-	symbol = INPUT;
-	if( string[2] == 'c' ) {
-	  symbol = INCM;
-	}
-      } else {
-	symbol = IF;
-      }
-      break;
-      
-    case 'p':
-      symbol = PRINT;
-      break;
-
-    case 'e':
-      symbol = END;
-      break;
-
-    case 'd':
-      symbol = DECM;
-      break;
-
-    case '!':
-      symbol = DNE;
-      break;
-
-    case '=':
-      symbol = EQL;
-      break;
-
-    case '<':
-      if( string[1] == '=' ) {
-	symbol = LTE;
-      } else {
-	symbol = LT;
-      }
-      break;
-
-    case '>':
-      if( string[1] == '=' ) {
-	symbol = GTE;
-      } else {
-	symbol = GT;
-      }
-      break;
-	 
-    default:
-      break;
-    }
-    token->symbol = symbol;
-    token->type = 'K';		/* K-eyword */
-    token->location = -1;
+  token->type = 'K';		/* K-eyword */
+  token->location = -1;
+  if( (strcmp(string,"let") == 0)) {
+    token->symbol = LET;
     return 0;
   }
+  if( (strcmp(string,"rem") == 0) ) {
+    token->symbol = REM;
+    return 0;
+  }
+  if( (strcmp(string,"goto") == 0) ) {
+    token->symbol = GOTO;
+    return 0;
+  }
+  if( (strcmp(string,"sinput") == 0) ) {
+    token->symbol = SINPUT;
+    return 0;
+  }
+  if( (strcmp(string,"sprint") == 0) ) {
+    token->symbol = SPRINT;
+    return 0;
+  }
+  if ( (strcmp(string,"input") == 0) ) {
+    token->symbol = INPUT;
+    return 0;
+  }
+  if( (strcmp(string,"print") == 0) ) {
+    token->symbol = PRINT;
+    return 0;
+  }
+  if( (strcmp(string,"if") == 0) ) {
+    token->symbol = IF;
+    return 0;
+  }
+  if( (strcmp(string,"inc") == 0) ) {
+    token->symbol = INC;
+    return 0;
+  }
+  if( (strcmp(string,"dec") == 0) ) {
+    token->symbol = DEC;
+    return 0;
+  }
+  if( (strcmp(string,"end") == 0) ) {
+    token->symbol = END;
+    return 0;
+  }
+  if( (strcmp(string,"==") == 0) ) {
+    token->symbol = EQL;
+    return 0;
+  }
+  if( (strcmp(string,"!=") == 0) ) {
+    token->symbol = DNE;
+    return 0;
+  }
+  if( (strcmp(string,">=") == 0) ) {
+    token->symbol = GTE;
+    return 0;
+  }
+  if( (strcmp(string,">") == 0) ) {
+    token->symbol = GT;
+    return 0;
+  }
+  if( (strcmp(string,"<=") == 0) ) {
+    token->symbol = LTE;
+    return 0;
+  }
+  if( (strcmp(string,"<") == 0) ) {
+    token->symbol = LT;
+    return 0;
+  }
+
 
   if( (string[0] == '-' && string[1] == 0) ||
       string[0] == '+' || string[0] == '*' ||
@@ -188,7 +167,8 @@ int str2token(char *string, struct Token *token)
     return 0;
   }
   
-  if( (string[0] >= '0' && string[0] <= '9') || string[0] == '-') {
+  if( (string[0] >= '0' && string[0] <= '9') ||
+      (string[0] == '-' || string[0] == '+') ) {
     symbol = strtol(string, 0, 10);
     token->symbol = symbol;
     token->type = 'C';		/* C-onst (or L-ine number) */

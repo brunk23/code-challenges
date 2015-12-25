@@ -220,7 +220,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	 */
 	if( (curr = getNextToken(0, inptPtr)) ) {
 	  if( inpt.type == 'V' || inpt.type == 'S' ) {
-	    inpt.type == 'S';
+	    inpt.type = 'S';
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (SREAD*OPFACT) + dest;
 	  } else {
@@ -249,7 +249,7 @@ int decode_line(char *line, int core[MEMSIZE],
 	 */
 	if( (curr = getNextToken(0, inptPtr))) {
 	  if( inpt.type == 'V' || inpt.type == 'S' ) {
-	    inpt.type == 'S';
+	    inpt.type = 'S';
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (SWRITE*OPFACT) + dest;
 	  } else {
