@@ -7,6 +7,7 @@
 #include "sml_math.h"
 #include "sml_control.h"
 #include "sml_memory.h"
+#include "sml_stack.h"
 
 using std::cin;
 using std::cout;
@@ -146,8 +147,15 @@ int init_machine(machineState *sml, opPtr inst_tble[])
   inst_tble[DUMP]=memory_dump;
   inst_tble[NOP]=opcode_nop;
 
+  // Stack opcodes
+  inst_tble[PUSH]=opcode_push;
+  inst_tble[POP]=opcode_pop;
+  inst_tble[CALL]=opcode_call;
+  inst_tble[RET]=opcode_ret;
+  
   sml->accumulator = 0;
   sml->counter = 0;
+  sml->stackPointer = MEMSIZE - 1;
   sml->instructionRegister = 0;
   sml->operationCode = 0;
   sml->operand = 0;
@@ -178,8 +186,10 @@ int memory_dump(machineState *sml)
   cout << "\n\nREGISTERS:" << endl
        << setfill(' ') << setw(20) << "Accumulator" << setw(8)
        << setfill(' ') << sml->accumulator << endl
-       << setfill(' ') << setw(20) << "counter" << setw(8)
+       << setfill(' ') << setw(20) << "instructionPointer" << setw(8)
        << setfill(' ') << sml->counter << endl
+       << setfill(' ') << setw(20) << "stackPointer" << setw(8)
+       << setfill(' ') << sml->stackPointer << endl    
        << setfill(' ') << setw(20) << "instructionRegister" << setw(8)
        << setfill(' ') << sml->instructionRegister << endl
        << setfill(' ') << setw(20) << "operationCode" << setw(8)

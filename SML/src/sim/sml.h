@@ -10,6 +10,7 @@ using std::string;
 
 struct machineState {
   int accumulator;
+  int stackPointer;
   int counter;
   int instructionRegister;
   int operationCode;
