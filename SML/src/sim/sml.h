@@ -9,13 +9,13 @@
 using std::string;
 
 struct machineState {
-	int accumulator;
-	int counter;
-	int instructionRegister;
-	int operationCode;
-	int operand;
-	int memory[MEMSIZE];
-	bool running;
+  int accumulator;
+  int counter;
+  int instructionRegister;
+  int operationCode;
+  int operand;
+  int memory[MEMSIZE];
+  bool running;
 };
 
 typedef int (*opPtr)(machineState *);
