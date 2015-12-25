@@ -37,7 +37,9 @@ int output_core(char *filename, int core[MEMSIZE]) {
     }
   }
 
-  fclose(dest);
+  if( dest != stdout ) {
+    fclose(dest);
+  }
   return 0;
 }
 
