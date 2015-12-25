@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
   int input = 0;
   machineState smlReal;
   machineState *sml = &smlReal;
-
+  bool debug = false;
+  int x = 1;
   /*
    * We are going to use a jump table for the commands.
    */
@@ -35,13 +36,18 @@ int main(int argc, char *argv[])
     return 1;
   }
   if( argc > 1 ) {
+    if( strcmp(argv[1],"-d") == 0 || strcmp(argv[1],"-debug") == 0) {
+      debug = true;
+      x++;
+    }
     ifstream filename;
-    filename.open(argv[1], std::ios::in);
-    cout << "Opened: " << argv[1] << endl;
+    filename.open(argv[x], std::ios::in);
+    cout << "Opening file: " << argv[x] << endl;
     if( !filename.is_open() ) {
       cout << "Unable to open file" << endl;
       return 1;
     }
+    cout << "Opened file: " << argv[x] << endl;
     while( !filename.eof() ) {
       filename >> input;
       if( !out_of_bounds(input,MINVAL,MAXVAL) ) {
