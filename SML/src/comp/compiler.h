@@ -6,6 +6,19 @@
 #define MAXSYMS MEMSIZE * 10
 #define SSIZE 25
 
+/*
+ * Types and meanings:
+ * L - Label
+ * K - Keyword
+ * M - Math operator
+ *
+ * C - Constant
+ * V - Variable
+ *
+ * S - Fixed length string
+ * W - Writable string
+ */
+
 struct Token {
   int symbol;
   char type;			/* 'C', 'L', 'V', 'K', 'E' */

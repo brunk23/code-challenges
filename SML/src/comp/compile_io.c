@@ -57,7 +57,7 @@ int process_source(char *filename, int core[MEMSIZE]){
   struct Token symbolTable[MAXSYMS];
   struct Token labels[MEMSIZE];
   int retcode = 0;
-  int x, dest;
+  int x, dest, strtmp, strindex;
 
   if( !( source = fopen(filename, "r")) ) {
     currline(filename,strlen(filename)+1,-1);
@@ -108,13 +108,14 @@ int process_source(char *filename, int core[MEMSIZE]){
 
 	/* Check if the symbol and type are equal */
 	if( symbolTable[dest].symbol == labels[x].symbol &&
-	    symbolTable[dest].type == labels[x].type ) {
-
+	    (symbolTable[dest].type == labels[x].type ||
+	     (symbolTable[dest].type == 'S' && labels[x].type == 'W') ||
+	     (symbolTable[dest].type == 'W' && labels[x].type == 'S') ) ) {
 	  /* If this is our symbol, but the location is not defined
 	   * we need to assign it to an area after memory (if it is
 	   * a variable or constant). If it is a line number, we
 	   * jump to a non-existant location, a fatal error.*/
-	  if( symbolTable[dest].location == -1 ) {
+	  if( symbolTable[dest].location < 0 ) {
 	    if( symbolTable[dest].type == 'V' ) {
 	      /* All variables are uninitialized by default and should 
 	       * be zero */
@@ -125,6 +126,26 @@ int process_source(char *filename, int core[MEMSIZE]){
 	       * saved in core */
 	      core[iptr(0)] = symbolTable[dest].symbol;
 	      symbolTable[dest].location = iptr(1);
+	    }
+	    if( symbolTable[dest].type == 'W' ||
+		symbolTable[dest].type == 'S' ) {
+	      /* String input. Check to see if we start with something
+	       * here. If so, copy it into the current location. If it
+	       * is 'S', iptr( stringmemreq(core[iptr(0)]/OPFACT) )
+	       * else, iptr( stringmemreq(INPMAX) );
+	       */
+	      strtmp = symbolTable[dest].location * -1;
+	      symbolTable[dest].location = iptr(0);
+	      strindex = stringmemreq(core[strtmp]/OPFACT);
+	      while( strindex ) {
+		core[ iptr(0)+strindex-1 ] = core[ strtmp+strindex-1 ];
+		strindex--;
+	      }
+	      if( symbolTable[dest].type == 'W' ) {
+		iptr( stringmemreq( INPMAX ) );
+	      } else {
+		iptr( stringmemreq( core[ iptr(0) ] / OPFACT ) );
+	      }
 	    }
 	    if( symbolTable[dest].type == 'L' ) {
 	      /* The line number printed with this error is wrong */
@@ -219,8 +240,10 @@ int decode_line(char *line, int core[MEMSIZE],
 	 * input == read a value
 	 */
 	if( (curr = getNextToken(0, inptPtr)) ) {
-	  if( inpt.type == 'V' || inpt.type == 'S' ) {
-	    inpt.type = 'S';
+	  if( inpt.type == 'V' ||
+	      inpt.type == 'S' ||
+	      inpt.type == 'W' ) {
+	    inpt.type = 'W';
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (SREAD*OPFACT) + dest;
 	  } else {
@@ -248,8 +271,12 @@ int decode_line(char *line, int core[MEMSIZE],
 	 * print == display a value
 	 */
 	if( (curr = getNextToken(0, inptPtr))) {
-	  if( inpt.type == 'V' || inpt.type == 'S' ) {
-	    inpt.type = 'S';
+	  if( inpt.type == 'W' ||
+	      inpt.type == 'S' ||
+	      inpt.type == 'V' ) {
+	    if( inpt.type == 'V' ) {
+	      inpt.type = 'S';
+	    }
 	    dest = test_symbol(inptPtr, symbolTable, labels);
 	    core[iptr(1)] = (SWRITE*OPFACT) + dest;
 	  } else {

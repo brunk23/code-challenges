@@ -61,16 +61,20 @@ int opcode_read(machineState *sml)
 
 int opcode_sread(machineState *sml)
 {
-  unsigned int length, x;
+  unsigned int length, x, strsize;
   string line;
   int *buff;
   sml->counter++;
   getline(cin, line);
-  buff = new int[ (line.size()+2)/2 ];
-  for( x = 0; x < (line.size()+2)/2; ++x) {
+  strsize = line.size();
+  if( strsize > INPMAX ) {
+    strsize = INPMAX;
+  }
+  buff = new int[ (strsize+2)/2 ];
+  for( x = 0; x < (strsize+2)/2; ++x) {
     buff[x] = 0;
   }
-  for( length = 1; length <= line.size(); ++length ) {
+  for( length = 1; length <= strsize; ++length ) {
     if( (length%2) == 0 ) {
       buff[length/2] = line[length-1]*OPFACT; // store in top half
     } else {
@@ -78,7 +82,7 @@ int opcode_sread(machineState *sml)
     }
   }
   buff[0] += (length-1)*OPFACT;
-  for( x = 0; x < (line.size()+2)/2; ++x) {
+  for( x = 0; x < (strsize+2)/2; ++x) {
     sml->memory[sml->operand + x] = buff[x];
   }
   delete buff;

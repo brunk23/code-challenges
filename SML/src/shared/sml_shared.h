@@ -6,6 +6,7 @@
 #define MAXVAL 999999
 #define MINVAL -999999
 #define OPFACT 1000
+#define INPMAX 39		/* max for dynamnic strings */
 
 /*
  * Not all these opcodes were part of the original spec.

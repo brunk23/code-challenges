@@ -208,11 +208,23 @@ int insert_symbol(struct Token *token, struct Token symbolTable[MAXSYMS]) {
       break;
     }
     if( symbolTable[x].symbol == token->symbol ) {
-      if( symbolTable[x].type == token->type ) {
+      if( (token->type == 'S' || token->type == 'W') &&
+	  (symbolTable[x].type == 'S' || symbolTable[x].type =='W') ) {
+	/* This is a string, if one is W, make both W */
+	if( token->type == 'W' ) {
+	  symbolTable->type = 'W';
+	}
 	if( symbolTable[x].location < 0 ) {
 	  symbolTable[x].location = token->location;
 	}
 	break;
+      } else {
+	if( symbolTable[x].type == token->type ) {
+	  if( symbolTable[x].location < 0 ) {
+	    symbolTable[x].location = token->location;
+	  }
+	  break;
+	}
       }
     }
   }
@@ -238,4 +250,12 @@ int test_symbol(struct Token *token, struct Token syms[MAXSYMS],
     loc = 0;
   }
   return loc;
+}
+
+/*
+ * Real simply utility function to return the required number
+ * of bytes for a string.
+ */
+int stringmemreq(int length) {
+  return (length+2)/2;
 }
