@@ -1,11 +1,11 @@
 #ifndef SML_SHARED_H
 #define SML_SHARED_H
 
-#define MEMSIZE 100
+#define MEMSIZE 1000
 #define MAXOP 100
-#define MAXVAL 9999
-#define MINVAL -9999
-#define OPFACT 100
+#define MAXVAL 99999
+#define MINVAL -99999
+#define OPFACT 1000
 
 /*
  * Not all these opcodes were part of the original spec.

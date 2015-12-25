@@ -4,6 +4,8 @@
 #include <string>
 #include "../shared/sml_shared.h"
 
+#define EINPUT -99999
+
 using std::string;
 
 struct machineState {

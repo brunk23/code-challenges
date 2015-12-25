@@ -28,9 +28,10 @@ int output_core(char *filename, int core[MEMSIZE]) {
   }
 
   /* Read through the core memory, a number at a time, and print
-   * it out, with 4 digit integers padded */
-  for( x = 0; x < MEMSIZE; ++x ) {
-    fprintf(dest,"%04i ", core[x]);
+   * it out, with 5 digit integers padded, only output as many
+   * values as are used. */
+  for( x = 0; x < iptr(0); ++x ) {
+    fprintf(dest,"%05i ", core[x]);
     if( (x + 1) % 10 == 0 ) {
       fprintf(dest,"\n");
     }
