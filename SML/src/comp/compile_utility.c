@@ -130,6 +130,14 @@ int str2token(char *string, struct Token *token)
     token->symbol = END;
     return 0;
   }
+  if( (strcmp(string,"call") == 0) ) {
+    token->symbol = CALLF;
+    return 0;
+  }
+  if( (strcmp(string,"ret") == 0) ) {
+    token->symbol = RETF;
+    return 0;
+  }
   if( (strcmp(string,"==") == 0) ) {
     token->symbol = EQL;
     return 0;

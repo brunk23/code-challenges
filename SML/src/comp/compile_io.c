@@ -317,6 +317,28 @@ int decode_line(char *line, int core[MEMSIZE],
 	}
 	break;
 
+      case CALLF:
+	/*
+	 * call == function call
+	 */
+	if( (curr = getNextToken(0,inptPtr)) ) {
+	  if( inpt.type == 'C' ) {
+	    inpt.type = 'L';
+	    dest = test_symbol(inptPtr, symbolTable, labels);
+	    core[iptr(1)] = (CALL*OPFACT) + dest;
+	  } else {
+	    emessg("Missing/Invalid Label",1);
+	  }
+	}
+	break;
+
+      case RETF:
+	/*
+	 * ret == return from function call
+	 */
+	core[iptr(1)] = (RET*OPFACT);
+	break;
+
       case LET:
 	/* 
 	 * let == assignments
