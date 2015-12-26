@@ -1,5 +1,9 @@
 10 sinput a
 15 input a
 20 sprint a
+22 sinput b
+23 sinput c
 25 print a
+26 sprint c
+27 sprint b
 30 end

@@ -3,6 +3,7 @@
 
 char *getNextToken(char *, struct Token *);
 int iptr(int);
+int stringtable(int);
 int oplev(char);
 int str2token(char *, struct Token *);
 int insert_symbol(struct Token *, struct Token[]);

@@ -44,6 +44,25 @@ int iptr(int delta) {
 }
 
 /*
+ * Call with the length of a string when you know it.
+ */
+int sptr(int delta) {
+  static int stringPointer = MEMSIZE-1;
+
+  stringPointer -= delta;
+
+  if( stringPointer < 0 ) {
+    emessg("Too many strings",1);
+  }
+
+  if( stringPointer >= MEMSIZE ) {
+    emessg("How do you get less characters than you start with",1);
+  }
+
+  return stringPointer;
+}
+
+/*
  * Utility function to help with processing expressions
  */
 int oplev(char n) {
@@ -77,6 +96,21 @@ int oplev(char n) {
 int str2token(char *string, struct Token *token)
 {
   int symbol = 0, x = 0;
+  char *s;
+  if( string[x] == '"' ) {
+    /* This is a string constant. Save it as such. */
+    s = currline(0,0,0);
+    while( s[x] != 0 ) {
+      symbol += s[x];
+      x++;
+    }
+    symbol += strlen(s);
+    token->symbol = symbol;
+    token->type = 'S';
+    token->location = stringtable(-1) + MEMSIZE;
+    return 0;
+  }
+
   while( string[x] != 0 ) {
     if( (string[x] >= 'A') && (string[x] <= 'Z') ) {
       string[x] = tolower(string[x]);
@@ -163,7 +197,6 @@ int str2token(char *string, struct Token *token)
     return 0;
   }
 
-
   if( (string[0] == '-' && string[1] == 0) ||
       string[0] == '+' || string[0] == '*' ||
       string[0] == '/' || string[0] == '%' ||
@@ -208,23 +241,11 @@ int insert_symbol(struct Token *token, struct Token symbolTable[MAXSYMS]) {
       break;
     }
     if( symbolTable[x].symbol == token->symbol ) {
-      if( (token->type == 'S' || token->type == 'W') &&
-	  (symbolTable[x].type == 'S' || symbolTable[x].type =='W') ) {
-	/* This is a string, if one is W, make both W */
-	if( token->type == 'W' ) {
-	  symbolTable->type = 'W';
-	}
+      if( symbolTable[x].type == token->type ) {
 	if( symbolTable[x].location < 0 ) {
 	  symbolTable[x].location = token->location;
 	}
 	break;
-      } else {
-	if( symbolTable[x].type == token->type ) {
-	  if( symbolTable[x].location < 0 ) {
-	    symbolTable[x].location = token->location;
-	  }
-	  break;
-	}
       }
     }
   }
@@ -243,10 +264,10 @@ int test_symbol(struct Token *token, struct Token syms[MAXSYMS],
   int loc;
 
   loc = insert_symbol(token, syms);
-  if( loc == -1 ) {
+  if( loc == -1 || token->type == 'S' ) {
     labels[iptr(0)].symbol = token->symbol;
     labels[iptr(0)].type = token->type;
-    labels[iptr(0)].location = -1;
+    labels[iptr(0)].location = token->location;
     loc = 0;
   }
   return loc;
@@ -258,4 +279,48 @@ int test_symbol(struct Token *token, struct Token syms[MAXSYMS],
  */
 int stringmemreq(int length) {
   return (length+2)/2;
+}
+
+int stringtable(int location) {
+  static int stringTable[MEMSIZE];
+  static int offset = 1;
+  
+  int x = 0, y = 0, count = 0;
+  char *s;
+
+  if( location < 0 ) {
+  
+    if( !(s = currline(0,0,0)) ) {
+      emessg("Line doesn't exist to add to stringtable",1);
+    }
+    while( s[x] != '\"' && s[x] != 0 ) {
+      x++;
+    }
+    y = ++x;
+    while( s[x] != '\"' && s[x] != 0 ) {
+      x++;
+      count++;
+    }
+  
+    stringTable[ offset ] = count * OPFACT; /* start with length */
+    for( x = 0; x < count; ++x ) {
+      if( x%2 == 0 ) {
+	stringTable[ offset + x/2 ] += s[ y + x ];
+      } else {
+	stringTable[ offset + (x+1)/2 ] = s[ y + x ] * OPFACT;
+      }
+    }
+
+    x = offset;
+    offset += count; /* Make room for it */
+  
+    return x;
+  }
+
+  /* return the value at location */
+  if( location >= MEMSIZE ) {
+    emessg("Value outside string table range",1);
+  }
+  
+  return stringTable[location];
 }
