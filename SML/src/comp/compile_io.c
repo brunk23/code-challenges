@@ -54,8 +54,9 @@ int process_source(char *filename, int core[MEMSIZE]){
   ssize_t status;
   
   /* allow up to 10 symbols per memory spot in the machine */
-  struct Token symbolTable[MAXSYMS];
-  struct Token labels[MEMSIZE];
+  struct Node *basePtr = 0;
+  struct Node *currPtr = 0;
+
   int retcode = 0;
   int x, dest, strtmp, strindex;
 
@@ -85,6 +86,8 @@ int process_source(char *filename, int core[MEMSIZE]){
     linenumber++;
     curr = strtok(line, "\n");
     currline(curr, bytes_read, linenumber);
+
+    currPtr = newNode(BASE,basePtr,0,currline,linenumber);
     
     if( (retcode = decode_line(curr, core, symbolTable, labels)) ) {
       emessg("Failed to decode line (nonspecific)",1);
