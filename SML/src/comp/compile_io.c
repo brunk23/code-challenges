@@ -185,29 +185,30 @@ int unused_processsource() {
   return retcode;
 }
 
-int decode_line(char *line, struct Node *base)
+int decode_line(char *line, struct Node *up, struct Node *left)
 {
-  struct Node *left = 0, *right = 0, *oper;
+  struct Node *right = 0, *oper;
   char *curr = line;
   
   /*
    * This line was blank or just a comment
    */
-  left = str2node(curr, base);
+  left = str2node(curr, up);
   if( !left ) {
     return 0;
   }
-
+  
   /*
    * This was a label.
    */
   if( left.type == LABEL ) {
-    if( base->up->type != BASE ) {
+    if( up->type != BASE ) {
       ewarn("Nested labels are foo.",1);
     }
-    base->left = left;
-    base->right = 0;
-    decode_line(0, left);
+    left->up = up;
+    up->left = left;
+    up->right = 0;
+    decode_line(0, left, 0);
   }
   
   if( left.type == KEYWORD ) {
