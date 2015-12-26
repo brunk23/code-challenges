@@ -37,7 +37,6 @@ int opcode_read(machineState *sml)
   char *pfull, *parse, *before;
   int input = MAXVAL+1;
   sml->counter++;		// increment the instruction counter	
-  cout << "? ";
   while( getline(cin, line) ) {
     pfull = new char[line.size()];
     parse = before = pfull;
@@ -47,7 +46,6 @@ int opcode_read(machineState *sml)
 	out_of_bounds(input,MINVAL,MAXVAL) ) {
       cout << "That is not a valid number.\n"
 	   << MINVAL << " to " << MAXVAL << endl;
-      cout << "? ";
       delete pfull;
       continue;
     } else {

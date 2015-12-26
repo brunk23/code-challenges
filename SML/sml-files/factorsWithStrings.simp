@@ -1,0 +1,31 @@
+10 rem		find the factors of a number
+
+12 sprint "Enter the number you want to find the factors of: "
+14 rem		get a number
+15 input a 
+18 sprint "The factors are: "
+
+19 rem		b is our current factor
+20 let b = 2
+
+29 rem		if we can't divide, jump to 80 to get next factor
+30 let c = a % b
+40 if c != 0 goto 80
+
+49 rem		we could divide, print this factor and reduce a by it
+50 print b
+60 let a = a / b
+
+69 rem		if a > 1, we need to find the next factor back to 30
+70 if a > 1 goto 30
+
+74 rem		a == 1, we're done, halt
+75 end
+
+78 rem		if our current factor is 2, add 1, else add two and
+79 rem		then go back to 30 and try again
+80 if b == 2 goto 90
+85 let b = b + 2
+86 goto 30
+90 let b = b + 1
+91 goto 30
