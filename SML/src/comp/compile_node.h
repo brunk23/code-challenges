@@ -3,7 +3,8 @@
 
 #include "compiler.h"
 
-struct Node *newNode(enum NTYPE ntype, struct Node *left, struct Node *right,
+struct Node *newNode(enum NTYPE ntype, struct Node * up,
+		     struct Node *left, struct Node *right,
 		     union SymbolValue sym, int location);
 int printNode(struct Node *node);
 

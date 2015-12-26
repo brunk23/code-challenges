@@ -7,6 +7,7 @@
 #include "compile_io.h"
 #include "compile_messages.h"
 #include "compile_parse.h"
+#include "compile_node.h"
 
 int main(int argc, char *argv[]) {
   int code[MEMSIZE];

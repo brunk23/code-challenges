@@ -3,7 +3,8 @@
 #include <string.h>
 #include "compiler.h"
 
-struct Node *newNode(enum NTYPE ntype, struct Node *left, struct Node *right,
+struct Node *newNode(enum NTYPE ntype, struct Node *up,
+		     struct Node *left, struct Node *right,
 		     union SymbolValue sym, int location) {
   struct Node *curr;
 
@@ -14,8 +15,10 @@ struct Node *newNode(enum NTYPE ntype, struct Node *left, struct Node *right,
   }
 
   curr->type = ntype;
+  curr->up = up;
   curr->left = left;
   curr->right = right;
+  curr->associate = 0;		/* which direction to go first */
 
   if( ntype == STRING || ntype == BASE || ntype == LABEL ) {
     /*
@@ -35,12 +38,13 @@ struct Node *newNode(enum NTYPE ntype, struct Node *left, struct Node *right,
     curr->resolved = 0;
   }
   curr->location = location;
-
+  
   return curr;
 }
 
 int printNode(struct Node *node) {
   printf("Memory Address: %x\n",node);
+  printf("Up: %x\n",node->up);
   printf("Left: %x\n",node->left);
   printf("Right: %x\n",node->right);
   printf("Type: %i\nValue: ",node->type);

@@ -53,9 +53,10 @@ int process_source(char *filename, int core[MEMSIZE]){
   size_t bytes_read;
   ssize_t status;
   
-  /* allow up to 10 symbols per memory spot in the machine */
+  /* basePtr will always point to the first base node */
   struct Node *basePtr = 0;
-  struct Node *currPtr = 0;
+  struct Node *currNodePtr = 0;
+  union SymbolValue val;
 
   int retcode = 0;
   int x, dest, strtmp, strindex;
@@ -70,30 +71,38 @@ int process_source(char *filename, int core[MEMSIZE]){
    * core memory is 0'd out
    */
   for(x = 0; x < MEMSIZE; ++x) {
-    labels[x].type = 0;
     core[x] = 0;
   }
-  for(x = 0; x < MAXSYMS; ++x) {
-    symbolTable[x].symbol = 0;
-    symbolTable[x].type = 0;
-    symbolTable[x].location = -1;
-  }
 
+  currNodePtr = basePtr;
   /*
    * This is the first pass of the compiler.
    */
   while(( status = getline(&line, &bytes_read, source)) != -1) {
     linenumber++;
     curr = strtok(line, "\n");
-    currline(curr, bytes_read, linenumber);
 
-    currPtr = newNode(BASE,basePtr,0,currline,linenumber);
+    /* Save the original line and where it was found  in the file
+     * in the base node, for error printing */
+    if( !(val.string = malloc( strlen(curr) + 1) ) ) {
+      emessg("Could not allocate memory for string.",1);
+    }
+    strncpy(val.string, curr, strlen(curr) + 1);
+
+    currNodePtr = newNode(BASE,currNodePtr,0,val,linenumber);
+
+    /* Make sure the previous base node points to this one */
+    currNodePtr->left->right = currNodePtr;
+
+    if( (currNodePtr->up = decode_line(curr, currNodePtr)) ) {
     
-    if( (retcode = decode_line(curr, core, symbolTable, labels)) ) {
-      emessg("Failed to decode line (nonspecific)",1);
     }
   }
-  
+
+  return 0;
+}
+
+int unused_processsource() {
   /*
    * Assign all data spots to locations right after the end of
    * our code and fill in the missing information. We only assign
@@ -176,45 +185,57 @@ int process_source(char *filename, int core[MEMSIZE]){
   return retcode;
 }
 
-int decode_line(char *line, int core[MEMSIZE], 
-		struct Token symbolTable[MAXSYMS],
-		struct Token labels[MEMSIZE])
+int decode_line(char *line, struct Node *base)
 {
-  struct Token inpt, *inptPtr = 0;
+  struct Node *left = 0, *right = 0, *oper;
   char *curr = line;
-  int dest;
-
-  /* We use this for getting our new token */
-  inpt.symbol = 0;
-  inpt.type = 0;
-  inpt.location = -1;
-  inptPtr = &inpt;
   
   /*
-   * First we process the line number
+   * This line was blank or just a comment
    */
-  curr = getNextToken(curr, inptPtr);
-  if( !curr ) {
-    /* Ignore blank lines */
+  left = str2node(curr, base);
+  if( !left ) {
     return 0;
   }
-  
-  if( inpt.type != 'C' ) {
-    emessg("All lines must start with a line number.",1);
-  } else {
-    inpt.type = 'L';
-    inpt.location = iptr(0);	/* Make sure we set the location */
-    test_symbol(inptPtr, symbolTable, labels);
-  }
 
-  /* Just in case a previous let messed with this location. */
-  labels[iptr(0)].symbol = 0;
-  labels[iptr(0)].type = 0;
-  labels[iptr(0)].location = -1;
+  /*
+   * This was a label.
+   */
+  if( left.type == LABEL ) {
+    if( base->up->type != BASE ) {
+      ewarn("Nested labels are foo.",1);
+    }
+    base->left = left;
+    base->right = 0;
+    decode_line(0, left);
+  }
   
+  if( left.type == KEYWORD ) {
+    /* This was a keyword, might be input print etc */
+    oper = left;
+    left = str2node(0, base);
+  } else {
+    oper = str2node(0, base);
+    right = str2node(0, base);
+  }
+  /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   * XX  This function needs to be completed to
+   * XX  parse the line correctly
+   * XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   */
   /*
    * Process the rest of the line, one token at a time.
    */
+
+}
+
+/*
+ * This will take a given node and compile it to the source
+ * code required. It will be recursive, as it might need to
+ * descend into the left and right nodes to resolve them before
+ * it can resolve this code.
+ */
+int compileNode(struct Node *node) {
   if ( (curr = getNextToken(0, inptPtr)) ) {
     if( inpt.type == 'K' ) {
       switch ( inpt.symbol ) {
