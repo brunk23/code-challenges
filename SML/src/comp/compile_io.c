@@ -94,7 +94,7 @@ int process_source(char *filename, int core[MEMSIZE]){
     /* Make sure the previous base node points to this one */
     currNodePtr->left->right = currNodePtr;
 
-    if( (currNodePtr->up = decode_line(curr, currNodePtr)) ) {
+    currNodePtr->up = decode_line(curr, currNodePtr, 0)
     
     }
   }
@@ -187,34 +187,36 @@ int unused_processsource() {
 
 int decode_line(char *line, struct Node *up, struct Node *left)
 {
-  struct Node *right = 0, *oper;
+  struct Node *temp = 0, *right = 0, *oper;
   char *curr = line;
   
   /*
    * This line was blank or just a comment
    */
-  left = str2node(curr, up);
-  if( !left ) {
+  temp = str2node(curr, up);
+  if( !temp ) {
     return 0;
   }
   
   /*
    * This was a label.
    */
-  if( left.type == LABEL ) {
+  if( temp.type == LABEL ) {
     if( up->type != BASE ) {
       ewarn("Nested labels are foo.",1);
     }
-    left->up = up;
-    up->left = left;
-    up->right = 0;
-    decode_line(0, left, 0);
+    temp->up = up;
+    temp->right = 0;
+    temp->left = decode_line(0, temp, left);
   }
   
-  if( left.type == KEYWORD ) {
+  if( temp.type == KEYWORD ) {
     /* This was a keyword, might be input print etc */
-    oper = left;
-    left = str2node(0, base);
+    oper = temp;
+    if( !left) {
+      left = str2node(0, up);
+    } else {
+      
   } else {
     oper = str2node(0, base);
     right = str2node(0, base);
