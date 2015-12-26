@@ -286,7 +286,7 @@ int stringtable(int location) {
   static int offset = 1;
   
   int x = 0, y = 0, count = 0;
-  char *s;
+  char *s, curr;
 
   if( location < 0 ) {
   
@@ -299,18 +299,46 @@ int stringtable(int location) {
     y = ++x;
     while( s[x] != '\"' && s[x] != 0 ) {
       x++;
+      if( s[x] == '\\' ) {
+	count--;
+      }
       count++;
     }
   
     stringTable[ offset ] = count * OPFACT; /* start with length */
     for( x = 0; x < count; ++x ) {
+      curr = s[ y + x ];
+      if( curr == '\\' ) {
+	y++;
+	switch (s[ y + x ]) {
+	case 'r':
+	  curr = '\r';
+	  break;
+
+	case 'n':
+	  curr = '\n';
+	  break;
+
+	case '\\':
+	  curr = '\\';
+	  break;
+
+	case 't':
+	  curr = '\t';
+	  break;
+
+	default:
+	  curr = s[ y + x];
+	  break;
+	}
+      }
       if( x%2 == 0 ) {
-	stringTable[ offset + x/2 ] += s[ y + x ];
+	stringTable[ offset + (x)/2 ] += curr;
       } else {
-	stringTable[ offset + (x+1)/2 ] = s[ y + x ] * OPFACT;
+	stringTable[ offset + (x+1)/2 ] = curr * OPFACT;
       }
     }
-
+    
     x = offset;
     offset += count; /* Make room for it */
   
