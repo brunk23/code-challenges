@@ -148,15 +148,12 @@ int process_source(char *filename, int core[MEMSIZE]){
 		core[ iptr(0)+strindex-1 ] = stringtable( strtmp+strindex-1 );
 		strindex--;
 	      }
+	      iptr( stringmemreq( core[ iptr(0) ] / OPFACT ) );
 	    } else {
 	      if( strtmp < 0 ) {
 		symbolTable[dest].location = iptr(0);
+		iptr( stringmemreq( INPMAX ) );
 	      }
-	    }
-	    if( INPMAX >= (core[ iptr(0) ] / OPFACT) ) {
-	      iptr( stringmemreq( INPMAX ) );
-	    } else {
-	      iptr( stringmemreq( core[ iptr(0) ] / OPFACT ) );
 	    }
 	  }
 
