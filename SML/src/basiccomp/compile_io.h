@@ -3,6 +3,6 @@
 
 int output_core(char *, int[]);
 int process_source(char *, int[]);
-int decode_line(char *,int[],struct Token [],struct Token[]);
+int decode_line(char *,int[],struct Node *,struct Node *);
 
 #endif

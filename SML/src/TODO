@@ -1,6 +1,25 @@
-The compiler should take care to ensure that strings are placed
-at the end of all other variables and have a decent amount of
-space between each one (50 spots). It should also check to be
-sure, when resolving symbols, that a string is not referenced
-outside of the string operations (if an unresolved label has
-the same symbol and type V, not S, throw the error/warning).
+Read input into a structure tree before doing any code generation
+Each line from the input file is a BASE node in a doubly linked
+list.
+
+input abc
+if abc < 0 goto done
+let boy = 3 * ( abc + 4 )
+print boy
+done: end
+
+START -> [BASE val:"input abc"]*right <---> *left[BASE val:"if abc < 0 goto done"]
+         *down                                        *down
+           |                                            |
+	   v 				     	        v
+      [KEYWORD val:INPUT]		       	 [KEYWORD val:IF]
+         *left   *right				  *left         *right
+           |        0			  	   |              |
+	   v	    			           v		  v
+      [VARIABLE val:"abc"]    	     [KEYWORD val:LT         [KEYWORD val:GOTO]
+         *left   *right              *left    *right          *left     *right
+	   0        0                 |	    |	               |         0      
+	   	    		      v	    v	               v	
+	              [VARIABLE val:"abc"] [CONSTANT val:0]  [LABEL val:"done"]
+		        *left  *right        *left *right      *left   *right
+		          0       0             0     0
