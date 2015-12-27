@@ -11,6 +11,15 @@
 #include "compile_utility.h"
 #include "compile_messages.h"
 
+/* Returns 0 on failure */
+char *getNextToken(char *string, struct Token *token) {
+  if( (string = strtok( string, " \t" ) ) ) {
+    str2token(string, token);
+  }
+  return string;
+}
+  
+
 /*
  * This will allow us to use our instruction pointer more securely.
  * It ensures that it remains in bounds, it is the responsibility
@@ -32,6 +41,25 @@ int iptr(int delta) {
   }
   
   return temp;
+}
+
+/*
+ * Call with the length of a string when you know it.
+ */
+int sptr(int delta) {
+  static int stringPointer = MEMSIZE-1;
+
+  stringPointer -= delta;
+
+  if( stringPointer < 0 ) {
+    emessg("Too many strings",1);
+  }
+
+  if( stringPointer >= MEMSIZE ) {
+    emessg("How do you get less characters than you start with",1);
+  }
+
+  return stringPointer;
 }
 
 /*
@@ -65,41 +93,22 @@ int oplev(char n) {
   return x;
 }
 
-struct Node *str2node(char *str, struct Node *up)
+int str2token(char *string, struct Token *token)
 {
-  struct Node *node = 0;
-  int x = 0, y=0;
-  char *s, *string;
-  enum NTYPE ntype;
-  enum KEYWORDS keyword;
-  union SymbolValue n;
-
-  string = strtok(str,"\t ");
-  if( !string || string[0] =='#' ) {
-    /* There was nothing left or we started a comment */
-    return node;
-  }
-  
+  int symbol = 0, x = 0;
+  char *s;
   if( string[x] == '"' ) {
-    /* This is a string constant. This should only be
-     * called from a base node XXX we should check this! XXX */
-    s = up->val.string;
-    while( s[x] != 0 && s[x] != '"' ) {
+    /* This is a string constant. Save it as such. */
+    s = currline(0,0,0);
+    while( s[x] != 0 ) {
+      symbol += s[x];
       x++;
     }
-    x++;
-    while( s[x+y] != 0 && s[x+y] != '"' ) {
-      y++;
-    }
-    if( !(n.string = malloc( y + 1)) ) {
-      emessg("Couldn't allocate memory for string.",1);
-    }
-    strncpy(n.string, s[x], y);
-    n.string[y] = 0;
-    
-    node = newNode(STRING, up, 0, 0, n, 0);
-
-    return node;
+    symbol += strlen(s);
+    token->symbol = symbol;
+    token->type = 'S';
+    token->location = stringtable(-1) + MEMSIZE;
+    return 0;
   }
 
   while( string[x] != 0 ) {
@@ -109,89 +118,83 @@ struct Node *str2node(char *str, struct Node *up)
     ++x;
   }
 
-  for(x = 0; x < 1; x++) {
-    n.keyword = NONE;
-    if( (strcmp(string,"let") == 0)) {
-      n.keyword = LET;
-      break;
-    }
-    if( (strcmp(string,"rem") == 0) ) {
-      n.keyword = REM;
-      break;
-    }
-    if( (strcmp(string,"goto") == 0) ) {
-      n.keyword = GOTO;
-      break;
-    }
-    if( (strcmp(string,"sinput") == 0) ) {
-      n.keyword = SINPUT;
-      break;
-    }
-    if( (strcmp(string,"sprint") == 0) ) {
-      n.keyword = SPRINT;
-      break;
-    }
-    if ( (strcmp(string,"input") == 0) ) {
-      n.keyword = INPUT;
-      break;
-    }
-    if( (strcmp(string,"print") == 0) ) {
-      n.keyword = PRINT;
-      break;
-    }
-    if( (strcmp(string,"if") == 0) ) {
-      n.keyword = IF;
-      break;
-    }
-    if( (strcmp(string,"inc") == 0) ) {
-      n.keyword = INC;
-      break;
-    }
-    if( (strcmp(string,"dec") == 0) ) {
-      n.keyword = DEC;
-      break;
-    }
-    if( (strcmp(string,"end") == 0) ) {
-      n.keyword = END;
-      break;
-    }
-    if( (strcmp(string,"call") == 0) ) {
-      n.keyword = CALLF;
-      break;
-    }
-    if( (strcmp(string,"ret") == 0) ) {
-      n.keyword = RETF;
-      break;
-    }
-    
-    if( (strcmp(string,"==") == 0) ) {
-      n.keyword = EQL;
-      break;
-    }
-    if( (strcmp(string,"!=") == 0) ) {
-      n.keyword = DNE;
-      break;
-    }
-    if( (strcmp(string,">=") == 0) ) {
-      n.keyword = GTE;
-      break;
-    }
-    if( (strcmp(string,">") == 0) ) {
-      n.keyword = GT;
-      break;
-    }
-    if( (strcmp(string,"<=") == 0) ) {
-      n.keyword = LTE;
-      break;
-    }
-    if( (strcmp(string,"<") == 0) ) {
-      n.keyword = LT;
-      break;
-    }
+  token->type = 'K';		/* K-eyword */
+  token->location = -1;
+  if( (strcmp(string,"let") == 0)) {
+    token->symbol = LET;
+    return 0;
   }
-  if( n.keyword != NONE ) {
-    node = newNode(KEYWORD, up, 0, 0, n, 0);
-    return node;
+  if( (strcmp(string,"rem") == 0) ) {
+    token->symbol = REM;
+    return 0;
+  }
+  if( (strcmp(string,"goto") == 0) ) {
+    token->symbol = GOTO;
+    return 0;
+  }
+  if( (strcmp(string,"sinput") == 0) ) {
+    token->symbol = SINPUT;
+    return 0;
+  }
+  if( (strcmp(string,"sprint") == 0) ) {
+    token->symbol = SPRINT;
+    return 0;
+  }
+  if ( (strcmp(string,"input") == 0) ) {
+    token->symbol = INPUT;
+    return 0;
+  }
+  if( (strcmp(string,"print") == 0) ) {
+    token->symbol = PRINT;
+    return 0;
+  }
+  if( (strcmp(string,"if") == 0) ) {
+    token->symbol = IF;
+    return 0;
+  }
+  if( (strcmp(string,"inc") == 0) ) {
+    token->symbol = INC;
+    return 0;
+  }
+  if( (strcmp(string,"dec") == 0) ) {
+    token->symbol = DEC;
+    return 0;
+  }
+  if( (strcmp(string,"end") == 0) ) {
+    token->symbol = END;
+    return 0;
+  }
+  if( (strcmp(string,"call") == 0) ) {
+    token->symbol = CALLF;
+    return 0;
+  }
+  if( (strcmp(string,"ret") == 0) ) {
+    token->symbol = RETF;
+    return 0;
+  }
+  if( (strcmp(string,"==") == 0) ) {
+    token->symbol = EQL;
+    return 0;
+  }
+  if( (strcmp(string,"!=") == 0) ) {
+    token->symbol = DNE;
+    return 0;
+  }
+  if( (strcmp(string,">=") == 0) ) {
+    token->symbol = GTE;
+    return 0;
+  }
+  if( (strcmp(string,">") == 0) ) {
+    token->symbol = GT;
+    return 0;
+  }
+  if( (strcmp(string,"<=") == 0) ) {
+    token->symbol = LTE;
+    return 0;
+  }
+  if( (strcmp(string,"<") == 0) ) {
+    token->symbol = LT;
+    return 0;
   }
 
   if( (string[0] == '-' && string[1] == 0) ||
@@ -199,37 +202,153 @@ struct Node *str2node(char *str, struct Node *up)
       string[0] == '/' || string[0] == '%' ||
       string[0] == '(' || string[0] == ')' ||
       string[0] == '=' ) {
-    n.operator = string[0];
-    node = newNode(OPERATOR, up, 0, 0, n, 0);
-    return node;
+    token->symbol = string[0];
+    token->type = 'M';		/* M-ath operation */
+    token->location = -1;
+    return 0;
   }
   
   if( (string[0] >= '0' && string[0] <= '9') ||
       (string[0] == '-' || string[0] == '+') ) {
-    n.number = strtol(string, 0, 10);
-    node = newNode(CONSTANT, up, 0, 0, n, 0);
-    return node;
+    symbol = strtol(string, 0, 10);
+    token->symbol = symbol;
+    token->type = 'C';		/* C-onst (or L-ine number) */
+    token->location = -1;
+    return 0;
   }
 
-  ntype = VARIABLE;
-  if( string[ strlen(string)-1 ] == ':' ) {
-    /* this is a label not a variable */
-    string[ strlen(string)-1 ] = 0;
-    ntype = LABEL;
+  if( (string[0] >= 'a' && string[0] <= 'z') ) {
+    token->symbol = string[0];
+    token->type = 'V';		/* V-ariable */
+    token->location = -1;
+    return 0;
   }
-  if( !(n.string = malloc( strlen(string) + 1)) ) {
-    emessg("Couldn't allocate string.",1);
-  }
-  strncpy(n.string, string, strlen(string));
-  n.string[strlen(string)] = 0;
-  node = newNode(ntype, up, 0, 0, n, 0);
-  return node;
+  
+  return 1;
 }
 
 /*
- * Real simple utility function to return the required number
+ * returns location if symbol exists
+ */
+int insert_symbol(struct Token *token, struct Token symbolTable[MAXSYMS]) {
+  int x;
+  for( x = 0; x < MAXSYMS; ++x ) {
+    if( symbolTable[x].type == 0 ) {
+      /* New symbol to be added */
+      symbolTable[x].symbol = token->symbol;
+      symbolTable[x].type = token->type;
+      symbolTable[x].location = token->location;
+      break;
+    }
+    if( symbolTable[x].symbol == token->symbol ) {
+      if( symbolTable[x].type == token->type ) {
+	if( symbolTable[x].location < 0 ) {
+	  symbolTable[x].location = token->location;
+	}
+	break;
+      }
+    }
+  }
+  if(x == MAXSYMS) {
+    emessg("Enough is never enough",1);
+  }
+  return symbolTable[x].location;
+}
+
+/*
+ * Test if we know where a token is. If so, return the memory location.
+ * If not, make this location (in labels) one we need to check later
+ */
+int test_symbol(struct Token *token, struct Token syms[MAXSYMS],
+		struct Token labels[MEMSIZE]) {
+  int loc;
+
+  loc = insert_symbol(token, syms);
+  if( loc == -1 || token->type == 'S' ) {
+    labels[iptr(0)].symbol = token->symbol;
+    labels[iptr(0)].type = token->type;
+    labels[iptr(0)].location = token->location;
+    loc = 0;
+  }
+  return loc;
+}
+
+/*
+ * Real simply utility function to return the required number
  * of bytes for a string.
  */
 int stringmemreq(int length) {
   return (length+2)/2;
+}
+
+int stringtable(int location) {
+  static int stringTable[MEMSIZE];
+  static int offset = 1;
+  
+  int x = 0, y = 0, count = 0;
+  char *s, curr;
+
+  if( location < 0 ) {
+  
+    if( !(s = currline(0,0,0)) ) {
+      emessg("Line doesn't exist to add to stringtable",1);
+    }
+    while( s[x] != '\"' && s[x] != 0 ) {
+      x++;
+    }
+    y = ++x;
+    while( s[x] != '\"' && s[x] != 0 ) {
+      x++;
+      if( s[x] == '\\' ) {
+	count--;
+      }
+      count++;
+    }
+  
+    stringTable[ offset ] = count * OPFACT; /* start with length */
+    for( x = 0; x < count; ++x ) {
+      curr = s[ y + x ];
+      if( curr == '\\' ) {
+	y++;
+	switch (s[ y + x ]) {
+	case 'r':
+	  curr = '\r';
+	  break;
+
+	case 'n':
+	  curr = '\n';
+	  break;
+
+	case '\\':
+	  curr = '\\';
+	  break;
+
+	case 't':
+	  curr = '\t';
+	  break;
+
+	default:
+	  curr = s[ y + x];
+	  break;
+	}
+      }
+      if( x%2 == 0 ) {
+	stringTable[ offset + (x)/2 ] += curr;
+      } else {
+	stringTable[ offset + (x+1)/2 ] = curr * OPFACT;
+      }
+    }
+    
+    x = offset;
+    offset += count; /* Make room for it */
+  
+    return x;
+  }
+
+  /* return the value at location */
+  if( location >= MEMSIZE ) {
+    emessg("Value outside string table range",1);
+  }
+  
+  return stringTable[location];
 }

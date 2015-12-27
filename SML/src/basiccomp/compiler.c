@@ -6,10 +6,10 @@
 #include "compile_utility.h"
 #include "compile_io.h"
 #include "compile_messages.h"
-#include "compile_node.h"
+#include "compile_parse.h"
 
 int main(int argc, char *argv[]) {
-  int core[MEMSIZE];
+  int core[MEMSIZE];		/* The memory in the SML machine */
   int retcode = 0;
   
   /* COMMAND LINE ARGUMENTS */
