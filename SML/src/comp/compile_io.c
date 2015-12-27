@@ -12,7 +12,8 @@
 #include "compile_parse.h"
 
 /*
- * Write memory out to a core file.
+ * Write memory out to a core file. This shouldn't have
+ * to change with the new code.
  */
 int output_core(char *filename, int core[MEMSIZE]) {
   FILE *dest = 0;
@@ -206,8 +207,9 @@ int decode_line(char *line, struct Node *up, struct Node *left)
       ewarn("Nested labels are foo.",1);
     }
     temp->up = up;
-    temp->right = 0;
-    temp->left = decode_line(0, temp, left);
+    temp->left = 0;
+    temp->associate = 2;
+    temp->right = decode_line(0, temp, left);
   }
   
   if( temp.type == KEYWORD ) {
