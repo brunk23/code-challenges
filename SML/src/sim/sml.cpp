@@ -28,13 +28,9 @@ int main(int argc, char *argv[])
   machineState *sml = &smlReal;
   bool debug = false;
   int x = 1;
-  /*
-   * We are going to use a jump table for the commands.
-   */
-  opPtr instruction_table[MAXOP];
 
   // If there's an error making the machine, quit.
-  if ( (returnCode = init_machine(sml, instruction_table)) ) {
+  if ( (returnCode = init_machine(sml)) ) {
     cout << "ERROR: Failed to create SML Machine." << endl;
     return 1;
   }
@@ -138,7 +134,7 @@ int main(int argc, char *argv[])
     } else {
       smlReal.indirect = false;
     }
-    returnCode=instruction_table[smlReal.operationCode](sml);
+    returnCode=sml->inst_tble[smlReal.operationCode](sml);
   }
   if( debug ) {
     // we only dump the memory if we input the file by hand
@@ -150,49 +146,49 @@ int main(int argc, char *argv[])
   return returnCode;
 }
 
-int init_machine(machineState *sml, opPtr inst_tble[])
+int init_machine(machineState *sml)
 {
   // Unsupported OPCODES crash the machine.
   for(int i = 0; i < MAXOP; ++i) {
-    inst_tble[i] = opcode_invalid;
+    sml->inst_tble[i] = opcode_invalid;
   }
 
   // These are the currently supported instructions
 	
   // Arithmatic
-  inst_tble[ADD]=opcode_add;
-  inst_tble[SUBTRACT]=opcode_subtract;
-  inst_tble[MULTIPLY]=opcode_multiply;
-  inst_tble[DIVIDE]=opcode_divide;
-  inst_tble[MOD]=opcode_mod;
+  sml->inst_tble[ADD]=opcode_add;
+  sml->inst_tble[SUBTRACT]=opcode_subtract;
+  sml->inst_tble[MULTIPLY]=opcode_multiply;
+  sml->inst_tble[DIVIDE]=opcode_divide;
+  sml->inst_tble[MOD]=opcode_mod;
 
   // memory access
-  inst_tble[LOAD]=opcode_load;
-  inst_tble[STORE]=opcode_store;
+  sml->inst_tble[LOAD]=opcode_load;
+  sml->inst_tble[STORE]=opcode_store;
 
   // i/o
-  inst_tble[READ]=opcode_read;
-  inst_tble[WRITE]=opcode_write;
-  inst_tble[SREAD]=opcode_sread;
-  inst_tble[SWRITE]=opcode_swrite;
+  sml->inst_tble[READ]=opcode_read;
+  sml->inst_tble[WRITE]=opcode_write;
+  sml->inst_tble[SREAD]=opcode_sread;
+  sml->inst_tble[SWRITE]=opcode_swrite;
 
   // flow control
-  inst_tble[BRANCH]=opcode_branch;
-  inst_tble[BRANCHNEG]=opcode_branch_neg;
-  inst_tble[BRANCHZERO]=opcode_branch_zero;
-  inst_tble[HALT]=opcode_halt;
+  sml->inst_tble[BRANCH]=opcode_branch;
+  sml->inst_tble[BRANCHNEG]=opcode_branch_neg;
+  sml->inst_tble[BRANCHZERO]=opcode_branch_zero;
+  sml->inst_tble[HALT]=opcode_halt;
 
   // Extended opcodes
-  inst_tble[INC]=opcode_inc;
-  inst_tble[DEC]=opcode_dec;
-  inst_tble[DUMP]=memory_dump;
-  inst_tble[NOP]=opcode_nop;
+  sml->inst_tble[INC]=opcode_inc;
+  sml->inst_tble[DEC]=opcode_dec;
+  sml->inst_tble[DUMP]=memory_dump;
+  sml->inst_tble[NOP]=opcode_nop;
 
   // Stack opcodes
-  inst_tble[PUSH]=opcode_push;
-  inst_tble[POP]=opcode_pop;
-  inst_tble[CALL]=opcode_call;
-  inst_tble[RET]=opcode_ret;
+  sml->inst_tble[PUSH]=opcode_push;
+  sml->inst_tble[POP]=opcode_pop;
+  sml->inst_tble[CALL]=opcode_call;
+  sml->inst_tble[RET]=opcode_ret;
   
   sml->accumulator = 0;
   sml->counter = 0;
