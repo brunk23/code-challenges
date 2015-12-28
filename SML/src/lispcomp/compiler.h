@@ -5,7 +5,7 @@
 
 enum KEYWORDS {
   SETF = 1, INPUT, IF, PRINT, INCM, DECM, DNE,
-  EQL, GT, GTE, LT, LTE, DEFUN, PROGN
+  EQL, GT, GTE, LT, LTE, DEFUN, PROGN, SUM
 };
 
 enum TYPE {
@@ -24,16 +24,15 @@ union SymVal {
  * A symbol leaves context when you go up and *right is not 0
  */
 struct Symbol {
-  struct Symbol *up;
-  struct Symbol *right;
-  struct Symbol *down;
+  struct Symbol *next;
+  union SymVal val;
   enum TYPE type;
   int ID;
 };
 
 struct Token {
   struct Symbol *symTree;	/* Pointer to the bottom */
-  struct Token *next;		/* The next command */
+  struct Token *parent;         /* Points to the function that contains this */
   struct Token *arg;		/* Points to the next argument */
   enum TYPE type;		/* what is this */
   int ID;

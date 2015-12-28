@@ -1,4 +1,6 @@
 (+ 5 6 7)
+(setf a 5)
+(if (< a b) (input a) (progn (print b) (input a)))
 
 ;; load 5
 ;; add 6

@@ -4,7 +4,7 @@
 
 /* Will return a uniq ID number each time it's called */
 int getID() {
-  static int ID = 1;
+  static int ID = 0;
   ID++;
   return ID;
 }
