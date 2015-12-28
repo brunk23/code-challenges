@@ -12,7 +12,8 @@ int process_functions(char *n, struct Token *curr) {
   temp = malloc(sizeof(struct Token));
 
   temp->symTree = curr->symTree;
-  temp->arg = 0;
+  temp->nextarg = 0;
+  temp->currarg = 0;
   temp->location = -1;
   
   if(strcmp(n,"defun") == 0) {
@@ -48,6 +49,6 @@ int process_functions(char *n, struct Token *curr) {
     temp->ID = PROGN;
   }
   temp->parent = curr;
-  curr->arg = temp;
+  curr->currarg = temp;
   return temp->ID;
 }

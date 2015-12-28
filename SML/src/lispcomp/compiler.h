@@ -28,12 +28,14 @@ struct Symbol {
   union SymVal val;
   enum TYPE type;
   int ID;
+  int location;
 };
 
 struct Token {
   struct Symbol *symTree;	/* Pointer to the bottom */
   struct Token *parent;         /* Points to the function that contains this */
-  struct Token *arg;		/* Points to the next argument */
+  struct Token *nextarg;       	/* Points to the next argument */
+  struct Token *currarg;
   enum TYPE type;		/* what is this */
   int ID;
   int location;		       

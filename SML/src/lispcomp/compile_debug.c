@@ -3,9 +3,11 @@
 #include "compile_debug.h"
 
 int printToken(struct Token *curr) {
-  printf("symTree Addr: %x\n",curr->symTree);	/* Pointer to the bottom */
-  printf("parent Addr: %x\n",curr->parent);
-  printf("arg Addr: %x\n",curr->arg);		/* Points to the next argument */
+  printf("token Addr: %p\n",curr);
+  printf("symTree Addr: %p\n",curr->symTree);	/* Pointer to the bottom */
+  printf("parent Addr: %p\n",curr->parent);
+  printf("currarg Addr: %p\n",curr->currarg);      	/* Points to the next argument */
+  printf("nextarg Addr: %p\n",curr->nextarg);      	/* Points to the next argument */
   printf("type: %s\n", printType(curr->type));	/* what is this */
   printf("ID: %i\n", curr->ID);
   if( curr->type == INTERNAL ) {
