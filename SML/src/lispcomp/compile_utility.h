@@ -2,5 +2,6 @@
 #define COMPILE_UTILITY_H
 
 int getID();
+int iptr();
 
 #endif
