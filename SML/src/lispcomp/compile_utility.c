@@ -222,7 +222,7 @@ struct Cons *getNextNode(char *string) {
   if( !(s[y] >='0' && s[y] <= '9') ||
       ((s[y] == '+' || s[y] =='-') &&
        !((s[y+1] >= '0') && (s[y+1] <= '9')))) {
-    created->type = VARIABLE;
+    created->type = SYMBOL;
     created->val.string = malloc( strlen(&s[y]) + 1 );
     if( created->val.string ) {
       strncpy(created->val.string, &s[y], strlen(&s[y]) +1 );

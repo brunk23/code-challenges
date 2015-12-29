@@ -6,7 +6,7 @@
 #include "compile_io.h"
 #include "compile_utility.h"
 #include "compile_messages.h"
-#include "compile_function.h"
+#include "compile_symbol.h"
 #include "compile_debug.h"
 
 /* Use Empty Place Holder for testing purposes */
