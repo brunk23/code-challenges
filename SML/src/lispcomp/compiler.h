@@ -5,7 +5,7 @@
 
 enum KEYWORDS {
   SETF = 1, INPUT, IF, PRINT, INCM, DECM, DNE,
-  EQL, GT, GTE, LT, LTE, DEFUN, PROGN, SUM
+  EQL, GT, GTE, LT, LTE, DEFUN, PROGN, SUM, EOL
 };
 
 enum TYPE {
@@ -30,12 +30,11 @@ struct Symbol {
   int ID;
   int location;
 };
-
+  
 struct Token {
-  struct Symbol *symTree;	/* Pointer to the bottom */
-  struct Token *parent;         /* Points to the function that contains this */
-  struct Token *nextarg;       	/* Points to the next argument */
-  struct Token *currarg;
+  struct Token *car;
+  struct Token *cdr;
+  union SymVal val;
   enum TYPE type;		/* what is this */
   int ID;
   int location;		       

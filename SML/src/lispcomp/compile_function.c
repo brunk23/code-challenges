@@ -8,13 +8,8 @@
  * This will process functions and built-ins
  */
 int process_functions(char *n, struct Token *curr) {
-  struct Token *temp;
-  temp = malloc(sizeof(struct Token));
 
-  temp->symTree = curr->symTree;
-  temp->nextarg = 0;
-  temp->currarg = 0;
-  temp->location = -1;
+  struct Token *temp = curr;
   
   if(strcmp(n,"defun") == 0) {
     temp->type = INTERNAL;
@@ -48,7 +43,5 @@ int process_functions(char *n, struct Token *curr) {
     temp->type = INTERNAL;
     temp->ID = PROGN;
   }
-  temp->parent = curr;
-  curr->currarg = temp;
   return temp->ID;
 }

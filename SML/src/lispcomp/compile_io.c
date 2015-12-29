@@ -38,9 +38,8 @@ int process_source(char *filename, int core[]) {
    */
   base = malloc(sizeof(struct Token));
   base->symTree = 0;
-  base->nextarg = 0;
-  base->currarg = 0;
-  base->parent = 0;
+  base->car = 0;
+  base->cdr = 0;
   base->type = INTERNAL;
   base->ID = PROGN;
   base->location = 0;
@@ -52,169 +51,18 @@ int process_source(char *filename, int core[]) {
   while(( status = getline(&line, &bytes_read, source)) != -1) {
     linenumber++;
     curr = line;
-    
-    for( x = 0; x < strlen(line); ++x ) {
 
-      /* ignore all comments */
-      if(curr[x] == ';') {
-	break;
+    while( 1 ) {
+      if( !(ctoken = getNextToken(curr)) ) {
+	break;			/* end of line */
       }
-      
-      /* HANDLE ENTERING FUNCTIONS AND CHANGING SCOPE */
-      if(curr[x] == '(') {
-	y = x+1;
-        ++x;
-	while( curr[x] != ' ' && curr[x] != 0 &&
-	       curr[x] != ')' && curr[x] != '(' &&
-	       curr[x] != '\t' && curr[x] != '\n' ) {
-	  ++x;
-	}
-	seperator = curr[x];
-	curr[x] = 0;
-	process_functions(&curr[y],ctoken);
-	ctoken = ctoken->currarg;
-	curr[x] = seperator;
-      }
-
-      if(curr[x] == ')') {
-	/* move context up to parent */
-	ctoken = ctoken->parent;
-	x++;
-      }
-      /* END CHANGING SCOPE AND FUNCTION HANDLING */
-
-      /* START PROCESSING VARIABLE NAME */
-      if( (curr[x] >= 'a' && curr[x]<='z') ) {
-	y = x;
-	while( (curr[x] >= 'a' && curr[x]<='z') ||
-	       (curr[x] >= '0' && curr[x]<='9') ||
-	       (curr[x] == '-') ) {
-	  ++x;
-	}
-	seperator = curr[x];
-	curr[x] = 0;
-	symbolPtr = ctoken->symTree;
-	while( symbolPtr ) {
-	  if( symbolPtr->type == VARIABLE) {
-	    if( strcmp(&curr[y],symbolPtr->val.string) == 0 ) {
-	      break;
-	    }
-	  }
-	  symbolPtr = symbolPtr->next;
-	}
-	if(ctoken->type == INTERNAL &&
-	   (ctoken->ID == DEFUN || ctoken->ID == SETF)) {
-	  if( !symbolPtr ) {
-	    symbolPtr = malloc(sizeof(struct Symbol));
-	    if(!symbolPtr) {
-	      emessg("Failed to allocate symbol",1);
-	    }
-	    /* XXX This should set the parent XXX */
-	    symbolPtr->next = ctoken->symTree;
-	    ctoken->symTree=symbolPtr;
-	    symbolPtr->type = VARIABLE;
-	    symbolPtr->ID = getID();
-	    symbolPtr->val.string = malloc(strlen(&curr[y]) + 1);
-	    if(! symbolPtr->val.string) {
-	      emessg("Failed to allocate string",1);
-	    }
-	    strncpy(symbolPtr->val.string, &curr[y],strlen(&curr[y]) +1);
-	    symbolPtr->location = -1;
-	  }
-	}
-	if(symbolPtr == 0) {
-	  /* Check parent scopes here */
-	  printf("%s\n",line);
-	  emessg("Variable not found in current Scope!",1);
-	} else {
-	  temptoken = ctoken;
-	  while( temptoken->nextarg ) {
-	    temptoken = temptoken->nextarg;
-	  }
-	  temptoken->nextarg = malloc(sizeof(struct Token));
-	  if(!temptoken->nextarg) {
-	    emessg("Failed to create Token",1);
-	  }
-	  temptoken = temptoken->nextarg;
-	  temptoken->parent = ctoken->parent;
-	  temptoken->symTree = ctoken->symTree;
-	  temptoken->nextarg = 0;
-	  temptoken->currarg = 0;
-	  temptoken->type = VARIABLE;
-	  temptoken->ID = symbolPtr->ID;
-	  temptoken->location = -1;
-	}
-      }
-      /* END PROCESSING VARIABLE NAME */
-      
-      /* START PROCESSING CONSTANT */
-      if( (curr[x] >= '0' && curr[x]<='9') ||
-	  (curr[x] == '-' || curr[x]=='+') ) {
-	/* This is the start of a constant, constants are
-	 * automatically saved and saved at global scope */
-	temptoken = ctoken;
-	constant = strtol(&curr[x],0,10);
-	while( (curr[x] >= '0' && curr[x] <= '9') ||
-	       (curr[x] == '-' || curr[x] == '+') ) {
-	  ++x;
-	}
-	while(temptoken->parent != 0) {
-	  temptoken = temptoken->parent;
-	}
-	symbolPtr = temptoken->symTree;
-	while( symbolPtr ) {
-	  if( symbolPtr->type == CONSTANT &&
-	      symbolPtr->val.value == constant ) {
-	    /* already in table */
-	    break;
-	  }
-	  symbolPtr = symbolPtr->next;
-	}
-	if( !symbolPtr ) {
-	  symbolPtr = malloc(sizeof(struct Symbol));
-	  symbolPtr->next = temptoken->symTree;
-	  temptoken->symTree = symbolPtr;
-	  symbolPtr->type = CONSTANT;
-	  symbolPtr->val.value = constant;
-	  symbolPtr->ID = getID();
-	  symbolPtr->location = -1;
-	}
-	temptoken = ctoken;
-	while( temptoken->nextarg) {
-	  temptoken = temptoken->nextarg;
-	}
-	temptoken->nextarg = malloc(sizeof(struct Token));
-	if(!temptoken->nextarg) {
-	  emessg("Failed to create Token",1);
-	}
-	temptoken = temptoken->nextarg;
-	temptoken->parent = ctoken->parent;
-	temptoken->symTree = ctoken->symTree;
-	temptoken->nextarg = 0;
-	temptoken->currarg = 0;
-	temptoken->type = CONSTANT;
-	temptoken->ID = symbolPtr->ID;
-	temptoken->location = -1;
-      }
-
-      /* END PROCESSING CONSTANT */
-      
+      curr = 0;
+      printf("Got token type: %s\n", printType(ctoken->type));
+      printf("Value: %s\n",ctoken->val.string);
+      free(ctoken);
     }
+      
   }
-
-  ctoken = base;
-  while (ctoken) {
-    printToken(ctoken);
-    printf("\n\n");
-    ctoken = ctoken->nextarg;
-  }
-
-  ctoken = base->nextarg->currarg;
-  while (ctoken) {
-    printToken(ctoken);
-    printf("\n\n");
-    ctoken = ctoken->nextarg;
-  }  
 
 
 
