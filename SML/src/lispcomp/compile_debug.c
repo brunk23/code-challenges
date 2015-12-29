@@ -2,8 +2,9 @@
 #include "compiler.h"
 #include "compile_debug.h"
 
-int printToken(struct Token *curr) {
-
+int printToken(struct Cons *curr) {
+  printf("Cons ID: %i\n",curr->ID);
+  printf("Cons type: %i\n",curr->type);
   return 0;
 }
 

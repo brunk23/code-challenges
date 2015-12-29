@@ -21,7 +21,7 @@ int process_source(char *filename, int core[]) {
   int retcode = 0;
   int x, y, constant, dest, strtmp, strindex;
 
-  struct Token *base, *ctoken, *temptoken, *stack, *stemp;
+  struct Cons *base, *ctoken, *temptoken, *stack, *stemp;
   struct Symbol *symbolPtr = 0, *newSymbol = 0;
 
   /*
@@ -36,14 +36,21 @@ int process_source(char *filename, int core[]) {
    * Create the base node that our program will be under.
    * This is of type "INTERNAL" and will have an ID of PROGN.
    */
-  base = malloc(sizeof(struct Token));
+  base = malloc(sizeof(struct Cons));
   base->car = 0;
   base->cdr = 0;
-  base->type = INTERNAL;
-  base->ID = PROGN;
+  base->type = LIST;
+  base->ID = getID();
   base->location = 0;
 
-  stack = base;
+  base->car = malloc(sizeof( struct Cons));
+  base->car->type = INTERNAL;
+  base->car->ID = PROGN;
+  base->car->location = 0;
+  base->car->car = 0;
+  base->car->cdr = 0;
+
+  stack = 0;
   
   /*
    * This is the first pass of the compiler.
@@ -54,41 +61,36 @@ int process_source(char *filename, int core[]) {
     curr = line;
 
     while( 1 ) {
-      if( !(temptoken = getNextToken(curr)) ) {
+      if( !(temptoken = getNextNode(curr)) ) {
 	break;			/* end of line */
       }
       curr = 0;
-      
-      if(temptoken->type == FUNCTION) {
-	if( !(stemp = malloc(sizeof(struct Token))) ) {
-	  emessg("Stack failed",1);
-	}
-	printf("Function\n");
-	stemp->cdr = stack;
-	stack = stemp;
-	stack->car = ctoken;
-	ctoken->car = temptoken;
-	ctoken = temptoken;
-      }
-
-      if(temptoken->type == VARIABLE || temptoken->type == CONSTANT) {
-	printf("Const or Variable\n");
-	ctoken->cdr = temptoken;
-	ctoken = temptoken;
-      }
 
       if(temptoken->type == EOL) {
-	printf("End Function\n");
-	ctoken = stack->car;
-	stemp = stack->cdr;
-	free(stack);
-	stack = stemp;
+	ctoken = pop(&stack);
+	continue;
+      }
+
+      if( ctoken->car ) {
+	ctoken = append(ctoken,temptoken);
+      } else {
+	ctoken->car = temptoken;
+      }
+
+      printf("type: %i\t",temptoken->type);
+      printf("base: %p\tctoken: %p\tstack: %p\n",base,ctoken,stack);
+      
+      if(temptoken->type == LIST) {
+        stack=push(ctoken,stack);
+	ctoken = temptoken;
       }
       
     }
       
   }
 
+  printList(base);
+  printf("\n");
 
   /*
    * Before we actually compile the parsed tree

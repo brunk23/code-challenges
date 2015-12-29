@@ -3,7 +3,7 @@
 
 #include "compiler.h"
 
-int printToken(struct Token *);
+int printToken(struct Cons *);
 char *printType(enum TYPE);
 char *printInternalID(int);
 

@@ -9,7 +9,7 @@ enum KEYWORDS {
 };
 
 enum TYPE {
-  CONSTANT, FUNCTION, INTERNAL, VARIABLE, STRING
+  LIST, CONSTANT, FUNCTION, INTERNAL, VARIABLE, STRING
 };
 
 union SymVal {
@@ -31,9 +31,9 @@ struct Symbol {
   int location;
 };
   
-struct Token {
-  struct Token *car;
-  struct Token *cdr;
+struct Cons {
+  struct Cons *car;
+  struct Cons *cdr;
   union SymVal val;
   enum TYPE type;		/* what is this */
   int ID;

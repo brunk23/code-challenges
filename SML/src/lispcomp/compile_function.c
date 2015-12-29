@@ -7,9 +7,9 @@
 /*
  * This will process functions and built-ins
  */
-int process_functions(char *n, struct Token *curr) {
+int process_functions(char *n, struct Cons *curr) {
 
-  struct Token *temp = curr;
+  struct Cons *temp = curr;
   
   if(strcmp(n,"defun") == 0) {
     temp->type = INTERNAL;
