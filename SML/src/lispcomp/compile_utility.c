@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "compiler.h"
 #include "compile_utility.h"
@@ -17,7 +19,11 @@ struct Token *getNextToken(char *string) {
   int y;
   
   if(string) {
-    s = string;
+    if(s) {
+      free(s);
+    }
+    s = malloc(strlen(string) + 1);
+    strncpy(s,string,strlen(string));
     x = 0;
     prev = 0;
   }
@@ -42,7 +48,6 @@ struct Token *getNextToken(char *string) {
   if( prev == ')' ) {
     /* we need to return a token to represent it */
     created->type = EOL;
-    created->val.string = &s[x];
     prev = s[x];
     return created;
   }
@@ -53,7 +58,7 @@ struct Token *getNextToken(char *string) {
   }
   
   while( s[x] != 0 ) {
-    if( s[x] == ' ' || s[x] == ')' ||
+    if( s[x] == ' ' || s[x] == '(' ||
 	s[x] == '\t' || s[x] == '\n' || s[x] == '\r' ||
 	s[x] == 0 || s[x] == ';' ) {
       ++x;
@@ -64,7 +69,7 @@ struct Token *getNextToken(char *string) {
 
   y = x;
   while( s[x] != 0 ) {
-    if( s[x] == ' ' || s[x] == ')' || s[x] == '(' ||
+    if( s[x] == ' ' || s[x] == ')' ||
 	s[x] == '\t' || s[x] == '\n' || s[x] == '\r' ||
 	s[x] == 0 || s[x] == ';' ) {
       prev = s[x];
@@ -76,6 +81,7 @@ struct Token *getNextToken(char *string) {
 
   /* The string was empty */
   if( x == y ) {
+    printf("Function\n");
     free(created);
     return 0;
   }

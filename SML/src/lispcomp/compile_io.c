@@ -63,6 +63,7 @@ int process_source(char *filename, int core[]) {
 	if( !(stemp = malloc(sizeof(struct Token))) ) {
 	  emessg("Stack failed",1);
 	}
+	printf("Function\n");
 	stemp->cdr = stack;
 	stack = stemp;
 	stack->car = ctoken;
@@ -71,11 +72,13 @@ int process_source(char *filename, int core[]) {
       }
 
       if(temptoken->type == VARIABLE || temptoken->type == CONSTANT) {
+	printf("Const or Variable\n");
 	ctoken->cdr = temptoken;
 	ctoken = temptoken;
       }
 
       if(temptoken->type == EOL) {
+	printf("End Function\n");
 	ctoken = stack->car;
 	stemp = stack->cdr;
 	free(stack);
