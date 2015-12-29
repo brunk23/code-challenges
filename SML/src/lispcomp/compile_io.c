@@ -76,9 +76,6 @@ int process_source(char *filename, int core[]) {
       } else {
 	ctoken->car = temptoken;
       }
-
-      printf("type: %i\t",temptoken->type);
-      printf("base: %p\tctoken: %p\tstack: %p\n",base,ctoken,stack);
       
       if(temptoken->type == LIST) {
         stack=push(ctoken,stack);
