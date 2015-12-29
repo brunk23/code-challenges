@@ -21,7 +21,7 @@ int process_source(char *filename, int core[]) {
   int retcode = 0;
   int x, y, constant, dest, strtmp, strindex;
 
-  struct Token *base, *ctoken, *temptoken;
+  struct Token *base, *ctoken, *temptoken, *stack, *stemp;
   struct Symbol *symbolPtr = 0, *newSymbol = 0;
 
   /*
@@ -37,13 +37,14 @@ int process_source(char *filename, int core[]) {
    * This is of type "INTERNAL" and will have an ID of PROGN.
    */
   base = malloc(sizeof(struct Token));
-  base->symTree = 0;
   base->car = 0;
   base->cdr = 0;
   base->type = INTERNAL;
   base->ID = PROGN;
   base->location = 0;
 
+  stack = base;
+  
   /*
    * This is the first pass of the compiler.
    */
@@ -53,17 +54,37 @@ int process_source(char *filename, int core[]) {
     curr = line;
 
     while( 1 ) {
-      if( !(ctoken = getNextToken(curr)) ) {
+      if( !(temptoken = getNextToken(curr)) ) {
 	break;			/* end of line */
       }
       curr = 0;
-      printf("Got token type: %s\n", printType(ctoken->type));
-      printf("Value: %s\n",ctoken->val.string);
-      free(ctoken);
+      
+      if(temptoken->type == FUNCTION) {
+	if( !(stemp = malloc(sizeof(struct Token))) ) {
+	  emessg("Stack failed",1);
+	}
+	stemp->cdr = stack;
+	stack = stemp;
+	stack->car = ctoken;
+	ctoken->car = temptoken;
+	ctoken = temptoken;
+      }
+
+      if(temptoken->type == VARIABLE || temptoken->type == CONSTANT) {
+	ctoken->cdr = temptoken;
+	ctoken = temptoken;
+      }
+
+      if(temptoken->type == EOL) {
+	ctoken = stack->car;
+	stemp = stack->cdr;
+	free(stack);
+	stack = stemp;
+      }
+      
     }
       
   }
-
 
 
   /*
@@ -76,6 +97,7 @@ int process_source(char *filename, int core[]) {
 
   return 0;
 }
+
 
 /*
  * Write memory out to a core file.

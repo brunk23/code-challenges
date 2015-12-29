@@ -4,6 +4,9 @@
 #include "compile_utility.h"
 #include "compile_messages.h"
 
+/*
+ * This is currently not working with '(' and ')' correctly
+ */
 struct Token *getNextToken(char *string) {
   static char *s;
   static int x;
