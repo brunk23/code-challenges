@@ -4,6 +4,7 @@
 
 #include "compiler.h"
 #include "compile_symbol.h"
+#include "compile_messages.h"
 
 /*
  * This will process functions and built-ins
@@ -55,4 +56,26 @@ struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
     temp->args = -1;
   }
   return temp;
+}
+
+struct Cons *copy(struct Cons *old) {
+  struct Cons *cpy;
+
+  if( !(cpy = malloc( sizeof( struct Cons ) ) ) ) {
+    emessg("Couldn't get copy",1);
+  }
+  cpy->car = 0;
+  cpy->cdr = 0;
+  cpy->type = old->type;
+  if(old->type == CONSTANT) {
+    cpy->val.value = old->val.value;
+  } else {
+    cpy->val.string = old->val.string;
+  }
+  cpy->ID=old->ID;
+  cpy->args=old->args;
+  cpy->location= -1;
+  cpy->resolved = NIL;
+
+  return cpy;
 }

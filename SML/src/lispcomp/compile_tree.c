@@ -20,10 +20,28 @@ int compileTree(struct Cons *base, int code[MEMSIZE]) {
   code[iptr(1)] = (HALT*OPFACT) + NIL;
 
   assign_symbols(symTree,code);
+  resolve_symbols(base,symTree,code);
   
   return 0;
 }
 
+int resolve_symbols(struct Cons *tree, struct Cons *syms,
+		    int code[MEMSIZE]) {
+  struct Cons *curr, *s;
+  curr = tree;
+  while( curr ) {
+    if( curr->car->type == LIST ) {
+      resolve_symbols(curr->car, syms, code);
+    } else {
+      if( curr->car->resolved == NIL ) {
+	s = inSymTree(curr->car, syms);
+	code[curr->car->location] += s->location;
+      }
+    }
+    curr = curr->cdr;
+  }
+  return 0;
+}
 int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
   struct Cons *curr;
   curr = tree;
@@ -31,6 +49,7 @@ int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
   while( curr ) {
     if( curr->car->type == CONSTANT ) {
       curr->car->location = iptr(0);
+      curr->car->resolved = T;
       code[iptr(1)] = curr->car->val.value;
       curr = curr->cdr;
     }
@@ -75,7 +94,7 @@ struct Cons *cType(struct Cons *a, struct Cons **s) {
   sym = inSymTree(curr,*s);
   if( a->type == CONSTANT && !sym ) {
     /* Constants always added to the symbol tree */
-    (*s) = push(a, *s);
+    (*s) = push(copy(a), *s);
     sym = inSymTree(curr,*s);
   }
   if( curr->type == SYMBOL ) {
@@ -156,6 +175,7 @@ int comp_plus(struct Cons *curr, struct Cons **symtree,
     comp_list(arg,symtree,code);
   } else {
     arg->location = iptr(0);
+    arg->resolved = NIL;
     code[iptr(1)] = (LOAD*OPFACT) + NIL;
   }
   
@@ -168,6 +188,7 @@ int comp_plus(struct Cons *curr, struct Cons **symtree,
       code[iptr(1)] = (POP*OPFACT) + ADD;
     } else {
       arg->location = iptr(0);
+      arg->resolved = NIL;
       code[iptr(1)] = (ADD*OPFACT) + NIL;
     }
   }

@@ -3,6 +3,7 @@
 
 int assign_symbols(struct Cons *, int []);
 int compileTree(struct Cons *, int []);
+int resolve_symbols(struct Cons *, struct Cons *,int []);
 struct Cons *inSymTree(struct Cons *, struct Cons *);
 struct Cons *cType(struct Cons *, struct Cons **);
 int comp_plus(struct Cons *, struct Cons **,int []);

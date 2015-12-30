@@ -14,6 +14,7 @@ struct Cons *push(struct Cons *new, struct Cons *old) {
       head->car = new;
       head->cdr = old;
       head->type = LIST;
+      head->resolved = T;
     } else {
       emessg("Push failed",1);
     }
@@ -112,6 +113,7 @@ struct Cons *append(struct Cons *list, struct Cons *add) {
       spot->location = 0;
       spot->val.value = 0;
       spot->ID = 0;
+      spot->resolved = T;
     }
   }
   return list;
@@ -185,6 +187,7 @@ struct Cons *getNextNode(char *string) {
   created->car = 0;
   created->cdr = 0;
   created->location = 0;
+  created->resolved = T;
 
   if( prev == ')' ) {
     /* we need to return a token to represent it */

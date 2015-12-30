@@ -40,6 +40,7 @@ int process_source(char *filename, int core[]) {
   base->type = LIST;
   base->ID = getID();
   base->location = 0;
+  base->resolved = T;
 
   base->car = malloc(sizeof( struct Cons));
   base->car->type = INTERNAL;
@@ -47,6 +48,7 @@ int process_source(char *filename, int core[]) {
   base->car->location = 0;
   base->car->car = 0;
   base->car->cdr = 0;
+  base->car->resolved = T;
 
   stack = 0;
   
