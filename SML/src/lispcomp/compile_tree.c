@@ -250,7 +250,6 @@ int comp_print(struct Cons *curr, struct Cons **symtree,
       y++;
     }
     temp->val.string[y] = 0;
-    printf("%s\n",temp->val.string);
     (*symtree) = push(temp, *symtree);
     arg->resolved = NIL;
     arg->val.string = temp->val.string;
