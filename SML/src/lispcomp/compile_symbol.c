@@ -68,6 +68,31 @@ struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
     temp->ID = LT;
     temp->args = 2;
   }
+  if(strcmp(n,"<=") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = LTE;
+    temp->args = 2;
+  }
+  if(strcmp(n,">") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = GT;
+    temp->args = 2;
+  }
+  if(strcmp(n,">=") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = GTE;
+    temp->args = 2;
+  }
+  if(strcmp(n,"=") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = EQL;
+    temp->args = 2;
+  }
+  if(strcmp(n,"!=") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = DNE;
+    temp->args = 2;
+  }
   if(strcmp(n,"progn") == 0) {
     temp->type = INTERNAL;
     temp->ID = PROGN;

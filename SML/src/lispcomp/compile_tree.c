@@ -71,6 +71,30 @@ int comp_list(struct Cons *c, struct Cons **symtree,
       case IF:
 	comp_if(curr, symtree, code);
 	break;
+
+      case EQL:
+	comp_cond(curr, symtree, code, EQL);
+	break;
+
+      case DNE:
+	comp_cond(curr, symtree, code, DNE);
+	break;
+
+      case GT:
+	comp_cond(curr, symtree, code, GT);
+	break;
+
+      case GTE:
+	comp_cond(curr, symtree, code, GTE);
+	break;
+
+      case LT:
+	comp_cond(curr, symtree, code, LT);
+	break;
+
+      case LTE:
+	comp_cond(curr, symtree, code, LTE);
+	break;
 	
       default:
 	printf("Unimplemented\n");
