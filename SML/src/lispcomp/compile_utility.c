@@ -131,7 +131,22 @@ int length(struct Cons *list) {
   }
   return 0;
 }
-  
+
+struct Cons *nth(struct Cons *list, int n) {
+  struct Cons *spot;
+  int x = 1;
+  spot = list;
+  if( spot ) {
+    while( x < n ) {
+      ++x;
+      spot = spot->cdr;
+      if( !spot ) {
+	emessg("nth does not exist",1);
+      }
+    }
+  }
+  return spot->car;
+}
 
 /*
  * This is currently not working with '(' and ')' correctly

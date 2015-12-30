@@ -8,7 +8,7 @@
 #include "compile_symbol.h"
 
 int compileTree(struct Cons *base, int code[MEMSIZE]) {
-  struct Cons *symTree, *ctoken;
+  struct Cons *symTree;
 
   symTree = 0;
   
@@ -16,9 +16,25 @@ int compileTree(struct Cons *base, int code[MEMSIZE]) {
    * the symbol tree, it generates code for everything but
    * defun options, we call comp_progn because everything is
    * constained in a (progn ) list */
-  comp_list(base,symTree,code);
+  comp_list(base,&symTree,code);
   code[iptr(1)] = (HALT*OPFACT) + NIL;
 
+  assign_symbols(symTree,code);
+  
+  return 0;
+}
+
+int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
+  struct Cons *curr;
+  curr = tree;
+
+  while( curr ) {
+    if( curr->car->type == CONSTANT ) {
+      curr->car->location = iptr(0);
+      code[iptr(1)] = curr->car->val.value;
+      curr = curr->cdr;
+    }
+  }
   return 0;
 }
 
@@ -42,7 +58,6 @@ struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
       }
     }
     b = b->cdr;
-    s = b->car;
   }
   return 0;
 }
@@ -51,16 +66,16 @@ struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
  * Returns a pointer to the value in the symTree
  * Returns 0 if the object is not in the symTree
  */
-struct Cons *carType(struct Cons *a, struct Cons **s) {
+struct Cons *cType(struct Cons *a, struct Cons **s) {
   struct Cons *curr, *sym;
-  curr = a->car;
+  curr = a;
   if( !a ) {
     emessg("The head of this list was empty?",1);
   }
   sym = inSymTree(curr,*s);
   if( a->type == CONSTANT && !sym ) {
     /* Constants always added to the symbol tree */
-    *s = push(sym, *s);
+    (*s) = push(a, *s);
     sym = inSymTree(curr,*s);
   }
   if( curr->type == SYMBOL ) {
@@ -71,13 +86,13 @@ struct Cons *carType(struct Cons *a, struct Cons **s) {
   return sym;
 }
 
-int comp_list(struct Cons *c, struct Cons *symtree,
+int comp_list(struct Cons *c, struct Cons **symtree,
 	      int code[MEMSIZE]) {
   struct Cons *object, *curr;
 
   curr = c;
   while( curr ) {
-    object = carType(curr, &symtree);
+    object = cType(curr->car, symtree);
     
     if( object->type == INTERNAL ) {
       switch (object->ID) {
@@ -105,10 +120,8 @@ int comp_list(struct Cons *c, struct Cons *symtree,
  * This expects a series of lists. It doesn't produce
  * any code by itself.
  */
-int comp_progn(struct Cons *curr, struct Cons *symtree,
+int comp_progn(struct Cons *curr, struct Cons **symtree,
 	       int code[MEMSIZE]) {
-  int argument = 0;
-  struct Cons *object;
  
   if(curr->car->type == CONSTANT) {
     printList(curr);
@@ -128,12 +141,36 @@ int comp_progn(struct Cons *curr, struct Cons *symtree,
 /*
  * Handles (+
  */
-int comp_plus(struct Cons *curr, struct Cons *symtree,
+int comp_plus(struct Cons *curr, struct Cons **symtree,
 	     int code[MEMSIZE]) {
+  int x;
+  struct Cons *arg;
 
-#ifdef DEBUG
-  printf("In comp_plus\n");
-#endif
-
+  /* Get the first value into accumulator. If it is a
+   * symbol or value, we load it. If it is a list, we
+   * execute it, because it will leave its result in the
+   * accumulator */
+  arg = nth(curr,1);
+  arg = cType(arg,symtree);
+  if(arg->type == LIST) {
+    comp_list(arg,symtree,code);
+  } else {
+    arg->location = iptr(0);
+    code[iptr(1)] = (LOAD*OPFACT) + NIL;
+  }
+  
+  for( x = 2; x <= length(curr); ++x ) {
+    arg = nth(curr,x);
+    arg = cType(arg,symtree);
+    if(arg->type == LIST) {
+      code[iptr(1)] = (PUSH*OPFACT) + NIL;
+      comp_list(arg,symtree,code);
+      code[iptr(1)] = (POP*OPFACT) + ADD;
+    } else {
+      arg->location = iptr(0);
+      code[iptr(1)] = (ADD*OPFACT) + NIL;
+    }
+  }
+  
   return 0;
 }

@@ -128,6 +128,7 @@ int output_core(char *filename, int core[MEMSIZE]) {
       fprintf(dest,"\n");
     }
   }
+  fprintf(dest,"\n");
 
   if( dest != stdout ) {
     fclose(dest);
