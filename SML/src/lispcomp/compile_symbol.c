@@ -40,6 +40,11 @@ struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
     temp->ID = SUM;
     temp->args = -1;
   }
+  if(strcmp(n,"-") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = DIFFERENCE;
+    temp->args = -1;
+  }
   if(strcmp(n,"if") == 0) {
     temp->type = INTERNAL;
     temp->ID = IF;
