@@ -159,7 +159,7 @@ struct Cons *getNextNode(char *string) {
       free(s);
     }
     s = malloc(strlen(string) + 1);
-    strncpy(s,string,strlen(string));
+    strncpy(s,string,strlen(string)+1);
     x = 0;
     prev = s[0];
   }
