@@ -1,6 +1,7 @@
 (setf asdf 19)
 (setf bad asdf)
 (setf foo (* bad bad))
+(if (< 5 6) (print (+ 5 6)) (print foo))
 (print foo)
 (print (+ 8 9))
 (print (- asdf 6 7))

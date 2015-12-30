@@ -2,5 +2,7 @@
 a.out
 *.core
 *.swp
-sml_comp
+sml_basic
+sml_lisp
+sml_disass
 sml_sim
