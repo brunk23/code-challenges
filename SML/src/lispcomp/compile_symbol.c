@@ -11,7 +11,7 @@ struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
   char *n;
   struct Cons *temp = curr;
   
-  n = curr->val.string;
+  n = curr->string;
   
   if(strcmp(n,"defun") == 0) {
     temp->type = INTERNAL;
@@ -129,7 +129,7 @@ int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
     if( curr->car->type == CONSTANT ) {
       curr->car->location = iptr(0);
       curr->car->resolved = T;
-      code[iptr(1)] = curr->car->val.value;
+      code[iptr(1)] = curr->car->value;
     }
     if( curr->car->type == VARIABLE ) {
       curr->car->location = iptr(1);
@@ -137,7 +137,7 @@ int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
     }
     if( curr->car->type == STRING ) {
       curr->car->location = iptr(0);
-      if( strlen(curr->car->val.string) > 0 ) {
+      if( strlen(curr->car->string) > 0 ) {
 	/* copy the string into memory here */
       }
       iptr(INPMAX/2+1);
@@ -156,14 +156,14 @@ struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
   while( b ) {
     s = b->car;
     if( s->type == CONSTANT && a->type == CONSTANT ) {
-      if( a->val.value == s->val.value ) {
+      if( a->value == s->value ) {
 	return s;
       }
     } else {
-      if( (s->val.string && a->val.string) &&
+      if( (s->string && a->string) &&
 	  (s->type != CONSTANT) &&
 	  (a->type != CONSTANT)) {
-	if( strcmp(a->val.string,s->val.string) == 0 ) {
+	if( strcmp(a->string,s->string) == 0 ) {
 	  return s;
 	}
       }

@@ -32,14 +32,14 @@ int process_source(char *filename, int core[]) {
   base->type = LIST;
   base->ID = getID();
   base->location = 0;
-  base->val.string = 0;
+  base->string = 0;
   base->resolved = T;
 
   base->car = malloc(sizeof( struct Cons));
   base->car->type = INTERNAL;
   base->car->ID = PROGN;
   base->car->location = 0;
-  base->val.string = 0;
+  base->string = 0;
   base->car->car = 0;
   base->car->cdr = 0;
   base->car->resolved = T;

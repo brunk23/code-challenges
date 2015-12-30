@@ -15,10 +15,10 @@ int printList(struct Cons *list) {
 	    printList(currCons->car);
 	  } else {
 	    if(currCons->car->type == CONSTANT) {
-	      fprintf(stderr,"#%i",currCons->car->val.value);
+	      fprintf(stderr,"#%i",currCons->car->value);
 	    } else {
-	      if(currCons->car->val.string) {
-		fprintf(stderr,"\"%s\"",currCons->car->val.string);
+	      if(currCons->car->string) {
+		fprintf(stderr,"\"%s\"",currCons->car->string);
 	      } else {
 		fprintf(stderr,"[NONE] ");
 	      }

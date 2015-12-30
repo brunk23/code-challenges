@@ -160,7 +160,7 @@ int comp_print(struct Cons *head, struct Cons **symtree,
     x = getID();
     temp->ID = x;
     temp->resolved = NIL;
-    if( !(temp->val.string = malloc( 10 ))) {
+    if( !(temp->string = malloc( 10 ))) {
       emessg("Failed to make room for string.",1);
     }
 
@@ -169,18 +169,18 @@ int comp_print(struct Cons *head, struct Cons **symtree,
      */
     y = 0;
     while( x > 0 ) {
-      temp->val.string[y] = (x % 4) + '0';
+      temp->string[y] = (x % 4) + '0';
       x = x / 4;
       y++;
     }
-    temp->val.string[y] = 0;
+    temp->string[y] = 0;
     (*symtree) = push(temp, *symtree);
     arg->resolved = NIL;
-    arg->val.string = temp->val.string;
+    arg->string = temp->string;
     arg->location = iptr(0);
     code[iptr(1)] = (STORE*OPFACT) + NIL;
     arg->car->resolved = NIL;
-    arg->car->val.string = temp->val.string;
+    arg->car->string = temp->string;
     arg->car->location = iptr(0);
     code[iptr(1)] = (WRITE*OPFACT) + NIL;
     sym = temp;
@@ -237,7 +237,7 @@ int comp_setf(struct Cons *head, struct Cons **symtree,
       sym = inSymTree(arg,*symtree);
     }
   }
-  if(arg->type == SYMBOL && arg->val.string[0] == '"') {
+  if(arg->type == SYMBOL && arg->string[0] == '"') {
     /* variable is a string */
     type = STRING;
     if( !sym ) {

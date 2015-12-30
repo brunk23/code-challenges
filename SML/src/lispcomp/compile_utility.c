@@ -12,7 +12,7 @@ struct Cons *push(struct Cons *new, struct Cons *old) {
       head->car = new;
       head->cdr = old;
       head->type = LIST;
-      head->val.string = 0;
+      head->string = 0;
       head->resolved = T;
       head->ID=getID();
     } else {
@@ -47,15 +47,15 @@ struct Cons *copy(struct Cons *old) {
   }
   cpy->car = 0;
   cpy->cdr = 0;
-  cpy->val.string = 0;
+  cpy->string = 0;
   cpy->type = old->type;
   if(old->type == CONSTANT) {
-    cpy->val.value = old->val.value;
+    cpy->value = old->value;
   } else {
-    if( !(cpy->val.string = malloc( strlen( old->val.string ) + 1))) {
+    if( !(cpy->string = malloc( strlen( old->string ) + 1))) {
       emessg("Could not make new string",1);
     }
-    strncpy(cpy->val.string,old->val.string,strlen(old->val.string)+1);
+    strncpy(cpy->string,old->string,strlen(old->string)+1);
   }
   cpy->ID=old->ID;
   cpy->args=old->args;
@@ -100,7 +100,7 @@ struct Cons *append(struct Cons *list, struct Cons *add) {
       spot->car = add;		/* put the new item in car */
       spot->cdr = 0;		/* this is the new end of the list */
       spot->type = LIST;
-      spot->val.string = 0;
+      spot->string = 0;
       spot->location = 0;
       spot->ID = getID();
       spot->resolved = T;
@@ -177,7 +177,7 @@ struct Cons *getNextNode(char *string) {
   created->car = 0;
   created->cdr = 0;
   created->location = 0;
-  created->val.string = 0;
+  created->string = 0;
   created->resolved = T;
   created->ID=getID();
 
@@ -240,9 +240,9 @@ struct Cons *getNextNode(char *string) {
       ((s[y] == '+' || s[y] =='-') &&
        !((s[y+1] >= '0') && (s[y+1] <= '9')))) {
     created->type = SYMBOL;
-    created->val.string = malloc( strlen(&s[y]) + 1 );
-    if( created->val.string ) {
-      strncpy(created->val.string, &s[y], strlen(&s[y]) +1 );
+    created->string = malloc( strlen(&s[y]) + 1 );
+    if( created->string ) {
+      strncpy(created->string, &s[y], strlen(&s[y]) +1 );
     } else {
       emessg("String not created",1);
     }
@@ -252,7 +252,7 @@ struct Cons *getNextNode(char *string) {
   if( (s[y] >= '0' && s[y] <= '9') ||
       (s[y] == '-') || (s[y] == '+') ) {
     created->type = CONSTANT;
-    created->val.value = strtol(&s[y],0,10);
+    created->value = strtol(&s[y],0,10);
     return created;
   }
   return created;

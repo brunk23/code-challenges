@@ -14,16 +14,12 @@ enum KEYWORDS {
 enum TYPE {
   LIST, SYMBOL, CONSTANT, FUNCTION, INTERNAL, VARIABLE, STRING
 };
-
-union SymVal {
-  char *string;
-  int value;
-};
   
 struct Cons {
   struct Cons *car;
   struct Cons *cdr;
-  union SymVal val;
+  char *string;
+  int value;
   enum TYPE type;		/* what is this */
   int ID;
   int args;

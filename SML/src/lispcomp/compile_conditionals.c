@@ -58,7 +58,7 @@ int comp_cond(struct Cons *head, struct Cons **symtree,
   curr = head->cdr;
   
   if( length(curr) != head->car->args ) {
-    fprintf(stderr,"(%s ",head->car->val.string);
+    fprintf(stderr,"(%s ",head->car->string);
     printList(curr);
     emessg("Incorrect number of arguments to COND",1);
   }

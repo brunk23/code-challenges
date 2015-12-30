@@ -11,7 +11,7 @@ int comp_math(struct Cons *head, struct Cons **symtree,
   struct Cons *arg, *curr;
 
   if( length(head->cdr ) < 2 ) {
-    fprintf(stderr,"(%s ",head->car->val.string);
+    fprintf(stderr,"(%s ",head->car->string);
     printList(head);
     emessg("Too few arguments to function",1);
   }
