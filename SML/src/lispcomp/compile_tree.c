@@ -7,6 +7,7 @@
 #include "compile_tree.h"
 #include "compile_utility.h"
 #include "compile_symbol.h"
+#include "compile_math.h"
 
 int compileTree(struct Cons *base, int code[MEMSIZE]) {
   struct Cons *symTree;
@@ -24,97 +25,6 @@ int compileTree(struct Cons *base, int code[MEMSIZE]) {
   resolve_symbols(base,symTree,code);
   
   return 0;
-}
-
-int resolve_symbols(struct Cons *tree, struct Cons *syms,
-		    int code[MEMSIZE]) {
-  struct Cons *curr, *s;
-  curr = tree;
-  while( curr ) {
-    if( curr->car->type == LIST ) {
-      resolve_symbols(curr->car, syms, code);
-    }
-    if( curr->car->resolved == NIL ) {
-      s = inSymTree(curr->car, syms);
-      code[curr->car->location] += s->location;
-    }
-    curr = curr->cdr;
-  }
-  return 0;
-}
-int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
-  struct Cons *curr;
-  curr = tree;
-
-  while( curr ) {
-    if( curr->car->type == CONSTANT ) {
-      curr->car->location = iptr(0);
-      curr->car->resolved = T;
-      code[iptr(1)] = curr->car->val.value;
-    }
-    if( curr->car->type == VARIABLE ) {
-      curr->car->location = iptr(1);
-      curr->car->resolved = T;
-    }
-    if( curr->car->type == STRING ) {
-      curr->car->location = iptr(0);
-      if( strlen(curr->car->val.string) > 0 ) {
-	/* copy the string into memory here */
-      }
-      iptr(INPMAX/2+1);
-    }
-    curr = curr->cdr;
-  }
-  return 0;
-}
-
-/*
- * Will go down the tree looking for a symbol.
- */
-struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
-  struct Cons *s, *b;
-  b = sym;
-  while( b ) {
-    s = b->car;
-    if( s->type == CONSTANT && a->type == CONSTANT ) {
-      if( a->val.value == s->val.value ) {
-	return s;
-      }
-    } else {
-      if( (s->val.string && a->val.string) &&
-	  !(s->type == CONSTANT || a->type == CONSTANT)) {
-	if( strcmp(a->val.string,s->val.string) == 0 ) {
-	  return s;
-	}
-      }
-    }
-    b = b->cdr;
-  }
-  return 0;
-}
-
-/*
- * Returns a pointer to the value in the symTree
- * Returns 0 if the object is not in the symTree
- */
-struct Cons *cType(struct Cons *a, struct Cons **s) {
-  struct Cons *curr, *sym;
-  curr = a;
-  if( !a ) {
-    emessg("The head of this list was empty?",1);
-  }
-  sym = inSymTree(curr,*s);
-  if( a->type == CONSTANT && !sym ) {
-    /* Constants always added to the symbol tree */
-    (*s) = push(copy(a), *s);
-    sym = inSymTree(curr,*s);
-  }
-  if( curr->type == SYMBOL ) {
-    sym = process_symbol(curr,*s);
-  } else {
-    sym = curr;
-  }
-  return sym;
 }
 
 int comp_list(struct Cons *c, struct Cons **symtree,
@@ -177,45 +87,6 @@ int comp_progn(struct Cons *curr, struct Cons **symtree,
   return 0;
 }
 
-/*
- * Handles (+
- */
-int comp_plus(struct Cons *curr, struct Cons **symtree,
-	     int code[MEMSIZE]) {
-  int x;
-  struct Cons *arg;
-
-  /* Get the first value into accumulator. If it is a
-   * symbol or value, we load it. If it is a list, we
-   * execute it, because it will leave its result in the
-   * accumulator */
-  arg = nth(curr,1);
-  arg = cType(arg,symtree);
-  if(arg->type == LIST) {
-    comp_list(arg,symtree,code);
-  } else {
-    arg->location = iptr(0);
-    arg->resolved = NIL;
-    code[iptr(1)] = (LOAD*OPFACT) + NIL;
-  }
-  
-  for( x = 2; x <= length(curr); ++x ) {
-    arg = nth(curr,x);
-    arg = cType(arg,symtree);
-    if(arg->type == LIST) {
-      code[iptr(1)] = (PUSH*OPFACT) + NIL;
-      comp_list(arg,symtree,code);
-      code[iptr(1)] = (POP*OPFACT) + ADD;
-    } else {
-      arg->location = iptr(0);
-      arg->resolved = NIL;
-      code[iptr(1)] = (ADD*OPFACT) + NIL;
-    }
-  }
-  
-  return 0;
-}
-
 int comp_print(struct Cons *curr, struct Cons **symtree,
 	     int code[MEMSIZE]) {
   struct Cons *arg, *temp;
@@ -272,44 +143,5 @@ int comp_print(struct Cons *curr, struct Cons **symtree,
       code[iptr(1)] = (WRITE*OPFACT) + NIL;
     }
   }
-  return 0;
-}
-
-/*
- * Handles (+
- */
-int comp_subtract(struct Cons *curr, struct Cons **symtree,
-	     int code[MEMSIZE]) {
-  int x;
-  struct Cons *arg;
-
-  /* Get the first value into accumulator. If it is a
-   * symbol or value, we load it. If it is a list, we
-   * execute it, because it will leave its result in the
-   * accumulator */
-  arg = nth(curr,1);
-  arg = cType(arg,symtree);
-  if(arg->type == LIST) {
-    comp_list(arg,symtree,code);
-  } else {
-    arg->location = iptr(0);
-    arg->resolved = NIL;
-    code[iptr(1)] = (LOAD*OPFACT) + NIL;
-  }
-  
-  for( x = 2; x <= length(curr); ++x ) {
-    arg = nth(curr,x);
-    arg = cType(arg,symtree);
-    if(arg->type == LIST) {
-      code[iptr(1)] = (PUSH*OPFACT) + NIL;
-      comp_list(arg,symtree,code);
-      code[iptr(1)] = (POP*OPFACT) + SUBTRACT;
-    } else {
-      arg->location = iptr(0);
-      arg->resolved = NIL;
-      code[iptr(1)] = (SUBTRACT*OPFACT) + NIL;
-    }
-  }
-  
   return 0;
 }

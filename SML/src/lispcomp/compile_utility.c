@@ -39,6 +39,28 @@ struct Cons *pop(struct Cons **stack) {
   return 0;
 }
 
+struct Cons *copy(struct Cons *old) {
+  struct Cons *cpy;
+
+  if( !(cpy = malloc( sizeof( struct Cons ) ) ) ) {
+    emessg("Couldn't get copy",1);
+  }
+  cpy->car = 0;
+  cpy->cdr = 0;
+  cpy->type = old->type;
+  if(old->type == CONSTANT) {
+    cpy->val.value = old->val.value;
+  } else {
+    cpy->val.string = old->val.string;
+  }
+  cpy->ID=old->ID;
+  cpy->args=old->args;
+  cpy->location= -1;
+  cpy->resolved = NIL;
+
+  return cpy;
+}
+
 /* This should print the generated lists */
 int printList(struct Cons *list) {
   struct Cons *currCons;

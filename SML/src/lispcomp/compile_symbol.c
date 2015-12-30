@@ -5,6 +5,7 @@
 #include "compiler.h"
 #include "compile_symbol.h"
 #include "compile_messages.h"
+#include "compile_utility.h"
 
 /*
  * This will process functions and built-ins
@@ -63,24 +64,93 @@ struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
   return temp;
 }
 
-struct Cons *copy(struct Cons *old) {
-  struct Cons *cpy;
-
-  if( !(cpy = malloc( sizeof( struct Cons ) ) ) ) {
-    emessg("Couldn't get copy",1);
+int resolve_symbols(struct Cons *tree, struct Cons *syms,
+		    int code[MEMSIZE]) {
+  struct Cons *curr, *s;
+  curr = tree;
+  while( curr ) {
+    if( curr->car->type == LIST ) {
+      resolve_symbols(curr->car, syms, code);
+    }
+    if( curr->car->resolved == NIL ) {
+      s = inSymTree(curr->car, syms);
+      code[curr->car->location] += s->location;
+    }
+    curr = curr->cdr;
   }
-  cpy->car = 0;
-  cpy->cdr = 0;
-  cpy->type = old->type;
-  if(old->type == CONSTANT) {
-    cpy->val.value = old->val.value;
+  return 0;
+}
+int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
+  struct Cons *curr;
+  curr = tree;
+
+  while( curr ) {
+    if( curr->car->type == CONSTANT ) {
+      curr->car->location = iptr(0);
+      curr->car->resolved = T;
+      code[iptr(1)] = curr->car->val.value;
+    }
+    if( curr->car->type == VARIABLE ) {
+      curr->car->location = iptr(1);
+      curr->car->resolved = T;
+    }
+    if( curr->car->type == STRING ) {
+      curr->car->location = iptr(0);
+      if( strlen(curr->car->val.string) > 0 ) {
+	/* copy the string into memory here */
+      }
+      iptr(INPMAX/2+1);
+    }
+    curr = curr->cdr;
+  }
+  return 0;
+}
+
+/*
+ * Will go down the tree looking for a symbol.
+ */
+struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
+  struct Cons *s, *b;
+  b = sym;
+  while( b ) {
+    s = b->car;
+    if( s->type == CONSTANT && a->type == CONSTANT ) {
+      if( a->val.value == s->val.value ) {
+	return s;
+      }
+    } else {
+      if( (s->val.string && a->val.string) &&
+	  !(s->type == CONSTANT || a->type == CONSTANT)) {
+	if( strcmp(a->val.string,s->val.string) == 0 ) {
+	  return s;
+	}
+      }
+    }
+    b = b->cdr;
+  }
+  return 0;
+}
+
+/*
+ * Returns a pointer to the value in the symTree
+ * Returns 0 if the object is not in the symTree
+ */
+struct Cons *cType(struct Cons *a, struct Cons **s) {
+  struct Cons *curr, *sym;
+  curr = a;
+  if( !a ) {
+    emessg("The head of this list was empty?",1);
+  }
+  sym = inSymTree(curr,*s);
+  if( a->type == CONSTANT && !sym ) {
+    /* Constants always added to the symbol tree */
+    (*s) = push(copy(a), *s);
+    sym = inSymTree(curr,*s);
+  }
+  if( curr->type == SYMBOL ) {
+    sym = process_symbol(curr,*s);
   } else {
-    cpy->val.string = old->val.string;
+    sym = curr;
   }
-  cpy->ID=old->ID;
-  cpy->args=old->args;
-  cpy->location= -1;
-  cpy->resolved = NIL;
-
-  return cpy;
+  return sym;
 }
