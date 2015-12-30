@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "compiler.h"
 #include "compile_messages.h"
@@ -32,11 +33,10 @@ int resolve_symbols(struct Cons *tree, struct Cons *syms,
   while( curr ) {
     if( curr->car->type == LIST ) {
       resolve_symbols(curr->car, syms, code);
-    } else {
-      if( curr->car->resolved == NIL ) {
-	s = inSymTree(curr->car, syms);
-	code[curr->car->location] += s->location;
-      }
+    }
+    if( curr->car->resolved == NIL ) {
+      s = inSymTree(curr->car, syms);
+      code[curr->car->location] += s->location;
     }
     curr = curr->cdr;
   }
@@ -51,8 +51,19 @@ int assign_symbols(struct Cons *tree, int code[MEMSIZE]) {
       curr->car->location = iptr(0);
       curr->car->resolved = T;
       code[iptr(1)] = curr->car->val.value;
-      curr = curr->cdr;
     }
+    if( curr->car->type == VARIABLE ) {
+      curr->car->location = iptr(1);
+      curr->car->resolved = T;
+    }
+    if( curr->car->type == STRING ) {
+      curr->car->location = iptr(0);
+      if( strlen(curr->car->val.string) > 0 ) {
+	/* copy the string into memory here */
+      }
+      iptr(INPMAX/2+1);
+    }
+    curr = curr->cdr;
   }
   return 0;
 }
@@ -70,7 +81,8 @@ struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
 	return s;
       }
     } else {
-      if( s->type != CONSTANT && a->type != CONSTANT ) {
+      if( (s->val.string && a->val.string) &&
+	  !(s->type == CONSTANT || a->type == CONSTANT)) {
 	if( strcmp(a->val.string,s->val.string) == 0 ) {
 	  return s;
 	}
@@ -123,6 +135,10 @@ int comp_list(struct Cons *c, struct Cons **symtree,
 	comp_plus(curr->cdr, symtree, code);
 	break;
 
+      case PRINT:
+	comp_print(curr->cdr, symtree, code);
+	break;
+	
       default:
 	printf("Unimplemented\n");
 	break;
@@ -193,5 +209,65 @@ int comp_plus(struct Cons *curr, struct Cons **symtree,
     }
   }
   
+  return 0;
+}
+
+int comp_print(struct Cons *curr, struct Cons **symtree,
+	     int code[MEMSIZE]) {
+  struct Cons *arg, *temp;
+  int x, y;
+  
+  if( length(curr) > 1 ) {
+    emessg("Too many arguments to print",1);
+  }
+
+  arg = curr->car;
+
+  if(arg->type == LIST) {
+    comp_list(arg,symtree,code);
+    /* we need to make a location to save the value in */
+    if( !(temp = malloc( sizeof( struct Cons)))) {
+      emessg("Failed to create temp.",1);
+    }
+    temp->car = 0;
+    temp->cdr = 0;
+    temp->type = VARIABLE;
+    temp->location = -1;
+    x = getID();
+    temp->ID = x;
+    temp->resolved = NIL;
+    if( !(temp->val.string = malloc( 10 ))) {
+      emessg("Failed to make room for string.",1);
+    }
+    y = 0;
+    while( x > 0 ) {
+      temp->val.string[y] = (x % 8) + '0';
+      x = x / 8;
+      y++;
+    }
+    temp->val.string[y] = 0;
+    printf("%s\n",temp->val.string);
+    (*symtree) = push(temp, *symtree);
+    arg->resolved = NIL;
+    arg->val.string = temp->val.string;
+    arg->location = iptr(0);
+    code[iptr(1)] = (STORE*OPFACT) + NIL;
+    arg->car->resolved = NIL;
+    arg->car->val.string = temp->val.string;
+    arg->car->location = iptr(0);
+    code[iptr(1)] = (WRITE*OPFACT) + NIL;
+  }
+  
+  if(arg->type == STRING) {
+    arg->location = iptr(0);
+    arg->resolved = NIL;
+    code[iptr(1)] = (SWRITE*OPFACT) + NIL;
+  } else {
+    if(arg->type == CONSTANT) {
+      arg->location = iptr(0);
+      arg->resolved = NIL;
+      code[iptr(1)] = (WRITE*OPFACT) + NIL;
+    }
+  }
   return 0;
 }

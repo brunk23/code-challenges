@@ -9,5 +9,6 @@ struct Cons *cType(struct Cons *, struct Cons **);
 int comp_plus(struct Cons *, struct Cons **,int []);
 int comp_list(struct Cons *, struct Cons **, int []);
 int comp_progn(struct Cons *, struct Cons **, int []);
+int comp_print(struct Cons *, struct Cons **, int []);
 
 #endif
