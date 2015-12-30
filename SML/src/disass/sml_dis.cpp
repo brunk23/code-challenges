@@ -25,6 +25,11 @@ int main(int argc, char *argv[])
     type[x] = 0;
   }
 
+  /*
+   * This is not done. It should recognize labels, strings, data
+   * and pop+inst instructions and print them all correctly
+   */
+  
   define_codes(opcodemap);
 
   int returnCode = 0, counter = 0;
