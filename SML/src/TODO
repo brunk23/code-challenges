@@ -1,6 +1,0 @@
-The compiler should take care to ensure that strings are placed
-at the end of all other variables and have a decent amount of
-space between each one (50 spots). It should also check to be
-sure, when resolving symbols, that a string is not referenced
-outside of the string operations (if an unresolved label has
-the same symbol and type V, not S, throw the error/warning).

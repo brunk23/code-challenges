@@ -1,9 +1,0 @@
-10 input a
-20 input b
-25 let c = a
-30 call 80
-35 let c = b
-40 call 80
-45 end
-80 print c
-90 ret

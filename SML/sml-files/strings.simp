@@ -1,8 +1,0 @@
-10 sprint "This is a very long string and it should be counted as such\n"
-15 call 30
-20 end
-30 sprint "Enter your name: "
-32 sinput a
-33 sprint "Hello "
-35 sprint a
-40 ret
