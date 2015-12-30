@@ -1,5 +1,11 @@
-(print 8)(print (- 5 6 7))(print (+ 4 (+ 5 6) 7))
-(print (+ 5 7))
+(setf asdf 19)
+(setf bad asdf)
+(setf foo (* bad bad))
+(print foo)
+(print (+ 8 9))
+(print (- asdf 6 7))
+(print (* 4 (/ 30 6 ) 2))
+(print (% 9 7))
 ; (setf a 5)
 ; (if (< a b) (input a) (progn (print b) (input a)))
 

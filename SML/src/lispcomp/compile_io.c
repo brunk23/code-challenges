@@ -14,7 +14,6 @@
 int process_source(char *filename, int core[]) {
   FILE *source;
   char *line = 0, *curr = 0;
-  int linenumber = 0;           /* for debugging */
   size_t bytes_read;
   ssize_t status;
   
@@ -26,7 +25,6 @@ int process_source(char *filename, int core[]) {
    * Open the source file.  Fail if we can't.
    */
   if( !( source = fopen(filename, "r")) ) {
-    currline(filename,strlen(filename)+1,-1);
     emessg("Could not open source file", 1);
   }
 
@@ -40,12 +38,14 @@ int process_source(char *filename, int core[]) {
   base->type = LIST;
   base->ID = getID();
   base->location = 0;
+  base->val.string = 0;
   base->resolved = T;
 
   base->car = malloc(sizeof( struct Cons));
   base->car->type = INTERNAL;
   base->car->ID = PROGN;
   base->car->location = 0;
+  base->val.string = 0;
   base->car->car = 0;
   base->car->cdr = 0;
   base->car->resolved = T;
@@ -57,7 +57,6 @@ int process_source(char *filename, int core[]) {
    */
   ctoken = base;
   while(( status = getline(&line, &bytes_read, source)) != -1) {
-    linenumber++;
     curr = line;
 
     while( 1 ) {
@@ -114,7 +113,6 @@ int output_core(char *filename, int core[MEMSIZE]) {
   
   if( filename ) {
     if( !( dest = fopen(filename, "w")) ) {
-      currline(filename,strlen(filename)+1,-1);
       emessg("Could not open destination file:", 1);
     }
   } else {

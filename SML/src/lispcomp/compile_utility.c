@@ -14,7 +14,9 @@ struct Cons *push(struct Cons *new, struct Cons *old) {
       head->car = new;
       head->cdr = old;
       head->type = LIST;
+      head->val.string = 0;
       head->resolved = T;
+      head->ID=getID();
     } else {
       emessg("Push failed",1);
     }
@@ -47,11 +49,15 @@ struct Cons *copy(struct Cons *old) {
   }
   cpy->car = 0;
   cpy->cdr = 0;
+  cpy->val.string = 0;
   cpy->type = old->type;
   if(old->type == CONSTANT) {
     cpy->val.value = old->val.value;
   } else {
-    cpy->val.string = old->val.string;
+    if( !(cpy->val.string = malloc( strlen( old->val.string ) + 1))) {
+      emessg("Could not make new string",1);
+    }
+    strncpy(cpy->val.string,old->val.string,strlen(old->val.string)+1);
   }
   cpy->ID=old->ID;
   cpy->args=old->args;
@@ -59,43 +65,7 @@ struct Cons *copy(struct Cons *old) {
   cpy->resolved = NIL;
 
   return cpy;
-}
-
-/* This should print the generated lists */
-int printList(struct Cons *list) {
-  struct Cons *currCons;
-  currCons = list;
-  if(list) {
-    if(list->type == LIST) {
-      printf("(");
-      while( currCons ) {
-	if( currCons->car ) {
-	  if( currCons->car->type == LIST ) {
-	    printList(currCons->car);
-	  } else {
-	    printf("%i:",currCons->car->ID);
-	    if(currCons->car->type == CONSTANT) {
-	      printf("%i ",currCons->car->val.value);
-	    } else {
-	      if(currCons->car->val.string) {
-		printf("%s ",currCons->car->val.string);
-	      } else {
-		printf("[NONE] ");
-	      }
-	    }
-	  }
-	}
-	if( currCons->cdr == 0 ) {
-	  printf(")");
-	}
-	currCons = currCons->cdr;
-      }
-    }
-    return 0;
-  }
-  return 0;
-}
-      
+}     
 
 struct Cons *car(struct Cons *list) {
   if(list) {
@@ -132,9 +102,9 @@ struct Cons *append(struct Cons *list, struct Cons *add) {
       spot->car = add;		/* put the new item in car */
       spot->cdr = 0;		/* this is the new end of the list */
       spot->type = LIST;
+      spot->val.string = 0;
       spot->location = 0;
-      spot->val.value = 0;
-      spot->ID = 0;
+      spot->ID = getID();
       spot->resolved = T;
     }
   }
@@ -209,7 +179,9 @@ struct Cons *getNextNode(char *string) {
   created->car = 0;
   created->cdr = 0;
   created->location = 0;
+  created->val.string = 0;
   created->resolved = T;
+  created->ID=getID();
 
   if( prev == ')' ) {
     /* we need to return a token to represent it */
@@ -253,6 +225,13 @@ struct Cons *getNextNode(char *string) {
     return created;
   }
 
+  if( x == y && prev  == ')' ) {
+    /* this ends a list */
+    created->type = EOL;
+    prev = s[++x];
+    return created;
+  }
+
   /* The string was empty */
   if( x == y ) {
     free(created);
@@ -284,7 +263,7 @@ struct Cons *getNextNode(char *string) {
 
 /* Will return a uniq ID number each time it's called */
 int getID() {
-  static int ID = 0;
+  static int ID = EOL;
   ID++;
   return ID;
 }

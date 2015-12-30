@@ -6,7 +6,5 @@
 int wmessg(char *,int);
 int emessg(char *,int);
 int help_menu(char *);
-char *currline(const char *, size_t, int);
-int lineno(int);
 
 #endif

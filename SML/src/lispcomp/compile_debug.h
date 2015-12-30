@@ -6,5 +6,6 @@
 int printToken(struct Cons *);
 char *printType(enum TYPE);
 char *printInternalID(int);
+int printList(struct Cons *);
 
 #endif

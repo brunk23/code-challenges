@@ -1,7 +1,6 @@
 #ifndef COMPILE_UTILITY_H
 #define COMPILE_UTILITY_H
 
-int printList(struct Cons *);
 struct Cons *pop(struct Cons **);
 struct Cons *push(struct Cons *, struct Cons *);
 struct Cons *car(struct Cons *);

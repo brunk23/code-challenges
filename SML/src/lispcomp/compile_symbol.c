@@ -46,6 +46,21 @@ struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
     temp->ID = DIFFERENCE;
     temp->args = -1;
   }
+  if(strcmp(n,"*") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = PRODUCT;
+    temp->args = -1;
+  }
+  if(strcmp(n,"/") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = QUOTIENT;
+    temp->args = -1;
+  }
+  if(strcmp(n,"%") == 0) {
+    temp->type = INTERNAL;
+    temp->ID = REMAINDER;
+    temp->args = -1;
+  }
   if(strcmp(n,"if") == 0) {
     temp->type = INTERNAL;
     temp->ID = IF;
@@ -74,7 +89,11 @@ int resolve_symbols(struct Cons *tree, struct Cons *syms,
     }
     if( curr->car->resolved == NIL ) {
       s = inSymTree(curr->car, syms);
-      code[curr->car->location] += s->location;
+      if( s ) {
+	code[curr->car->location] += s->location;
+      } else {
+	emessg("Symbol not found",1);
+      }
     }
     curr = curr->cdr;
   }
@@ -120,7 +139,8 @@ struct Cons *inSymTree(struct Cons *a, struct Cons *sym) {
       }
     } else {
       if( (s->val.string && a->val.string) &&
-	  !(s->type == CONSTANT || a->type == CONSTANT)) {
+	  (s->type != CONSTANT) &&
+	  (a->type != CONSTANT)) {
 	if( strcmp(a->val.string,s->val.string) == 0 ) {
 	  return s;
 	}
