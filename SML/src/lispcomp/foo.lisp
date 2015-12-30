@@ -1,4 +1,4 @@
-(+ 5 6 7)(* 4 (- 5 6) 7)
+(+ 5 6 7)8(+ 4 (+ 5 6) 7)
 (+ 5 7)
 ; (setf a 5)
 ; (if (< a b) (input a) (progn (print b) (input a)))

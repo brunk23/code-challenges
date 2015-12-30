@@ -1,6 +1,6 @@
 #ifndef COMPILE_FUNCTION_H
 #define COMPILE_FUNCTION_H
 
-int process_symbol(struct Symbol *, struct Cons *curr);
+struct Cons *process_symbol(struct Cons *, struct Cons *curr);
 
 #endif

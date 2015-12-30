@@ -8,10 +8,10 @@
 /*
  * This will process functions and built-ins
  */
-int process_symbol(struct Symbol *symTree, struct Cons *curr) {
+struct Cons *process_symbol(struct Cons *curr, struct Cons *sym) {
   char *n;
   struct Cons *temp = curr;
-
+  
   n = curr->val.string;
   
   if(strcmp(n,"defun") == 0) {
@@ -54,5 +54,5 @@ int process_symbol(struct Symbol *symTree, struct Cons *curr) {
     temp->ID = PROGN;
     temp->args = -1;
   }
-  return temp->ID;
+  return temp;
 }

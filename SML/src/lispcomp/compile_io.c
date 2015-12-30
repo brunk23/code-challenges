@@ -8,6 +8,7 @@
 #include "compile_messages.h"
 #include "compile_symbol.h"
 #include "compile_debug.h"
+#include "compile_tree.h"
 
 /* Use Empty Place Holder for testing purposes */
 int process_source(char *filename, int core[]) {
@@ -16,13 +17,10 @@ int process_source(char *filename, int core[]) {
   int linenumber = 0;           /* for debugging */
   size_t bytes_read;
   ssize_t status;
-  char seperator;
   
-  int retcode = 0;
-  int x, y, constant, dest, strtmp, strindex;
+  int x;
 
-  struct Cons *base, *ctoken, *temptoken, *stack, *stemp;
-  struct Symbol *symbolPtr = 0, *newSymbol = 0;
+  struct Cons *base, *ctoken, *temptoken, *stack;
 
   /*
    * Open the source file.  Fail if we can't.
@@ -86,8 +84,10 @@ int process_source(char *filename, int core[]) {
       
   }
 
+#ifdef DEBUG
   printList(base);
-  printf("\n");
+   printf("\n");
+#endif
 
   /*
    * Before we actually compile the parsed tree
@@ -97,6 +97,8 @@ int process_source(char *filename, int core[]) {
     core[x] = 0;
   }
 
+  compileTree(base,core);
+  
   return 0;
 }
 
