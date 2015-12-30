@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "compiler.h"
-#include "compile_debug.h"
 
 
 /* This should print the generated lists */

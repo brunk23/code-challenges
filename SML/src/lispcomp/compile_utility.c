@@ -3,8 +3,6 @@
 #include <string.h>
 
 #include "compiler.h"
-#include "compile_utility.h"
-#include "compile_messages.h"
 
 struct Cons *push(struct Cons *new, struct Cons *old) {
   struct Cons *head;

@@ -3,9 +3,6 @@
 #include <stdlib.h>
 
 #include "compiler.h"
-#include "compile_symbol.h"
-#include "compile_messages.h"
-#include "compile_utility.h"
 
 /*
  * This will process functions and built-ins

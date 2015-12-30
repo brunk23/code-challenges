@@ -1,12 +1,6 @@
 #include <stdio.h>
 
 #include "compiler.h"
-#include "compile_debug.h"
-#include "compile_math.h"
-#include "compile_messages.h"
-#include "compile_utility.h"
-#include "compile_symbol.h"
-#include "compile_tree.h"
 
 /*
  * Handles (+ (- (* (/ (%

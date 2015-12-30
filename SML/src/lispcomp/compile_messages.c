@@ -8,7 +8,6 @@
 #include <string.h>
 
 #include "compiler.h"
-#include "compile_messages.h"
 
 int help_menu(char *progname) {
   fprintf(stderr,"Usage: %s {sourcefile} -o [destination]\n",progname);

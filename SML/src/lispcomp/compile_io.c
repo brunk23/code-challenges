@@ -3,12 +3,6 @@
 #include <stdlib.h>
 
 #include "compiler.h"
-#include "compile_io.h"
-#include "compile_utility.h"
-#include "compile_messages.h"
-#include "compile_symbol.h"
-#include "compile_debug.h"
-#include "compile_tree.h"
 
 /* Use Empty Place Holder for testing purposes */
 int process_source(char *filename, int core[]) {

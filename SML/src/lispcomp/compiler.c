@@ -3,8 +3,6 @@
 #include <stdlib.h>
 
 #include "compiler.h"
-#include "compile_messages.h"
-#include "compile_io.h"
 
 int main(int argc, char *argv[]) {
   int core[MEMSIZE];		/* The memory in the SML machine */

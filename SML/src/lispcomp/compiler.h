@@ -31,4 +31,13 @@ struct Cons {
   int resolved;
 };
 
+#include "compile_conditionals.h"
+#include "compile_debug.h"
+#include "compile_io.h"
+#include "compile_math.h"
+#include "compile_messages.h"
+#include "compile_symbol.h"
+#include "compile_tree.h"
+#include "compile_utility.h"
+
 #endif

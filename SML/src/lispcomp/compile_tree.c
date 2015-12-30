@@ -3,12 +3,6 @@
 #include <stdlib.h>
 
 #include "compiler.h"
-#include "compile_debug.h"
-#include "compile_math.h"
-#include "compile_messages.h"
-#include "compile_symbol.h"
-#include "compile_tree.h"
-#include "compile_utility.h"
 
 int compileTree(struct Cons *base, int code[MEMSIZE]) {
   struct Cons *symTree;
@@ -22,8 +16,10 @@ int compileTree(struct Cons *base, int code[MEMSIZE]) {
   comp_list(base,&symTree,code);
   code[iptr(1)] = (HALT*OPFACT) + NIL;
 
+#ifdef DEBUG
   printList(symTree);
   fprintf(stderr,"\n");
+#endif
   assign_symbols(symTree,code);
   resolve_symbols(base,symTree,code);
   
@@ -70,6 +66,10 @@ int comp_list(struct Cons *c, struct Cons **symtree,
 
       case SETF:
 	comp_setf(curr, symtree, code);
+	break;
+
+      case IF:
+	comp_if(curr, symtree, code);
 	break;
 	
       default:
