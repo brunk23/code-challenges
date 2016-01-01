@@ -131,19 +131,8 @@ unsigned short int get_add(unsigned short int a) {
 
 unsigned short int set_add(unsigned short int a,
 			   unsigned short int b) {
-  unsigned short int c, d;
+  unsigned short int c;
   c = memory[a];
-  d = memory[b];
-
-  if(d >= REGOFFSET ) {
-    d -= REGOFFSET;
-    if( d >= 8 ) {
-      fprintf(stderr,"Invalid access request: %i at %i\n",
-	      b+REGOFFSET, pc);
-      return 0;
-    }
-    d = reg[d];
-  }
 
   if( c >= REGOFFSET ) {
     c -= REGOFFSET;
@@ -152,9 +141,9 @@ unsigned short int set_add(unsigned short int a,
 	      a+REGOFFSET, pc);
       return 0;
     }
-    return reg[c] = d;
+    return reg[c] = b;
   }
-  return memory[c] = d;
+  return memory[c] = b;
 }
 
 /* Just return 1 to end the program */
@@ -164,7 +153,7 @@ int op_halt() {
 
 /* set a b :: set register a to value of b */
 int op_set() {
-  set_add( pc + 1, pc + 2 );
+  set_add( pc + 1, get_add( pc + 2 ) );
   pc += 3;
   return 0;
 }
@@ -208,7 +197,12 @@ int op_eq() {
 }
 
 int op_gt() {
-  printf("gt unimplemented\n");
+  if( get_add(pc + 2) > get_add(pc + 3) ) {
+    set_add(pc + 1, 1);
+  } else {
+    set_add(pc + 1, 0);
+  }
+  pc += 4;
   return 0;
 }
 
@@ -259,17 +253,30 @@ int op_mod() {
 }
 
 int op_and() {
-  printf("and unimplemented\n");
+  unsigned short int temp;
+  temp = get_add(pc + 2);
+  temp &= get_add(pc + 3);
+  set_add(pc + 1, temp);
+  pc += 4;
   return 0;
 }
 
 int op_or() {
-  printf("or unimplemented\n");
+  unsigned short int temp;
+  temp = get_add(pc + 2);
+  temp |= get_add(pc + 3);
+  set_add(pc + 1, temp);
+  pc += 4;
   return 0;
 }
 
 int op_not() {
-  printf("not unimplemented\n");
+  unsigned short int temp;
+  temp = get_add(pc + 2);
+  temp = ~temp;
+  temp %= REGOFFSET;
+  set_add(pc + 1, temp);
+  pc += 3;
   return 0;
 }
 
@@ -284,12 +291,29 @@ int op_wmem() {
 }
 
 int op_call() {
-  printf("call unimplemented\n");
+  struct STACKOBJ *nbottom;
+  if( !(nbottom = malloc(sizeof(struct STACKOBJ)))) {
+    fprintf(stderr,"Could not allocate room on stack\n");
+    return 1;
+  }
+  nbottom->next = stack;
+  stack = nbottom;
+  stack->value = pc + 2;
+  pc = get_add(pc+1);
   return 0;
 }
 
 int op_ret() {
-  printf("ret unimplemented\n");
+  struct STACKOBJ *obottom;
+  if(stack) {
+    pc = stack->value;
+    obottom = stack;
+    stack = stack->next;
+    free(obottom);
+  } else {
+    fprintf(stderr,"Pop from empty stack.\n");
+    return 1;
+  }
   return 0;
 }
 
