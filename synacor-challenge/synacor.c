@@ -6,10 +6,9 @@
  * Synacor Emulator
  */
 
-int read_in_file(const char *);
-
 int main(int argc, char *argv[]) {
-
+  int retval = 55;
+  
   if( argc != 2 ) {
     fprintf(stderr,"Usage: %s {challenge.bin}\n",argv[0]);
     return 1;
@@ -19,6 +18,49 @@ int main(int argc, char *argv[]) {
     fprintf(stderr,"Could not read file: %s\n",argv[1]);
     return 1;
   }
+
+  init_machine();
+
+  while( 1 ) {
+    if( memory[pc] > 21 ) {
+      fprintf(stderr,"Error: Invalid operation");
+      break;
+    }
+
+    /* Only halt returns 1 */
+    if( ( retval=inst_tble[ memory[pc] ]() ) ) {
+      break;
+    }
+  }
+
+  return 0;
+}
+
+int init_machine() {
+  inst_tble[0] = op_halt;
+  inst_tble[1] = op_set;
+  inst_tble[2] = op_push;
+  inst_tble[3] = op_pop;
+  inst_tble[4] = op_eq;
+  inst_tble[5] = op_gt;
+  inst_tble[6] = op_jmp;
+  inst_tble[7] = op_jt;
+  inst_tble[8] = op_jf;
+  inst_tble[9] = op_add;
+  inst_tble[10] = op_mult;
+  inst_tble[11] = op_op_mod;
+  inst_tble[12] = op_and;
+  inst_tble[13] = op_or;
+  inst_tble[14] = op_not;
+  inst_tble[15] = op_rmem;
+  inst_tble[16] = op_wmem;
+  inst_tble[17] = op_call;
+  inst_tble[18] = op_ret;
+  inst_tble[19] = op_out;
+  inst_tble[20] = op_in;
+  inst_tble[21] = op_noop;
+  stack = 0;
+  pc = 0;
 
   return 0;
 }
@@ -39,8 +81,58 @@ int read_in_file(const char *filename) {
   fprintf(stderr,"Initializing Machine...\n");
   fprintf(stderr,"Read %i words into memory\n",words_read);
 
+  /*  We don't need to worry about the order as
+   * little endian is read in correctly.
+   * for( x = 0; x < 8; ++x ) {
+   * y = memory[x] << 8;
+   * y += memory[x] / 0x100;
+   * }
+   */
+  
   if( source ) {
     fclose(source);
   }
   return words_read;
+}
+
+/* Just return 1 to end the program */
+int op_halt() {
+  return 1;
+}
+
+int op_set() {
+  return 0;
+}
+
+int op_push() { return 0; }
+int op_pop() { return 0; }
+int op_eq() { return 0; }
+int op_gt() { return 0; }
+int op_jmp() { return 0; }
+int op_jt() { return 0; }
+int op_jf() { return 0; }
+int op_add() { return 0; }
+int op_mult() { return 0; }
+int op_op_mod() { return 0; }
+int op_and() { return 0; }
+int op_or() { return 0; }
+int op_not() { return 0; }
+int op_rmem() { return 0; }
+int op_wmem() { return 0; }
+int op_call() { return 0; }
+int op_ret() { return 0; }
+
+/* out <a> :: print ascii value of a to screen */
+int op_out() {
+  printf("%c", memory[pc+1]);
+  pc += 2;
+  return 0;
+}
+
+int op_in() { return 0; }
+
+/* Just increment the program counter and return */
+int op_noop() {
+  ++pc;
+  return 0;
 }

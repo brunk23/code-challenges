@@ -1,3 +1,6 @@
+#ifndef SYNACOR_H
+#define SYNACOR_H
+
 /*
  * Synacor Machine Description
  */
@@ -30,12 +33,39 @@ struct STACKOBJ {
   unsigned short int value;
 };
 
+int read_in_file(const char *);
+int init_machine();
+
 /*
  * See the arch-spec sheet for detailed instructions on
  * opcodes
  */
+int op_halt();
+int op_set();
+int op_push();
+int op_pop();
+int op_eq();
+int op_gt();
+int op_jmp();
+int op_jt();
+int op_jf();
+int op_add();
+int op_mult();
+int op_op_mod();
+int op_and();
+int op_or();
+int op_not();
+int op_rmem();
+int op_wmem();
+int op_call();
+int op_ret();
+int op_out();
+int op_in();
+int op_noop();
 
 /* There are 22 opcodes and we just call them
  * from here. */
 typedef int (*iPtr)();
 iPtr inst_tble[22];
+
+#endif
