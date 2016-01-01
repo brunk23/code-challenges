@@ -48,7 +48,7 @@ int init_machine() {
   inst_tble[8] = op_jf;
   inst_tble[9] = op_add;
   inst_tble[10] = op_mult;
-  inst_tble[11] = op_op_mod;
+  inst_tble[11] = op_mod;
   inst_tble[12] = op_and;
   inst_tble[13] = op_or;
   inst_tble[14] = op_not;
@@ -101,26 +101,94 @@ int op_halt() {
 }
 
 int op_set() {
+  printf("set unimplemented\n");
   return 0;
 }
 
-int op_push() { return 0; }
-int op_pop() { return 0; }
-int op_eq() { return 0; }
-int op_gt() { return 0; }
-int op_jmp() { return 0; }
-int op_jt() { return 0; }
-int op_jf() { return 0; }
-int op_add() { return 0; }
-int op_mult() { return 0; }
-int op_op_mod() { return 0; }
-int op_and() { return 0; }
-int op_or() { return 0; }
-int op_not() { return 0; }
-int op_rmem() { return 0; }
-int op_wmem() { return 0; }
-int op_call() { return 0; }
-int op_ret() { return 0; }
+int op_push() {
+  printf("push unimplemented\n");
+  return 0;
+}
+
+int op_pop() {
+  printf("pop unimplemented\n");
+  return 0;
+}
+
+int op_eq() {
+  printf("eq unimplemented\n");
+  return 0;
+}
+
+int op_gt() {
+  printf("gt unimplemented\n");
+  return 0;
+}
+
+int op_jmp() {
+  printf("jmp unimplemented\n");
+  return 0;
+}
+
+int op_jt() {
+  printf("jt unimplemented\n");
+  return 0;
+}
+
+int op_jf() {
+  printf("jf unimplemented\n");
+  return 0;
+}
+
+int op_add() {
+  printf("add unimplemented\n");
+  return 0;
+}
+
+int op_mult() {
+  printf("mult unimplemented\n");
+  return 0;
+}
+
+int op_mod() {
+  printf("mod unimplemented\n");
+  return 0;
+}
+
+int op_and() {
+  printf("and unimplemented\n");
+  return 0;
+}
+
+int op_or() {
+  printf("or unimplemented\n");
+  return 0;
+}
+
+int op_not() {
+  printf("not unimplemented\n");
+  return 0;
+}
+
+int op_rmem() {
+  printf("rmem unimplemented\n");
+  return 0;
+}
+
+int op_wmem() {
+  printf("wmem unimplemented\n");
+  return 0;
+}
+
+int op_call() {
+  printf("call unimplemented\n");
+  return 0;
+}
+
+int op_ret() {
+  printf("ret unimplemented\n");
+  return 0;
+}
 
 /* out <a> :: print ascii value of a to screen */
 int op_out() {
@@ -129,7 +197,10 @@ int op_out() {
   return 0;
 }
 
-int op_in() { return 0; }
+int op_in() {
+  printf("in unimplemented\n");
+  return 0;
+}
 
 /* Just increment the program counter and return */
 int op_noop() {

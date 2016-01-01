@@ -51,7 +51,7 @@ int op_jt();
 int op_jf();
 int op_add();
 int op_mult();
-int op_op_mod();
+int op_mod();
 int op_and();
 int op_or();
 int op_not();
