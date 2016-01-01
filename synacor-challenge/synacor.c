@@ -13,13 +13,13 @@ int main(int argc, char *argv[]) {
     fprintf(stderr,"Usage: %s {challenge.bin}\n",argv[0]);
     return 1;
   }
+
+  init_machine();
   
   if( !read_in_file(argv[1])) {
     fprintf(stderr,"Could not read file: %s\n",argv[1]);
     return 1;
   }
-
-  init_machine();
 
   while( 1 ) {
     if( memory[pc] > 21 ) {
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Only halt returns 1 */
-    if( ( retval=inst_tble[ memory[pc] ]() ) ) {
+    if( ( retval=inst_tble[ get_add(pc) ]() ) ) {
       break;
     }
   }
@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
 }
 
 int init_machine() {
+  int x;
   inst_tble[0] = op_halt;
   inst_tble[1] = op_set;
   inst_tble[2] = op_push;
@@ -61,6 +62,14 @@ int init_machine() {
   inst_tble[21] = op_noop;
   stack = 0;
   pc = 0;
+
+  for( x = 0; x < REGOFFSET; ++x ) {
+    memory[x] = 0;
+  }
+
+  for( x = 0; x < 8; ++x ) {
+    reg[x] = 0;
+  }
 
   return 0;
 }
@@ -95,13 +104,59 @@ int read_in_file(const char *filename) {
   return words_read;
 }
 
+unsigned short int get_add(unsigned short int a) {
+  unsigned short int b;
+  b = memory[a];
+  if( b < REGOFFSET ) {
+    return b;
+  } else {
+    b -= REGOFFSET;
+  }
+  if( b <= r7 ) {
+    return reg[b];
+  }
+  fprintf(stderr,"Invalid access request: %i at %i\n",
+	  b+REGOFFSET, pc);
+  return 0;
+}
+
+unsigned short int set_add(unsigned short int a,
+			   unsigned short int b) {
+  unsigned short int c, d;
+  c = memory[a];
+  d = memory[b];
+
+  if(d >= REGOFFSET ) {
+    d -= REGOFFSET;
+    if( d >= 8 ) {
+      fprintf(stderr,"Invalid access request: %i at %i\n",
+	      b+REGOFFSET, pc);
+      return 0;
+    }
+    d = reg[d];
+  }
+
+  if( c >= REGOFFSET ) {
+    c -= REGOFFSET;
+    if( c >= 8 ) {
+      fprintf(stderr,"Invalid access request: %i at %i\n",
+	      a+REGOFFSET, pc);
+      return 0;
+    }
+    return reg[c] = d;
+  }
+  return memory[c] = d;
+}
+
 /* Just return 1 to end the program */
 int op_halt() {
   return 1;
 }
 
+/* set a b :: set register a to value of b */
 int op_set() {
-  printf("set unimplemented\n");
+  set_add( pc + 1, pc + 2 );
+  pc += 3;
   return 0;
 }
 
@@ -125,18 +180,29 @@ int op_gt() {
   return 0;
 }
 
+/* jmp a :: jump to a */
 int op_jmp() {
-  printf("jmp unimplemented\n");
+  pc = get_add(pc + 1);
   return 0;
 }
 
+/* jt a b :: if a is non-zero, jump to b */
 int op_jt() {
-  printf("jt unimplemented\n");
+  if( get_add(pc + 1) != 0 ) {
+    pc = get_add(pc + 2);
+  } else {
+    pc += 3;
+  }
   return 0;
 }
 
+/* jf a b :: if a is zero, jump to b */
 int op_jf() {
-  printf("jf unimplemented\n");
+  if( get_add(pc + 1) == 0 ) {
+    pc = get_add(pc + 2);
+  } else {
+    pc += 3;
+  }
   return 0;
 }
 
@@ -192,7 +258,7 @@ int op_ret() {
 
 /* out <a> :: print ascii value of a to screen */
 int op_out() {
-  printf("%c", memory[pc+1]);
+  printf("%c", get_add(pc+1));
   pc += 2;
   return 0;
 }

@@ -35,6 +35,9 @@ struct STACKOBJ {
 
 int read_in_file(const char *);
 int init_machine();
+unsigned short int set_add(unsigned short int,
+			   unsigned short int);
+unsigned short int get_add(unsigned short int);
 
 /*
  * See the arch-spec sheet for detailed instructions on
