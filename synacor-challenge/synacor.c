@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "synacor.h"
 
@@ -366,6 +367,10 @@ int op_in() {
     for(index = 0 ; index < BUFFSIZE; ++index ) {
       if( inbuffer[index] != 0 ) {
 	inp = inbuffer[index];
+	if(inp == '#') {
+	  enter_debug_mode();
+	  index = BUFFSIZE;
+	}
 	inbuffer[index] = 0;
 	break;
       }
@@ -385,5 +390,57 @@ int op_in() {
 /* Just increment the program counter and return */
 int op_noop() {
   ++pc;
+  return 0;
+}
+
+int enter_debug_mode() {
+  char *test = 0;
+  int x = 0, index = 0;
+  printf("ENTER DEBUG MODE: %s%i: ",inbuffer, pc);
+  while( (test = fgets(inbuffer, BUFFSIZE, stdin)) ) {
+    if( !(test = strtok(inbuffer," \n"))) {
+      continue;
+    }
+
+    /* START PRINT */
+    if( strcmp(test,"print") == 0) {
+      if( (test = strtok(0," \n") )) {
+	  
+	if( strcmp(test,"reg") == 0) {
+	  for( x = 0; x < 8; ++x ) {
+	    printf("r%i: %i\n", x, reg[x]);
+	  }
+	}
+
+	continue;
+      } else {
+	continue;
+      }
+    } /* END PRINT */
+
+    /* START SET */
+    if (strcmp(test,"set") == 0) {
+      if( (test = strtok(0," \n"))) {
+	if( test[0] == 'r' ) {
+	  index = test[1] - '0';
+	  if( (test = strtok(0," \n"))) {
+	    x = strtol(test,0,10);
+	    reg[index] = x;
+	  }
+	}
+	continue;
+      } else {
+        continue;
+      }
+    
+    } /* END SET */
+    
+    if( inbuffer[0] == '#' ) {
+      printf("LEAVE DEBUG MODE\n");
+      break;
+    } else {
+      printf("%i: ",pc);
+    }
+  }
   return 0;
 }

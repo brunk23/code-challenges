@@ -38,6 +38,7 @@ char inbuffer[BUFFSIZE];
 
 int read_in_file(const char *);
 int init_machine();
+int enter_debug_mode();
 unsigned short int set_add(unsigned short int,
 			   unsigned short int);
 unsigned short int get_add(unsigned short int);
