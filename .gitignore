@@ -6,3 +6,6 @@ sml_basic
 sml_lisp
 sml_disass
 sml_sim
+arch-spec
+challenge.bin
+synacor
