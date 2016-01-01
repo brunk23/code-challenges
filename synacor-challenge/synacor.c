@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "synacor.h"
 
@@ -7,7 +8,8 @@
  */
 
 int main(int argc, char *argv[]) {
-  int retval = 55;
+  struct STACKOBJ *obottom;
+  int retval = 0;
   
   if( argc != 2 ) {
     fprintf(stderr,"Usage: %s {challenge.bin}\n",argv[0]);
@@ -33,6 +35,13 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  /* Unwind the stack and free it */
+  while(stack) {
+    obottom = stack;
+    stack = stack->next;
+    free(obottom);
+  }
+  
   return 0;
 }
 
@@ -161,17 +170,40 @@ int op_set() {
 }
 
 int op_push() {
-  printf("push unimplemented\n");
+  struct STACKOBJ *nbottom;
+  if( !(nbottom = malloc(sizeof(struct STACKOBJ)))) {
+    fprintf(stderr,"Could not allocate room on stack\n");
+    return 1;
+  }
+  nbottom->next = stack;
+  stack = nbottom;
+  stack->value = get_add(pc + 1);
+  pc += 2;
   return 0;
 }
 
 int op_pop() {
-  printf("pop unimplemented\n");
+  struct STACKOBJ *obottom;
+  if(stack) {
+    set_add(pc+1, stack->value);
+    obottom = stack;
+    stack = stack->next;
+    free(obottom);
+  } else {
+    fprintf(stderr,"Pop from empty stack.\n");
+    return 1;
+  }
+  pc += 2;
   return 0;
 }
 
 int op_eq() {
-  printf("eq unimplemented\n");
+  if( get_add(pc + 2) == get_add(pc + 3) ) {
+    set_add(pc + 1, 1);
+  } else {
+    set_add(pc + 1, 0);
+  }
+  pc += 4;
   return 0;
 }
 
@@ -207,7 +239,12 @@ int op_jf() {
 }
 
 int op_add() {
-  printf("add unimplemented\n");
+  unsigned short int sum;
+  sum = get_add(pc + 2);
+  sum += get_add(pc + 3);
+  sum %= REGOFFSET;
+  set_add(pc + 1, sum);
+  pc += 4;
   return 0;
 }
 

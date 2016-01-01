@@ -14,8 +14,7 @@
  */
 unsigned short int memory[32768];
 unsigned short int reg[8];
-unsigned short int *stack = 0;
-int pc = 0;
+int pc;
 
 #define REGOFFSET 32768
 
@@ -32,6 +31,8 @@ struct STACKOBJ {
   struct STACKOBJ *next;
   unsigned short int value;
 };
+
+struct STACKOBJ *stack;
 
 int read_in_file(const char *);
 int init_machine();
