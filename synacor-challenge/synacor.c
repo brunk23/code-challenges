@@ -72,6 +72,10 @@ int init_machine() {
   stack = 0;
   pc = 0;
 
+  for( x = 0; x < BUFFSIZE; ++x ) {
+    inbuffer[x] = 0;
+  }
+  
   for( x = 0; x < REGOFFSET; ++x ) {
     memory[x] = 0;
   }
@@ -80,6 +84,7 @@ int init_machine() {
     reg[x] = 0;
   }
 
+  
   return 0;
 }
 
@@ -243,12 +248,21 @@ int op_add() {
 }
 
 int op_mult() {
-  printf("mult unimplemented\n");
+  unsigned int temp;
+  temp = get_add(pc + 2);
+  temp *= get_add(pc + 3);
+  temp %= REGOFFSET;
+  set_add(pc + 1, temp);
+  pc += 4;
   return 0;
 }
 
 int op_mod() {
-  printf("mod unimplemented\n");
+  unsigned short int temp;
+  temp = get_add(pc + 2);
+  temp %= get_add(pc + 3);
+  set_add(pc + 1, temp);
+  pc += 4;
   return 0;
 }
 
@@ -281,12 +295,18 @@ int op_not() {
 }
 
 int op_rmem() {
-  printf("rmem unimplemented\n");
+  unsigned short int source;
+  source = get_add(pc+2);
+  set_add(pc+1, memory[source]);
+  pc += 3;
   return 0;
 }
 
 int op_wmem() {
-  printf("wmem unimplemented\n");
+  unsigned short int dest;
+  dest = get_add(pc+1);
+  memory[dest] = get_add(pc+2);
+  pc += 3;
   return 0;
 }
 
@@ -325,7 +345,40 @@ int op_out() {
 }
 
 int op_in() {
-  printf("in unimplemented\n");
+  static int index = 0;
+  char *test;
+  char inp = 0;
+  
+  for( ; index < BUFFSIZE; ++index ) {
+    if( inbuffer[index] != 0 ) {
+      inp = inbuffer[index];
+      inbuffer[index] = 0;
+      break;
+    }
+  }
+  if( index == BUFFSIZE ) {
+    /* We need more input */
+    test = fgets(inbuffer, BUFFSIZE, stdin);
+    if( !test || feof(stdin) || ferror(stdin) ) {
+      fprintf(stderr,"Input error!");
+      return 1;
+    }
+    for(index = 0 ; index < BUFFSIZE; ++index ) {
+      if( inbuffer[index] != 0 ) {
+	inp = inbuffer[index];
+	inbuffer[index] = 0;
+	break;
+      }
+    }
+    if( inp == 0 ) {
+      fprintf(stderr,"No valid input found!\n");
+      return 1;
+    }
+  }
+
+  set_add(pc+1, inp);
+  pc += 2;
+  
   return 0;
 }
 

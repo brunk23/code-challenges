@@ -16,6 +16,7 @@ unsigned short int memory[32768];
 unsigned short int reg[8];
 int pc;
 
+#define BUFFSIZE 160
 #define REGOFFSET 32768
 
 enum REGISTERS {
@@ -33,6 +34,7 @@ struct STACKOBJ {
 };
 
 struct STACKOBJ *stack;
+char inbuffer[BUFFSIZE];
 
 int read_in_file(const char *);
 int init_machine();
