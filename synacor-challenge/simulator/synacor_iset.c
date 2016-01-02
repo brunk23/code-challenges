@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "synacor.h"
+
 /* Just return 1 to end the program */
 int op_halt() {
   return 1;

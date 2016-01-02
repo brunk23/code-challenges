@@ -1,10 +1,15 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "synacor.h"
 
 /*
  * Pretty print register names.
  */
-const char *register(SWORD r) {
-  const *char rname[] = { "r0", "r1", "r2", "r3",
-		    "r4", "r5", "r6", "r7" };
+const char *regname(SWORD r) {
+  const char *rname[] = { "r0", "r1", "r2", "r3",
+			  "r4", "r5", "r6", "r7" };
   SWORD x;
 
   x = REGOFFSET - r;
@@ -20,7 +25,7 @@ const char *register(SWORD r) {
  */
 int print_instruction(SWORD addr) {
   if( memory[addr] > 21 ) {
-    fprintf(stderr,"%05i:\tdata  %05i\n",addr);
+    fprintf(stderr,"%05i:\tdata  %05i\n",addr,memory[addr]);
   } else {
     switch (memory[addr]) {
     case halt:
@@ -29,14 +34,14 @@ int print_instruction(SWORD addr) {
 
     case set:
       fprintf(stderr,"%05i:\tset ",addr);
-      fprintf(stderr,"%s",register(memory[addr+1]));
+      fprintf(stderr,"%s",regname(memory[addr+1]));
       fprintf(stderr,", %i\n",memory[addr+2]);
       break;
 
     case push:
       fprintf(stderr,"%05i:\tpush ",addr);
       if( memory[addr+1] >= r0 && memory[addr+1] <= r7 ) {
-	fprintf(stderr,"%s\n",register(memory[addr+1]));
+	fprintf(stderr,"%s\n",regname(memory[addr+1]));
       } else {
 	fprintf(stderr,"%i\n",memory[addr+1]);
       }
@@ -45,7 +50,7 @@ int print_instruction(SWORD addr) {
     case pop:
       fprintf(stderr,"%05i:\tpop ",addr);
       if( memory[addr+1] >= r0 && memory[addr+1] <= r7 ) {
-	fprintf(stderr,"%s\n",register(memory[addr+1]));
+	fprintf(stderr,"%s\n",regname(memory[addr+1]));
       } else {
 	fprintf(stderr,"%i\n",memory[addr+1]);
       }

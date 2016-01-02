@@ -1,10 +1,12 @@
+SRCDIR = simulator
+CFILES = $(SRCDIR)/synacor.c $(SRCDIR)/synacor_debug.c
+CFILES += $(SRCDIR)/synacor_iset.c $(SRCDIR)/synacor_step.c
+HFILES = $(SRCDIR)/synacor.h
+DISASS = $(SRCDIR)/synacor_disassem.c
+DEST = bin
 
-CFILES = synacor.c synacor_debug.c
-HFILES = synacor.h
-DISASS = synacor_disassem.c
+bin/synacor: $(CFILES) $(HFILES)
+	gcc -Wall -g -o $(DEST)/synacor $(CFILES)
 
-synacor: $(CFILES) $(HFILES)
-	gcc -Wall -g -o synacor $(CFILES)
-
-disass: $(DISASS) $(HFILES)
-	gcc -Wall -g -o disass $(DISASS)
+bin/disass: $(SRCDIR)/$(DISASS) $(SRCDIR)/$(HFILES)
+	gcc -Wall -g -o $(DEST)/disass $(DISASS)

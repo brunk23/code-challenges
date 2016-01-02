@@ -12,7 +12,7 @@
  * access registers, memory, and the stack. pc is the program
  * counter
  */
-typdef SWORD unsigned short int;
+typedef unsigned short int SWORD;
 SWORD memory[32768];
 SWORD reg[8];
 SWORD pc;
