@@ -72,7 +72,8 @@ int init_machine() {
   inst_tble[21] = op_noop;
   stack = 0;
   pc = 0;
-
+  debugmode = 0;
+  
   for( x = 0; x < BUFFSIZE; ++x ) {
     inbuffer[x] = 0;
   }
@@ -154,12 +155,18 @@ unsigned short int set_add(unsigned short int a,
 
 /* Just return 1 to end the program */
 int op_halt() {
+  if(debugmode) {
+    fprintf(stderr,"%i HALT\n",pc);
+  }
   return 1;
 }
 
 /* set a b :: set register a to value of b */
 int op_set() {
   set_add( pc + 1, get_add( pc + 2 ) );
+  if(debugmode) {
+    fprintf(stderr,"%i SET  %i <- %i\n",pc,get_add(pc+1),get_add(pc+2));
+  }
   pc += 3;
   return 0;
 }
@@ -173,6 +180,9 @@ int op_push() {
   nbottom->next = stack;
   stack = nbottom;
   stack->value = get_add(pc + 1);
+  if(debugmode) {
+    fprintf(stderr,"%i PUSH  %i -->\n",pc,get_add(pc+1));
+  }
   pc += 2;
   return 0;
 }
@@ -188,6 +198,9 @@ int op_pop() {
     fprintf(stderr,"Pop from empty stack.\n");
     return 1;
   }
+  if(debugmode) {
+    fprintf(stderr,"%i POP  --> %i\n",pc,get_add(pc+1));
+  }
   pc += 2;
   return 0;
 }
@@ -197,6 +210,10 @@ int op_eq() {
     set_add(pc + 1, 1);
   } else {
     set_add(pc + 1, 0);
+  }
+  if(debugmode) {
+    fprintf(stderr,"%i EQ  %i <- %i == %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
   }
   pc += 4;
   return 0;
@@ -208,18 +225,29 @@ int op_gt() {
   } else {
     set_add(pc + 1, 0);
   }
+  if(debugmode) {
+    fprintf(stderr,"%i GT  %i <- %i > %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
+  }
   pc += 4;
   return 0;
 }
 
 /* jmp a :: jump to a */
 int op_jmp() {
+  if(debugmode) {
+    fprintf(stderr,"%i JMP  %i\n",pc,get_add(pc+1));
+  }
   pc = get_add(pc + 1);
   return 0;
 }
 
 /* jt a b :: if a is non-zero, jump to b */
 int op_jt() {
+  if(debugmode) {
+    fprintf(stderr,"%i JT  %i  (1 == %i)\n",pc,get_add(pc+1),
+	   get_add(pc+2));
+  }
   if( get_add(pc + 1) != 0 ) {
     pc = get_add(pc + 2);
   } else {
@@ -230,6 +258,10 @@ int op_jt() {
 
 /* jf a b :: if a is zero, jump to b */
 int op_jf() {
+  if(debugmode) {
+    fprintf(stderr,"%i JF  %i  (0 == %i)\n",pc,get_add(pc+1),
+	   get_add(pc+2));
+  }
   if( get_add(pc + 1) == 0 ) {
     pc = get_add(pc + 2);
   } else {
@@ -244,6 +276,10 @@ int op_add() {
   sum += get_add(pc + 3);
   sum %= REGOFFSET;
   set_add(pc + 1, sum);
+  if(debugmode) {
+    fprintf(stderr,"%i ADD  %i <- %i + %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
+  }
   pc += 4;
   return 0;
 }
@@ -254,6 +290,10 @@ int op_mult() {
   temp *= get_add(pc + 3);
   temp %= REGOFFSET;
   set_add(pc + 1, temp);
+  if(debugmode) {
+    fprintf(stderr,"%i MULT  %i <- %i * %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
+  }
   pc += 4;
   return 0;
 }
@@ -263,6 +303,10 @@ int op_mod() {
   temp = get_add(pc + 2);
   temp %= get_add(pc + 3);
   set_add(pc + 1, temp);
+  if(debugmode) {
+    fprintf(stderr,"%i MOD  %i <- %i %% %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
+  }
   pc += 4;
   return 0;
 }
@@ -272,6 +316,10 @@ int op_and() {
   temp = get_add(pc + 2);
   temp &= get_add(pc + 3);
   set_add(pc + 1, temp);
+  if(debugmode) {
+    fprintf(stderr,"%i AND  %i <- %i & %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
+  }
   pc += 4;
   return 0;
 }
@@ -281,6 +329,10 @@ int op_or() {
   temp = get_add(pc + 2);
   temp |= get_add(pc + 3);
   set_add(pc + 1, temp);
+  if(debugmode) {
+    fprintf(stderr,"%i OR  %i <- %i | %i\n",pc,get_add(pc+1),
+	   get_add(pc+2),get_add(pc+3));
+  }
   pc += 4;
   return 0;
 }
@@ -291,6 +343,10 @@ int op_not() {
   temp = ~temp;
   temp %= REGOFFSET;
   set_add(pc + 1, temp);
+  if(debugmode) {
+    fprintf(stderr,"%i ADD  %i <- ~(%i)\n",pc,get_add(pc+1),
+	   get_add(pc+2));
+  }
   pc += 3;
   return 0;
 }
@@ -299,6 +355,10 @@ int op_rmem() {
   unsigned short int source;
   source = get_add(pc+2);
   set_add(pc+1, memory[source]);
+  if(debugmode) {
+    fprintf(stderr,"%i RMEM  %i <- %i\n",pc,get_add(pc+1),
+	   memory[get_add(pc+2)]);
+  }
   pc += 3;
   return 0;
 }
@@ -307,6 +367,10 @@ int op_wmem() {
   unsigned short int dest;
   dest = get_add(pc+1);
   memory[dest] = get_add(pc+2);
+  if(debugmode) {
+    fprintf(stderr,"%i WMEM  [%i] <- %i\n",pc,get_add(pc+1),
+	   get_add(pc+2));
+  }
   pc += 3;
   return 0;
 }
@@ -320,12 +384,18 @@ int op_call() {
   nbottom->next = stack;
   stack = nbottom;
   stack->value = pc + 2;
+  if(debugmode) {
+    fprintf(stderr,"%i CALL  %i\n",pc,get_add(pc+1));
+  }
   pc = get_add(pc+1);
   return 0;
 }
 
 int op_ret() {
   struct STACKOBJ *obottom;
+  if(debugmode) {
+    fprintf(stderr,"%i RET\n",pc);
+  }
   if(stack) {
     pc = stack->value;
     obottom = stack;
@@ -340,6 +410,9 @@ int op_ret() {
 
 /* out <a> :: print ascii value of a to screen */
 int op_out() {
+  if(debugmode) {
+    fprintf(stderr,"%i OUT  %i\n",pc,get_add(pc+1));
+  }
   printf("%c", get_add(pc+1));
   pc += 2;
   return 0;
@@ -349,6 +422,10 @@ int op_in() {
   static int index = 0;
   char *test;
   char inp = 0;
+
+  if(debugmode) {
+    fprintf(stderr,"%i IN  %i\n",pc,get_add(pc+1));
+  }
   
   for( ; index < BUFFSIZE; ++index ) {
     if( inbuffer[index] != 0 ) {
@@ -364,12 +441,13 @@ int op_in() {
       fprintf(stderr,"Input error!");
       return 1;
     }
+    fprintf(stderr,"%s",inbuffer);
     for(index = 0 ; index < BUFFSIZE; ++index ) {
       if( inbuffer[index] != 0 ) {
 	inp = inbuffer[index];
 	if(inp == '#') {
 	  enter_debug_mode();
-	  index = BUFFSIZE;
+	  inp = '\n';
 	}
 	inbuffer[index] = 0;
 	break;
@@ -389,210 +467,9 @@ int op_in() {
 
 /* Just increment the program counter and return */
 int op_noop() {
+  if(debugmode) {
+    fprintf(stderr,"%i NOP\n",pc);
+  }
   ++pc;
   return 0;
-}
-
-int enter_debug_mode() {
-  char *test = 0;
-  int x = 0, index = 0;
-  
-  printf("ENTER DEBUG MODE: %s%i: ",inbuffer, pc);
-  while( (test = fgets(inbuffer, BUFFSIZE, stdin)) ) {
-    if( !(test = strtok(inbuffer," \n"))) {
-      continue;
-    }
-
-    if( strcmp(test,"savestate") == 0) {
-      save_state();
-      continue;
-    }
-
-    if( strcmp(test,"loadstate") == 0) {
-      load_state();
-      continue;
-    }
-    
-    /* START PRINT */
-    if( strcmp(test,"print") == 0) {
-      if( (test = strtok(0," \n") )) {
-	  
-	if( strcmp(test,"reg") == 0) {
-	  for( x = 0; x < 8; ++x ) {
-	    printf("r%i: %i\n", x, reg[x]);
-	  }
-	}
-
-	if( strcmp(test,"pc") == 0) {
-	  printf("r%i: %i\n", x, pc);
-	}
-
-	if( strcmp(test,"stack") == 0) {
-	  printstack();
-	}
-	
-	continue;
-      } else {
-	continue;
-      }
-    } /* END PRINT */
-
-    /* START SET */
-    if (strcmp(test,"set") == 0) {
-      if( (test = strtok(0," \n"))) {
-	if( test[0] == 'r' ) {
-	  index = test[1] - '0';
-	  if( (test = strtok(0," \n"))) {
-	    x = strtol(test,0,10);
-	    reg[index] = x;
-	  }
-	}
-	continue;
-      } else {
-        continue;
-      }
-    
-    } /* END SET */
-    
-    if( inbuffer[0] == '#' ) {
-      printf("LEAVE DEBUG MODE\n");
-      break;
-    } else {
-      printf("%i: ",pc);
-    }
-  }
-  return 0;
-}
-
-int printstack() {
-  struct STACKOBJ *sptr = 0;
-
-  sptr = stack;
-
-  while(sptr) {
-    printf("%i\n",sptr->value);
-    sptr = sptr->next;
-  }
-  return 0;
-}
-
-int save_state() {
-  FILE *source;
-  int words_written = 0, x = 0, y = 0;
-  struct STACKOBJ *sptr;
-  int *temp;
-  
-  if( !( source = fopen("synacor.dump", "w"))) {
-    fprintf(stderr,"Could not open file for writing.\n");
-    return 0;
-  }
-
-  words_written= fwrite(memory,
-			sizeof(unsigned short int),
-			REGOFFSET,
-			source);
-  fprintf(stderr,"CORE MEM: %i words\n",words_written);
-  words_written= fwrite(reg,
-			sizeof(unsigned short int),
-			8,
-			source);
-  fprintf(stderr,"REGISTERS: %i words\n",words_written);
-  words_written= fwrite(&pc,
-			sizeof(unsigned short int),
-			1,
-			source);
-  fprintf(stderr,"PROGRAM COUNTER: %i words\n",words_written);
-
-  sptr = stack;
-  while( sptr ) {
-    ++x;
-    sptr = sptr->next;
-  }
-
-  words_written= fwrite(&x,
-			sizeof(unsigned short int),
-			1,
-			source);
-  fprintf(stderr,"STACK SIZE: %i words\n",words_written);
-  if( x ) {
-    if( !(temp = malloc( x*sizeof(unsigned short int)) ) ) {
-      fprintf(stderr,"Couldn't save stack.\n");
-    }
-    sptr = stack;
-    for( y = 1; y <= x; ++y ) {
-      temp[x-y] = sptr->value;
-      sptr = sptr->next;
-    }
-    words_written= fwrite(temp,
-			  sizeof(unsigned short int),
-			  x,
-			  source);
-    fprintf(stderr,"STACK CONTENTS: %i words\n",words_written);
-  }
-  if( source ) {
-    fclose(source);
-  }
-  return words_written;
-}
-
-int load_state() {
-  FILE *source;
-  int words_read = 0, x = 0, y = 0;
-  struct STACKOBJ *sptr;
-
-  /* Free the stack, if there is one */
-  while(stack) {
-    sptr = stack->next;
-    free(stack);
-    stack = sptr;
-  }
-
-  stack = 0;
-  
-  if( !( source = fopen("synacor.dump", "r"))) {
-    fprintf(stderr,"Could not open file for reading.\n");
-    return 0;
-  }
-
-  words_read = fread(memory,
-		     sizeof(unsigned short int),
-		     REGOFFSET,
-		     source);
-  fprintf(stderr,"CORE MEM: %i words\n",words_read);
-  words_read = fread(reg,
-		     sizeof(unsigned short int),
-		     8,
-		     source);
-  fprintf(stderr,"REGISTERS: %i words\n",words_read);
-  words_read = fread(&pc,
-		     sizeof(unsigned short int),
-		     1,
-		     source);
-  fprintf(stderr,"PROGRAM COUNTER: %i words\n",words_read);
-
-  words_read = fread(&x,
-		     sizeof(unsigned short int),
-		     1,
-		     source);
-  fprintf(stderr,"STACK SIZE: %i words\n",words_read);
-  while( x ) {
-    if( !(sptr = malloc( sizeof(struct STACKOBJ) ) ) ) {
-      fprintf(stderr,"Couldn't get memory for stack.\n");
-      break;
-    }
-    sptr->next = stack;
-    stack = sptr;
-    
-    words_read= fread(&y,
-		      sizeof(unsigned short int),
-		      1,
-		      source);
-    fprintf(stderr,"STACK CONTENTS: %i words\n",words_read);
-    stack->value = y;
-    --x;
-  }
-  if( source ) {
-    fclose(source);
-  }
-  return words_read;
 }

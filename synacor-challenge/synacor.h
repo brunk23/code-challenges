@@ -15,6 +15,7 @@
 unsigned short int memory[32768];
 unsigned short int reg[8];
 int pc;
+int debugmode;
 
 #define BUFFSIZE 160
 #define REGOFFSET 32768
