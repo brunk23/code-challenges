@@ -12,10 +12,11 @@
  * access registers, memory, and the stack. pc is the program
  * counter
  */
-unsigned short int memory[32768];
-unsigned short int reg[8];
-int pc;
-int debugmode;
+typdef SWORD unsigned short int;
+SWORD memory[32768];
+SWORD reg[8];
+SWORD pc;
+SWORD debugmode;
 
 #define BUFFSIZE 160
 #define REGOFFSET 32768
@@ -26,12 +27,12 @@ enum REGISTERS {
 
 enum INSTSET {
   halt = 0, set, push, pop, eq, gt, jmp, jt, jf, add, mult,
-  mod, and, or, not, rmem, wmem, call, ret, out, in, noop
+  mod, and, or, not, rmem, wmem, call, ret, out, in, nop
 };
 
 struct STACKOBJ {
   struct STACKOBJ *next;
-  unsigned short int value;
+  SWORD value;
 };
 
 struct STACKOBJ *stack;
@@ -43,9 +44,8 @@ int enter_debug_mode();
 int printstack();
 int save_state();
 int load_state();
-unsigned short int set_add(unsigned short int,
-			   unsigned short int);
-unsigned short int get_add(unsigned short int);
+SWORD set_add( SWORD, SWORD );
+SWORD get_add( SWORD );
 
 /*
  * See the arch-spec sheet for detailed instructions on
@@ -72,7 +72,7 @@ int op_call();
 int op_ret();
 int op_out();
 int op_in();
-int op_noop();
+int op_nop();
 
 /* There are 22 opcodes and we just call them
  * from here. */

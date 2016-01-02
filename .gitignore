@@ -8,6 +8,5 @@ sml_disass
 sml_sim
 arch-spec
 challenge.bin
-synacor
-randomwalk
-steps
+bin
+notes
