@@ -30,6 +30,12 @@ int main(int argc, char *argv[]) {
       break;
     }
 
+    /* I want to bring the string operation in here */
+
+    if(debugmode) {
+      print_instruction( pc );
+    }
+
     /* Only halt returns 1 */
     if( ( retval=inst_tble[ get_add(pc) ]() ) ) {
       break;
@@ -121,6 +127,10 @@ int read_in_file(const char *filename) {
   return words_read;
 }
 
+/*
+ * Helper function for memory access to return
+ * register values when those are requested.
+ */
 unsigned short int get_add(unsigned short int a) {
   unsigned short int b;
   b = memory[a];
@@ -137,6 +147,10 @@ unsigned short int get_add(unsigned short int a) {
   return 0;
 }
 
+/*
+ * Helper function for memory setting. It also sets
+ * registers correctly.
+ */
 unsigned short int set_add(unsigned short int a,
 			   unsigned short int b) {
   unsigned short int c;

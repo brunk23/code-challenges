@@ -46,6 +46,9 @@ int save_state();
 int load_state();
 SWORD set_add( SWORD, SWORD );
 SWORD get_add( SWORD );
+const char *regname( SWORD );
+SWORD print_instruction( SWORD );
+int print_addr(SWORD, const char *);
 
 /*
  * See the arch-spec sheet for detailed instructions on

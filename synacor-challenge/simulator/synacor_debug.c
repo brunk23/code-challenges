@@ -4,6 +4,10 @@
 
 #include "synacor.h"
 
+/*
+ * The debug commands
+ */
+
 int enter_debug_mode() {
   char *test = 0;
   int x = 0, index = 0;

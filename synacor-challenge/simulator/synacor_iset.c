@@ -3,6 +3,10 @@
 
 #include "synacor.h"
 
+/*
+ * Implement the actual instruction set
+ */
+
 /* Just return 1 to end the program */
 int op_halt() {
   return 1;
