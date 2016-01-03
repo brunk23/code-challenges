@@ -39,12 +39,12 @@ char inbuffer[BUFFSIZE];
 int inbuffindex;
 int breakpoint;
 
+/*
+ * Function prototypes
+ */
+int help_menu(const char *);
 int read_in_file(const char *);
 int init_machine();
-int printstack();
-
-SWORD print_instruction( SWORD );
-int print_addr(SWORD, const char *);
 
 /*
  * See the arch-spec sheet for detailed instructions on
