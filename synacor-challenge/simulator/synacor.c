@@ -10,6 +10,7 @@
 
 int main(int argc, char *argv[]) {
   struct STACKOBJ *obottom;
+  char *test;
   int retval = 0;
   
   if( argc != 2 ) {
@@ -32,8 +33,22 @@ int main(int argc, char *argv[]) {
 
     /* I want to bring the string operation in here */
 
-    if(debugmode) {
+    if( pc == breakpoint ) {
+      stepmode = 1;
+    }
+    
+    if((memory[pc] == in && inbuffindex >= strlen(inbuffer)) ||
+       (stepmode)) {
       print_instruction( pc );
+      test = fgets(inbuffer, BUFFSIZE, stdin);
+      if( !test || feof(stdin) || ferror(stdin) ) {
+	fprintf(stderr,"Input error!");
+	return 1;
+      }
+      inbuffindex = 0;
+      if( inbuffer[inbuffindex] == '#' ) {
+	enter_debug_mode();
+      }
     }
 
     /* Only halt returns 1 */
@@ -78,12 +93,14 @@ int init_machine() {
   inst_tble[21] = op_nop;
   stack = 0;
   pc = 0;
-  debugmode = 0;
-
+  stepmode = 0;
+  breakpoint = REGOFFSET;
+  
   /* Reset Input Buffer */
   for( x = 0; x < BUFFSIZE; ++x ) {
     inbuffer[x] = 0;
   }
+  inbuffindex = 0;
 
   /* Reset Memory */
   for( x = 0; x < REGOFFSET; ++x ) {

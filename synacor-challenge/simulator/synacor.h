@@ -16,7 +16,7 @@ typedef unsigned short int SWORD;
 SWORD memory[32768];
 SWORD reg[8];
 SWORD pc;
-SWORD debugmode;
+SWORD stepmode;
 
 #define BUFFSIZE 160
 #define REGOFFSET 32768
@@ -37,6 +37,8 @@ struct STACKOBJ {
 
 struct STACKOBJ *stack;
 char inbuffer[BUFFSIZE];
+int inbuffindex;
+int breakpoint;
 
 int read_in_file(const char *);
 int init_machine();

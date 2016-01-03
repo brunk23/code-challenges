@@ -9,80 +9,160 @@
  */
 
 int enter_debug_mode() {
-  char *test = 0;
-  int x = 0, index = 0;
+  int x = 0, y = 0, i=0, index = 0;
+  struct STACKOBJ *sptr;
   
-  printf("ENTER DEBUG MODE: %s%i: ",inbuffer, pc);
-  while( (test = fgets(inbuffer, BUFFSIZE, stdin)) ) {
-    if( !(test = strtok(inbuffer," \n"))) {
-      continue;
-    }
+  inbuffindex++;
+  switch ( inbuffer[inbuffindex] ) {
+    /* Return at the end of the string */
+  case 0:
+    return 0;
+    break;
 
-    if( strcmp(test,"savestate") == 0) {
-      save_state();
-      continue;
-    }
+    /* Ignore whitespace and # */
+  case ' ':
+  case '\t':
+  case '\n':
+  case '#':
+    inbuffindex++;
+    break;
 
-    if( strcmp(test,"loadstate") == 0) {
-      load_state();
-      continue;
+    /* This has to be load state */
+  case 'l':
+    while( inbuffer[inbuffindex] >= 'a' &&
+	   inbuffer[inbuffindex] <= 'z') {
+      inbuffindex++;
     }
+    load_state();
+    break;
 
-    if( strcmp(test,"debugmode") == 0) {
-      if( debugmode ) {
-	debugmode = 0;
-      } else {
-	debugmode = 1;
-      }
+  case 'j':
+    while( (inbuffer[inbuffindex] >= 'a' &&
+	    inbuffer[inbuffindex] <= 'z') ||
+	   (inbuffer[inbuffindex] >= '0' &&
+	    inbuffer[inbuffindex] <= '9') ) {
+      inbuffindex++;
     }
+    y = strtol(&inbuffer[inbuffindex],0,10);
+    pc = y;
+    break;
+
+  case 'b':
+    while( (inbuffer[inbuffindex] >= 'a' &&
+	    inbuffer[inbuffindex] <= 'z') ||
+	   (inbuffer[inbuffindex] >= '0' &&
+	    inbuffer[inbuffindex] <= '9') ) {
+      inbuffindex++;
+    }
+    y = strtol(&inbuffer[inbuffindex],0,10);
+    breakpoint = y;
+    break;
     
-    /* START PRINT */
-    if( strcmp(test,"print") == 0) {
-      if( (test = strtok(0," \n") )) {
-	  
-	if( strcmp(test,"reg") == 0) {
-	  for( x = 0; x < 8; ++x ) {
-	    printf("r%i: %i\n", x, reg[x]);
-	  }
-	}
+  case 'c':
+    while( (inbuffer[inbuffindex] >= 'a' &&
+	    inbuffer[inbuffindex] <= 'z') ||
+	   (inbuffer[inbuffindex] >= '0' &&
+	    inbuffer[inbuffindex] <= '9') ) {
+      inbuffindex++;
+    }
+    y = strtol(&inbuffer[inbuffindex],0,10);
+    if( !(sptr = malloc(sizeof(struct STACKOBJ)))) {
+      fprintf(stderr,"Error saving pc\n");
+    }
+    sptr->next = stack;
+    sptr->value = pc;
+    stack = sptr;
+    pc = y;
+    break;
 
-	if( strcmp(test,"pc") == 0) {
-	  printf("r%i: %i\n", x, pc);
-	}
-
-	if( strcmp(test,"stack") == 0) {
-	  printstack();
-	}
-	
-	continue;
-      } else {
-	continue;
-      }
-    } /* END PRINT */
-
-    /* START SET */
-    if (strcmp(test,"set") == 0) {
-      if( (test = strtok(0," \n"))) {
-	if( test[0] == 'r' ) {
-	  index = test[1] - '0';
-	  if( (test = strtok(0," \n"))) {
-	    x = strtol(test,0,10);
-	    reg[index] = x;
-	  }
-	}
-	continue;
-      } else {
-        continue;
-      }
-    
-    } /* END SET */
-    
-    if( inbuffer[0] == '#' ) {
-      printf("LEAVE DEBUG MODE (%i)\n",debugmode);
+    /* This has to be print */
+  case 'p':
+    while( inbuffer[inbuffindex] >= 'a' &&
+	   inbuffer[inbuffindex] <= 'z') {
+      inbuffindex++;
+    }
+    while( inbuffer[inbuffindex] == ' ' ) {
+      inbuffindex++;
+    }
+    if( inbuffer[inbuffindex] == 'p' ) {
+      /* print pc */
+      printf("PC: %i\n", pc);
       break;
-    } else {
-      printf("%i: ",pc);
     }
+    if( inbuffer[inbuffindex] == 'r' ) {
+      for( x = 0; x < 8; ++x ) {
+	printf("r%i: %i\n", x, reg[x]);
+      }
+      break;
+    }
+    if( inbuffer[inbuffindex] == 's' ) {
+      printstack();
+      break;
+    }
+    x = strtol(&inbuffer[inbuffindex],0,10);
+    while( (inbuffer[inbuffindex] >= 'a' &&
+	    inbuffer[inbuffindex] <= 'z') ||
+	   (inbuffer[inbuffindex] >= '0' &&
+	    inbuffer[inbuffindex] <= '9') ) {
+      inbuffindex++;
+    }
+    y = strtol(&inbuffer[inbuffindex],0,10);
+    if( !y ) {
+      y = x;
+    }
+    if( (x < 0 || x > 32767) || (y < 0 || y > 32767 )) {
+      fprintf(stderr,"Invalid memory location\n");
+    }
+    fprintf(stderr,"MEMORY: %i to %i\n",x,y);
+    for( i = x; i <= y; ++i ) {
+      fprintf(stderr,"%05i\t",memory[i]);
+    }
+    fprintf(stderr,"\n");
+    break;
+
+  case 's':
+    if( inbuffer[inbuffindex+1] == 'a' ) {
+      save_state();
+      break;
+    }
+    if( inbuffer[inbuffindex+1] == 't' ) {
+      if( stepmode ) {
+	stepmode = 0;
+      } else {
+	stepmode = 1;
+      }
+      break;
+    }
+    if( inbuffer[inbuffindex+1] == 'e' ) {
+      while(inbuffer[inbuffindex] >= 'a' &&
+	    inbuffer[inbuffindex] <= 'z') {
+	inbuffindex++;
+      }
+      while(inbuffer[inbuffindex] == ' ') {
+	inbuffindex++;
+      }
+      if(inbuffer[inbuffindex] == 'r') {
+	inbuffindex++;
+	index = inbuffer[inbuffindex] - '0';
+	inbuffindex++;
+	x = strtol(&inbuffer[inbuffindex],0,10);
+	reg[index] = x;
+      }
+      if( inbuffer[inbuffindex] >= '0' && inbuffer[inbuffindex] <= '9' ) {
+	x = strtol(&inbuffer[inbuffindex],0,10);
+	while( (inbuffer[inbuffindex] >= '0' &&
+		inbuffer[inbuffindex] <= '9') ) {
+	  inbuffindex++;
+	}
+	y = strtol(&inbuffer[inbuffindex],0,10);
+	fprintf(stderr,"Setting [%05i] to %05i\n",x,y);
+	memory[x] = y;
+      }
+      break;
+    }
+  }
+  while( inbuffer[inbuffindex] != 0 ) {
+    inbuffindex++;
   }
   return 0;
 }
@@ -210,10 +290,16 @@ int load_state() {
 		      sizeof(unsigned short int),
 		      1,
 		      source);
-    fprintf(stderr,"STACK CONTENTS: %i words\n",words_read);
     stack->value = y;
     --x;
   }
+  x = 0;
+  sptr = stack;
+  while( sptr ) {
+    ++x;
+    sptr = sptr->next;
+  }
+  fprintf(stderr,"STACK CONTENTS: %i words\n",words_read);
   if( source ) {
     fclose(source);
   }

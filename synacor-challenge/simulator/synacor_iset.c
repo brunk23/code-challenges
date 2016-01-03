@@ -201,45 +201,8 @@ int op_out() {
 }
 
 int op_in() {
-  static int index = 0;
-  char *test;
-  char inp = 0;
-  
-  for( ; index < BUFFSIZE; ++index ) {
-    if( inbuffer[index] != 0 ) {
-      inp = inbuffer[index];
-      inbuffer[index] = 0;
-      break;
-    }
-  }
-  if( index == BUFFSIZE ) {
-    /* We need more input */
-    test = fgets(inbuffer, BUFFSIZE, stdin);
-    if( !test || feof(stdin) || ferror(stdin) ) {
-      fprintf(stderr,"Input error!");
-      return 1;
-    }
-    fprintf(stderr,"%s",inbuffer);
-    for(index = 0 ; index < BUFFSIZE; ++index ) {
-      if( inbuffer[index] != 0 ) {
-	inp = inbuffer[index];
-	if(inp == '#') {
-	  enter_debug_mode();
-	  inp = '\n';
-	}
-	inbuffer[index] = 0;
-	break;
-      }
-    }
-    if( inp == 0 ) {
-      fprintf(stderr,"No valid input found!\n");
-      return 1;
-    }
-  }
-
-  set_add(pc+1, inp);
+  set_add(pc+1, inbuffer[inbuffindex++]);
   pc += 2;
-  
   return 0;
 }
 
