@@ -39,7 +39,9 @@ int main(int argc, char *argv[]) {
     
     if((memory[pc] == in && inbuffindex >= strlen(inbuffer)) ||
        (stepmode)) {
-      print_instruction( pc );
+      if(stepmode) {
+	print_instruction( pc );
+      }
       test = fgets(inbuffer, BUFFSIZE, stdin);
       if( !test || feof(stdin) || ferror(stdin) ) {
 	fprintf(stderr,"Input error!");
