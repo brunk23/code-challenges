@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "synacor_a.h"
 
@@ -48,14 +49,40 @@ int process_input(const char *filename) {
 
   while( (str = fgets(inbuffer,BUFFSIZE,fp) ) ) {
     strind = 0;
-    printf("%s",inbuffer);
     while ( (tokenlen = findtoken(inbuffer)) ) {
-      printf("Found token at %i of length %i\n",strind,tokenlen);
-      strind += tokenlen;
+      if( inbuffer[strind] == '#' ) {
+	/* Start a comment */
+	break;
+      }
+      if( inbuffer[strind] == '.' ) {
+	strind += internal_command(tokenlen);
+      } else {
+	if( inbuffer[strind] == ':' ) {
+	  strind += variable_name(tokenlen);
+	} else {
+	  if( inbuffer[strind] >= 'a' &&
+	      inbuffer[strind] <= 'z' ) {
+	    strind += opcode(tokenlen);
+	  } else {
+	    fprintf(stderr,"Unexpected junk in input at %i\n",strind);
+	    fprintf(stderr,"%s",inbuffer);
+	    strind += tokenlen;
+	  }
+	}
+      }
     }
   }
-
   return 0;
+}
+
+int variable_name(int len) {
+
+  return len;
+}
+
+int opcode(int len) {
+
+  return len;
 }
 
 /*

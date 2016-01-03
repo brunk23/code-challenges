@@ -45,6 +45,9 @@ int help_menu(const char *);
 int init_machine();
 int process_input(const char *);
 int findtoken(const char *);
+int internal_command(int len);
+int variable_name(int len);
+int opcode(int len);
 
 /*
  * See the arch-spec sheet for detailed instructions on

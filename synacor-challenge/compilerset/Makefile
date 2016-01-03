@@ -1,5 +1,5 @@
 
-AFILES = syn-assem.c
+AFILES = syn-assem.c syn-asm-int.c
 AHFILES = synacor_a.h
 
 syn-asm: $(AFILES) $(AHFILES)
