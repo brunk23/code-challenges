@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "synacor_a.h"
 
@@ -27,9 +28,82 @@ int main(int argc, char *argv[]) {
   }
 
   init_machine();
+
+  if( process_input(argv[source]) ) {
+    return 1;
+  }
   
   return 0;
 }
+
+int process_input(const char *filename) {
+  FILE *fp;
+  char *str;
+  int tokenlen;
+  
+  if( !(fp = fopen(filename,"r"))) {
+    fprintf(stderr,"Couldn't open file: %s\n",filename);
+    return 1;
+  }
+
+  while( (str = fgets(inbuffer,BUFFSIZE,fp) ) ) {
+    strind = 0;
+    printf("%s",inbuffer);
+    while ( (tokenlen = findtoken(inbuffer)) ) {
+      printf("Found token at %i of length %i\n",strind,tokenlen);
+      strind += tokenlen;
+    }
+  }
+
+  return 0;
+}
+
+/*
+ * index = start of token, returns token length
+ */
+int findtoken(const char *buff) {
+  int n=0;
+  int found = 1;
+
+  while( found ) {
+    switch( inbuffer[strind] ) {
+    case ' ':
+    case '\t':
+    case ',':
+      strind++;
+      break;
+
+    case 0:
+    case '\n':
+      return 0;
+      break;
+
+    default:
+      found = 0;
+      break;
+    }
+  }
+  
+  found = 1;
+  while ( found ) {
+    ++n;
+    switch (inbuffer[strind+n]) {
+    case ' ':
+    case '\t':
+    case ',':
+    case '#':
+    case '\n':
+    case 0:
+      found = 0;
+      break;
+
+    default:
+      break;
+    }
+  }
+  return n;
+}
+  
 
 int init_machine() {
   int x;

@@ -36,15 +36,15 @@ struct STACKOBJ {
 
 struct STACKOBJ *stack;
 char inbuffer[BUFFSIZE];
-int inbuffindex;
-int breakpoint;
+int strind;
 
 /*
  * Function prototypes
  */
 int help_menu(const char *);
-int read_in_file(const char *);
 int init_machine();
+int process_input(const char *);
+int findtoken(const char *);
 
 /*
  * See the arch-spec sheet for detailed instructions on
