@@ -80,11 +80,6 @@ int variable_name(int len) {
   return len;
 }
 
-int opcode(int len) {
-
-  return len;
-}
-
 /*
  * index = start of token, returns token length
  */
@@ -139,7 +134,7 @@ int init_machine() {
   for( x = 0; x < REGOFFSET; ++x) {
     memory[x] = 0;
   }
-
+  
   return 0;
 }
 

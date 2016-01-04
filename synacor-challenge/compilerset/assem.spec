@@ -16,25 +16,26 @@ Assembly files will have the following format:
 
     # registers start with r
 -- OPCODES and number of args --
-halt
-set a b
-push a
-pop a
+add a b c
+and a b c
+call a
 eq a b c
 gt a b c
+halt
+in a
+jf a b
 jmp a
 jt a b
-jf a b
-add a b c
-mult a b c
+-- LEFT OFF HERE --
 mod a b c
-and a b c
-or a b c
-not a b
-rmem a b
-wmem a b
-call a
-ret
-out a
-in a
+mult a b c
 nop
+not a b
+or a b c
+out a
+pop a
+push a
+ret
+rmem a b
+set a b
+wmem a b

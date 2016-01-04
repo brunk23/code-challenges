@@ -14,7 +14,6 @@
  */
 typedef unsigned short int SWORD;
 SWORD memory[32768];
-SWORD reg[8];
 SWORD pc;
 
 #define BUFFSIZE 160
@@ -41,44 +40,14 @@ int strind;
 /*
  * Function prototypes
  */
-int help_menu(const char *);
+int help_menu( const char * );
 int init_machine();
-int process_input(const char *);
-int findtoken(const char *);
-int internal_command(int len);
-int variable_name(int len);
-int opcode(int len);
-
-/*
- * See the arch-spec sheet for detailed instructions on
- * opcodes
- */
-int op_halt();
-int op_set();
-int op_push();
-int op_pop();
-int op_eq();
-int op_gt();
-int op_jmp();
-int op_jt();
-int op_jf();
-int op_add();
-int op_mult();
-int op_mod();
-int op_and();
-int op_or();
-int op_not();
-int op_rmem();
-int op_wmem();
-int op_call();
-int op_ret();
-int op_out();
-int op_in();
-int op_nop();
-
-/* There are 22 opcodes and we just call them
- * from here. */
-typedef int (*iPtr)();
-iPtr inst_tble[22];
+int process_input( const char * );
+int findtoken( const char * );
+int internal_command( int );
+int variable_name( int );
+int opcode( int );
+int inv_op();
+int fill( int );
 
 #endif
