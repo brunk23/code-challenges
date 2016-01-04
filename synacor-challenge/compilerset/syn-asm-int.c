@@ -22,17 +22,9 @@ int internal_command(int len) {
     free(command);
     command = 0;
     used = findtoken(inbuffer);
-    if( !(command=malloc(used+1))) {
-      fprintf(stderr,"Can't get memory!\n");
-      return len;
-    }
-    for( x = 0; x < used; ++x) {
-      command[x] = inbuffer[strind + x];
-    }
-    command[used] = 0;
-    z = strtol(command,0,10);
-    free(command);
-    command = 0;
+
+    z = read_number(used);
+
     fprintf(stderr,"Setting origin to %i\n",z);
     pc = z;
     return used;
@@ -42,4 +34,27 @@ int internal_command(int len) {
     free(command);
   }
   return used;
+}
+
+/*
+ * Will take a token and return the value of it.
+ */
+int read_number(int used) {
+  int x, z;
+  char *command;
+
+  if( !(command=malloc(used+1))) {
+    fprintf(stderr,"Can't get memory!\n");
+  }
+  
+  for( x = 0; x < used; ++x) {
+    command[x] = inbuffer[strind + x];
+  }
+  command[used] = 0;
+
+  z = strtol(command,0,10);
+
+  free(command);
+
+  return z;
 }
