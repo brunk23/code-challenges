@@ -5,7 +5,6 @@
 
 int opcode(int len) {
 
-
   switch( inbuffer[strind] ) {
   case 'a':
     if( len == 3 && inbuffer[strind+2] == 'd' ) {
@@ -15,7 +14,6 @@ int opcode(int len) {
 	strind += len;
 	fill(3);
 	return 0;
-	break;
       }
       if( inbuffer[strind+1] == 'd' ) {
 	/* ADD */
@@ -23,7 +21,6 @@ int opcode(int len) {
 	strind += len;
 	fill(3);
 	return 0;
-	break;
       }
     }
     inv_op();
@@ -38,7 +35,6 @@ int opcode(int len) {
       strind += len;
       fill(1);
       return 0;
-      break;
     }
     inv_op();
     break;
@@ -50,7 +46,6 @@ int opcode(int len) {
       strind += len;
       fill(3);
       return 0;
-      break;
     }
     inv_op();
     break;
@@ -62,7 +57,6 @@ int opcode(int len) {
       strind += len;
       fill(3);
       return 0;
-      break;
     }
     inv_op();
     break;
@@ -74,7 +68,6 @@ int opcode(int len) {
       /* HALT */
       memory[pc++] = halt;
       return len;
-      break;
     }
     inv_op();
     break;
@@ -86,7 +79,6 @@ int opcode(int len) {
       strind += len;
       fill(1);
       return 0;
-      break;
     }
     inv_op();
     break;
@@ -99,7 +91,6 @@ int opcode(int len) {
 	strind += len;
 	fill(2);
 	return 0;
-	break;
       }
       if( inbuffer[strind+1] == 'f' ) {
 	/* JF */
@@ -107,7 +98,6 @@ int opcode(int len) {
 	strind += len;
 	fill(2);
 	return 0;
-	break;
       }
     }
     if( len == 3 && inbuffer[strind+1] == 'm' &&
@@ -117,13 +107,124 @@ int opcode(int len) {
       strind += len;
       fill(1);
       return 0;
-      break;
     }
     inv_op();
     break;
 
+  case 'm':
+    if( len == 3 && inbuffer[strind+1] == 'o' &&
+	inbuffer[strind+2] == 'd') {
+      /* MOD */
+      memory[pc++] = mod;
+      strind += len;
+      fill(3);
+      return 0;
+    }
+    if( len == 4 && inbuffer[strind+1] == 'u' &&
+	inbuffer[strind+2] == 'l' &&
+	inbuffer[strind+3] == 't') {
+      /* MULT */
+      memory[pc++] = mult;
+      strind += len;
+      fill(3);
+      return 0;
+    }
+    inv_op();
+    break;
 
-    
+  case 'n':
+    if( len == 3 && inbuffer[strind+1] =='o') {
+      if( inbuffer[strind+2] == 'p' ) {
+	/* NOP */
+	memory[pc++] = nop;
+	strind += len;
+	return 0;
+      }
+      if( inbuffer[strind+2] == 't' ) {
+	memory[pc++] = not;
+	strind += len;
+	fill(2);
+	return 0;
+      }
+    }
+    inv_op();
+    break;
+
+  case 'o':
+    if( len == 2 && inbuffer[strind+1] == 'r' ) {
+      memory[pc++] = or;
+      strind += len;
+      fill(3);
+      return 0;
+    }
+    if( len == 3 && inbuffer[strind+1] == 'u' &&
+	inbuffer[strind+2] == 't') {
+      memory[pc++] = out;
+      strind += len;
+      fill(1);
+      return 0;
+    }
+    inv_op();
+    break;
+
+  case 'p':
+    if( len == 3 && inbuffer[strind+1] == 'o' &&
+	inbuffer[strind+2] == 'p') {
+      memory[pc++] = pop;
+      strind += len;
+      fill(1);
+      return 0;
+    }
+    if( len == 4 && inbuffer[strind+1] == 'u' &&
+	inbuffer[strind+2] == 's' &&
+	inbuffer[strind+3] == 'h' ) {
+      memory[pc++] = push;
+      strind += len;
+      fill(1);
+      return 0;
+    }
+    inv_op();
+    break;
+
+  case 'r':
+    if( len == 3 && inbuffer[strind+1] == 'e' &&
+	inbuffer[strind+2] == 't' ) {
+      memory[pc++] = ret;
+      strind += len;
+      return 0;
+    }
+    if( len == 4 && inbuffer[strind+1] == 'm' &&
+	inbuffer[strind+2] == 'e' &&
+	inbuffer[strind+3] == 'm' ) {
+      memory[pc++] = rmem;
+      strind += len;
+      fill(2);
+      return 0;
+    }
+
+  case 's':
+    if( len == 3 && inbuffer[strind+1] == 'e' &&
+	inbuffer[strind+2] == 't') {
+      memory[pc++] = set;
+      strind += len;
+      fill(2);
+      return 0;
+    }
+    inv_op();
+    break;
+
+  case 'w':
+    if( len == 4 && inbuffer[strind+1] == 'm' &&
+	inbuffer[strind+2] == 'e' &&
+	inbuffer[strind+3] == 'm' ) {
+      memory[pc++] = wmem;
+      strind += len;
+      fill(2);
+      return 0;
+    }
+    inv_op();
+    break;
+      
   default:
     inv_op();
     break;
