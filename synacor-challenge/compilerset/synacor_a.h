@@ -28,12 +28,14 @@ enum INSTSET {
   mod, and, or, not, rmem, wmem, call, ret, out, in, nop
 };
 
-struct STACKOBJ {
-  struct STACKOBJ *next;
-  SWORD value;
+struct symstack {
+  struct symstack *next;
+  char *name;
+  SWORD known;
+  SWORD location;
 };
 
-struct STACKOBJ *stack;
+struct symstack *stack;
 char inbuffer[BUFFSIZE];
 int strind;
 

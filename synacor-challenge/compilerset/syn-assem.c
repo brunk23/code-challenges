@@ -75,9 +75,65 @@ int process_input(const char *filename) {
   return 0;
 }
 
+/*
+ * Meh, I am unsure how I want to implement this
+ * if I want the stack objects to keep track of their
+ * locations, or if I want to track locations elsewhere
+ * probably the second... have another stack with variable
+ * names and the location they should be assigned to when
+ * located in memory
+ */
 int variable_name(int len) {
+  int x = 0, ndecl = 0;
+  struct symstack *sptr = 0;
+  char *vname;
+  if(inbuffer[strind] == ':') {
+    strind++;
+    len--;
+    ndecl = 1;
+  }
+  if(!(vname=malloc(len+1))) {
+    fprintf(stderr,"Can't allocate memory\n");
+    return len;
+  }
+  for(x = 0; x < len; ++x ) {
+    vname[x] = inbuffer[strind+x];
+  }
+  vname[len] = 0;
+  strind += len;
 
-  return len;
+  /* Check to see if it's in the tree */
+  sptr = stack;
+  while(sptr) {
+    if( strcmp(sptr->name, vname) == 0 ) {
+      /* in the tree */
+      break;
+    }
+  }
+
+  if( !sptr ) {
+    /* not in the tree */
+    sptr = malloc(sizeof(struct symstack));
+    sptr->next = stack;
+    stack = sptr;
+    sptr->name = vname;
+    sptr->location = 0;
+    sptr->known = 0;
+  }
+
+  if( ndecl == 1 && stack->known == 1 ) {
+    fprintf(stderr,"Double declaration of label\n");
+    return len;
+  }
+
+  if( ndecl == 1 ) {
+    stack->location = pc;
+    stack->known = 1;
+  }
+
+  /* INC */
+  
+  return 0;
 }
 
 /*
@@ -134,6 +190,9 @@ int init_machine() {
   for( x = 0; x < REGOFFSET; ++x) {
     memory[x] = 0;
   }
+
+  stack = 0;
+  pc = 0;
   
   return 0;
 }
