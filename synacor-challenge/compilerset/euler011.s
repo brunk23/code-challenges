@@ -1,6 +1,11 @@
 # Attempt to solve project Euler #11 in 
 # Synacor assembly
 
+# Due to limitations, the product will be kept in 4 words.
+# (00 00 00 49) * 99 = (00 00 00 4851) = (00 00 48 51)
+# (00 00 48 51) * 97 = (00 00 4656 4947) = (00 00 4705 47)
+# = (00 47 05 47) etc
+
 .origin 0
 
 # r0 will be row (0 - 19)
@@ -42,8 +47,8 @@ loopc:
 :right
 
 
-
-:curr   data 00 00 00 00
+:ascii0 data '0'
+:curr   data 00 00 00 00	# product will be kept in 4 words
 :max	data 00 00 00 00
 :grid
 	data 08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
