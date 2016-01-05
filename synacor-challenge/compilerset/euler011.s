@@ -30,17 +30,53 @@ loopc:
 	add r1 r1 1
 	gt r7 20 r1
 	jt r7 loopc
-	set r1 0	# Reset col to 0
-	add r0 r0 1	# Increment row
-	gt r7 20 r0	# Loop while under 20
+	set r1 0		# Reset col to 0
+	add r0 r0 1		# Increment row
+	gt r7 20 r0		# Loop while under 20
 	jt ry loopr
 
 :down
-
+	gt r7 r0 16
+	jt r7 done		# if we are at row 17+, return
+	mult r4 r0 20   	# r4 = row * 20
+	add r4 r4 r1		# r4 = row * 20 + col
+	rmem r5 r4		# read value of r4 into r5
+	set r6 curr		# r6 = address of curr product
+	wmem r6 0
+	add r6 r6 1
+	wmem r6 0
+	add r6 r6 1
+	wmem r6 0
+	add r6 r6 1
+	wmem r6 r5		# Reset the curr number to 00 00 00 row*20+col
+	add r4 r4 20		# Add 20 to go down a row
+	call getprod    	# multiply curr by this number
+	add r4 r4 20		# Add 20 to go down a row
+	call getprod		# multiply curr by this number
+	add r4 r4 20		# Add 20 to go down a row
+	call getprod		# multiply curr by this number
+	call checklarg		# check if it is larger
+:done
+	ret
 
 :downl
-
-
+	gt r7 r0 16
+	jt r7 done
+	lt r7 r0 3
+	jt r7 done		# only rectangle 0,3 - 16,19
+	mult r4 r0 20		# r4 = row * 20
+	add r4 r4 1		# r4 = r4 + col
+	rmem r5 r4
+	set r6 curr	        # r6 = address of curr product
+	wmem r6	0
+	add r6 r6 1
+	wmem r6	0
+	add r6 r6 1
+	wmem r6	0
+	add r6 r6 1
+	wmem r6	r5	        # Reset	the curr number	to 00 00 00 row*20+col
+	######
+	
 :downr
 
 
