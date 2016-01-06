@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
   sptr = stack;
   while( sptr ) {
     stack = sptr->next;
+    free(sptr->name);
     free(sptr);
     sptr = stack;
   }
@@ -99,6 +100,7 @@ int process_output(const char *filename) {
     fprintf(stderr,"Wrote %i words\nExpected to write %i words\n",y,x);
   }
 
+  fclose(fp);
   return 0;
 }
 
@@ -137,6 +139,7 @@ int process_input(const char *filename) {
       }
     }
   }
+  fclose(fp);
   return 0;
 }
 
