@@ -36,6 +36,7 @@ struct symstack {
 };
 
 struct symstack *stack;
+struct symstack *unresolved;
 char inbuffer[BUFFSIZE];
 int strind;
 

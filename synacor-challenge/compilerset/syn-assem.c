@@ -106,6 +106,7 @@ int variable_name(int len) {
   sptr = stack;
   while(sptr) {
     if( strcmp(sptr->name, vname) == 0 ) {
+      free(vname);
       /* in the tree */
       break;
     }
@@ -129,9 +130,32 @@ int variable_name(int len) {
   if( ndecl == 1 ) {
     stack->location = pc;
     stack->known = 1;
+    /* Go through and resolve all the old ones here */
+    sptr = unresolved;
+    while(sptr) {
+      break;
+    }
+    
+  } else {
+    /* This is not a new declaration, we need to see
+     * if we know where it belongs and assign it
+     * or push if, if not */
+    if( stack->known == 0 ) {
+      if( !(sptr=malloc(sizeof(struct symstack)))) {
+	fprintf(stderr,"Can't allocate memory\n");
+	return len;
+      }
+      sptr->name = stack->name;
+      sptr->location = pc;
+      sptr->known = 0;
+      sptr->next = unresolved;
+      unresolved = sptr;
+    } else {
+      memory[pc++] = stack->location;
+    }
   }
 
-  /* INC */
+  
   
   return 0;
 }
@@ -191,6 +215,7 @@ int init_machine() {
     memory[x] = 0;
   }
 
+  unresolved = 0;
   stack = 0;
   pc = 0;
   
