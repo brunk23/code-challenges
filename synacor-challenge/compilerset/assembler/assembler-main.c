@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "synacor_a.h"
+#include "assembler.h"
 
 int main(int argc, char *argv[]) {
   int retcode = 0, source = 0, dest = 0;

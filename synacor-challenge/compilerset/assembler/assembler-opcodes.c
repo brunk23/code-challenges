@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "synacor_a.h"
+#include "assembler.h"
 
 /*
  * This consumes the string passed to it and
