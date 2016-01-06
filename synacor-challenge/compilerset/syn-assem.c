@@ -33,6 +33,10 @@ int main(int argc, char *argv[]) {
   if( process_input(argv[source]) ) {
     return 1;
   }
+
+  /* Resolve unknown */
+
+  /* write output */
   
   return 0;
 }
@@ -55,14 +59,14 @@ int process_input(const char *filename) {
 	break;
       }
       if( inbuffer[strind] == '.' ) {
-	strind += internal_command(tokenlen);
+	internal_command(tokenlen);
       } else {
 	if( inbuffer[strind] == ':' ) {
-	  strind += variable_name(tokenlen);
+	  variable_name(tokenlen);
 	} else {
 	  if( inbuffer[strind] >= 'a' &&
 	      inbuffer[strind] <= 'z' ) {
-	    strind += opcode(tokenlen);
+	    opcode(tokenlen);
 	  } else {
 	    fprintf(stderr,"Unexpected junk in input at %i\n",strind);
 	    fprintf(stderr,"%s",inbuffer);
@@ -85,7 +89,7 @@ int process_input(const char *filename) {
  */
 int variable_name(int len) {
   int x = 0, ndecl = 0;
-  struct symstack *sptr = 0;
+  struct symstack *sptr = 0, *usptr = 0;
   char *vname;
   if(inbuffer[strind] == ':') {
     strind++;
@@ -110,6 +114,7 @@ int variable_name(int len) {
       /* in the tree */
       break;
     }
+    sptr = sptr->next;
   }
 
   if( !sptr ) {
@@ -122,36 +127,30 @@ int variable_name(int len) {
     sptr->known = 0;
   }
 
-  if( ndecl == 1 && stack->known == 1 ) {
+  if( ndecl == 1 && sptr->known == 1 ) {
     fprintf(stderr,"Double declaration of label\n");
     return len;
   }
 
   if( ndecl == 1 ) {
-    stack->location = pc;
-    stack->known = 1;
-    /* Go through and resolve all the old ones here */
-    sptr = unresolved;
-    while(sptr) {
-      break;
-    }
-    
+    sptr->location = pc;
+    sptr->known = 1;    
   } else {
     /* This is not a new declaration, we need to see
      * if we know where it belongs and assign it
      * or push if, if not */
-    if( stack->known == 0 ) {
-      if( !(sptr=malloc(sizeof(struct symstack)))) {
+    if( sptr->known == 0 ) {
+      if( !( usptr = malloc(sizeof(struct symstack)))) {
 	fprintf(stderr,"Can't allocate memory\n");
 	return len;
       }
-      sptr->name = stack->name;
-      sptr->location = pc;
-      sptr->known = 0;
-      sptr->next = unresolved;
-      unresolved = sptr;
+      usptr->name = sptr->name;
+      usptr->location = pc;
+      usptr->known = 0;
+      usptr->next = unresolved;
+      unresolved = usptr;
     } else {
-      memory[pc++] = stack->location;
+      memory[pc++] = sptr->location;
     }
   }
 

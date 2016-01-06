@@ -3,8 +3,11 @@
 #include <string.h>
 #include "synacor_a.h"
 
+/*
+ * This consumes the string passed to it and
+ * all arguments after it.
+ */
 int opcode(int len) {
-
   switch( inbuffer[strind] ) {
   case 'a':
     if( len == 3 && inbuffer[strind+2] == 'd' ) {
@@ -39,6 +42,18 @@ int opcode(int len) {
     inv_op();
     break;
 
+  case 'd':
+    if( len == 4 && inbuffer[strind+1] == 'a' &&
+	inbuffer[strind+2] == 't' &&
+	inbuffer[strind+3] == 'a' ) {
+      /* DATA */
+      strind += len;
+      process_data_line();
+      return 0;
+    }
+    inv_op();
+    break;
+
   case 'e':
     if( len == 2 && inbuffer[strind+1] == 'q' ) {
       /* EQ */
@@ -67,7 +82,8 @@ int opcode(int len) {
 	inbuffer[strind+3] == 't' ) {
       /* HALT */
       memory[pc++] = halt;
-      return len;
+      strind += len;
+      return 0;
     }
     inv_op();
     break;
@@ -141,6 +157,7 @@ int opcode(int len) {
 	return 0;
       }
       if( inbuffer[strind+2] == 't' ) {
+	/* NOT */
 	memory[pc++] = not;
 	strind += len;
 	fill(2);
@@ -152,6 +169,7 @@ int opcode(int len) {
 
   case 'o':
     if( len == 2 && inbuffer[strind+1] == 'r' ) {
+      /* OR */
       memory[pc++] = or;
       strind += len;
       fill(3);
@@ -159,6 +177,7 @@ int opcode(int len) {
     }
     if( len == 3 && inbuffer[strind+1] == 'u' &&
 	inbuffer[strind+2] == 't') {
+      /* OUT */
       memory[pc++] = out;
       strind += len;
       fill(1);
@@ -170,6 +189,7 @@ int opcode(int len) {
   case 'p':
     if( len == 3 && inbuffer[strind+1] == 'o' &&
 	inbuffer[strind+2] == 'p') {
+      /* POP */
       memory[pc++] = pop;
       strind += len;
       fill(1);
@@ -178,6 +198,7 @@ int opcode(int len) {
     if( len == 4 && inbuffer[strind+1] == 'u' &&
 	inbuffer[strind+2] == 's' &&
 	inbuffer[strind+3] == 'h' ) {
+      /* PUSH */
       memory[pc++] = push;
       strind += len;
       fill(1);
@@ -189,6 +210,7 @@ int opcode(int len) {
   case 'r':
     if( len == 3 && inbuffer[strind+1] == 'e' &&
 	inbuffer[strind+2] == 't' ) {
+      /* RET */
       memory[pc++] = ret;
       strind += len;
       return 0;
@@ -196,6 +218,7 @@ int opcode(int len) {
     if( len == 4 && inbuffer[strind+1] == 'm' &&
 	inbuffer[strind+2] == 'e' &&
 	inbuffer[strind+3] == 'm' ) {
+      /* RMEM */
       memory[pc++] = rmem;
       strind += len;
       fill(2);
@@ -205,6 +228,7 @@ int opcode(int len) {
   case 's':
     if( len == 3 && inbuffer[strind+1] == 'e' &&
 	inbuffer[strind+2] == 't') {
+      /* SET */
       memory[pc++] = set;
       strind += len;
       fill(2);
@@ -217,6 +241,7 @@ int opcode(int len) {
     if( len == 4 && inbuffer[strind+1] == 'm' &&
 	inbuffer[strind+2] == 'e' &&
 	inbuffer[strind+3] == 'm' ) {
+      /* WMEM */
       memory[pc++] = wmem;
       strind += len;
       fill(2);
@@ -231,19 +256,11 @@ int opcode(int len) {
     
   }
 
+  strind += len;
   return len;
 }
 
 int inv_op() {
   fprintf(stderr,"Unrecognized opcode:\n%s",inbuffer);
-  return 0;
-}
-
-/*
- * This will fill 'words' with the content on the line
- * leaves index after the last byte of the last word info.
- */
-int fill( int words ) {
-
   return 0;
 }

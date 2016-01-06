@@ -53,5 +53,6 @@ int opcode( int );
 int inv_op();
 int fill( int );
 int read_number( int );
+int process_data_line();
 
 #endif
