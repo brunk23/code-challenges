@@ -1,6 +1,7 @@
 *~
 a.out
 *.core
+*.bin
 *.swp
 sml_basic
 sml_lisp

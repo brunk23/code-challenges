@@ -144,12 +144,10 @@ int process_input(const char *filename) {
 }
 
 /*
- * Meh, I am unsure how I want to implement this
- * if I want the stack objects to keep track of their
- * locations, or if I want to track locations elsewhere
- * probably the second... have another stack with variable
- * names and the location they should be assigned to when
- * located in memory
+ * Will keep track of all variable names. It will create
+ * two lists. One of all the variables (assigning positions
+ * as they are found), and another which tracks those which
+ * have not been resolved, yet.
  */
 int variable_name(int len) {
   int x = 0, ndecl = 0;
