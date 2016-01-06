@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[]) {
   int retcode = 0, source = 0, dest = 0;
+  struct symstack *sptr = 0, *usptr = 0;
   
   /* COMMAND LINE ARGUMENTS */
   for( retcode = 1; retcode < argc; retcode++) {
@@ -34,10 +35,69 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  /* Resolve unknown */
+  usptr = unresolved;
 
-  /* write output */
+  /* Go through and place the unresolved */
+  while( usptr ) {
+    sptr = stack;
+    while( sptr ) {
+      if( strcmp(sptr->name,usptr->name) == 0 ) {
+	memory[usptr->location] = sptr->location;
+	break;
+      }
+      sptr = sptr->next;
+    }
+    if( !sptr ) {
+      fprintf(stderr,"Symbol NOT found! [%s]\n",usptr->name);
+      free(usptr->name);
+    }
+    usptr = usptr->next;
+  }
+
+  usptr = unresolved;
+  while(usptr) {
+    unresolved = usptr->next;
+    free(usptr);
+    usptr = unresolved;
+  }
+
+  sptr = stack;
+  while( sptr ) {
+    stack = sptr->next;
+    free(sptr);
+    sptr = stack;
+  }
+
+  if( dest ) {
+    process_output(argv[dest]);
+  } else {
+    process_output("syn-asm.bin");
+  }
   
+  return 0;
+}
+
+int process_output(const char *filename) {
+  FILE *fp;
+  int x, y;
+
+  for( x = REGOFFSET-1; x > 0; --x) {
+    if( memory[x] ) {
+      break;
+    }
+  }
+
+  if( !(fp = fopen(filename,"w"))) {
+    fprintf(stderr,"Couldn't open file: %s\n",filename);
+    return 1;
+  }
+
+  y = fwrite(memory, sizeof(SWORD), x, fp);
+
+  if( y != x ) {
+    fprintf(stderr,"Wrote %i words\nExpected to write %i words\n",y,x);
+  }
+
   return 0;
 }
 
@@ -153,9 +213,6 @@ int variable_name(int len) {
       memory[pc++] = sptr->location;
     }
   }
-
-  
-  
   return 0;
 }
 

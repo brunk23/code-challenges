@@ -46,6 +46,7 @@ int strind;
 int help_menu( const char * );
 int init_machine();
 int process_input( const char * );
+int process_output( const char * );
 int findtoken( const char * );
 int internal_command( int );
 int variable_name( int );
