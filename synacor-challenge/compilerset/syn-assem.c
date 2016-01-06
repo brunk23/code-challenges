@@ -86,6 +86,7 @@ int process_output(const char *filename) {
       break;
     }
   }
+  ++x;
 
   if( !(fp = fopen(filename,"w"))) {
     fprintf(stderr,"Couldn't open file: %s\n",filename);

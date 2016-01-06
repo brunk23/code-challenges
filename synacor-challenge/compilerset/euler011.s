@@ -17,10 +17,10 @@
 	set r1 0
 	set r2 0
 	set r3 0
-loopr:
+:loopr
 	
 
-loopc:
+:loopc
 	call down
 	call downl
 	call downr
@@ -62,8 +62,8 @@ loopc:
 :downl
 	gt r7 r0 16
 	jt r7 done
-	lt r7 r0 3
-	jt r7 done		# only rectangle 0,3 - 16,19
+	gt r7 r0 2
+	jf r7 done		# only rectangle 0,3 - 16,19
 	mult r4 r0 20		# r4 = row * 20
 	add r4 r4 1		# r4 = r4 + col
 	rmem r5 r4
@@ -83,7 +83,7 @@ loopc:
 :right
 
 
-:ascii0 data '0'
+:ascii0 data 48			# the ASCII for 0
 :curr   data 00 00 00 00	# product will be kept in 4 words
 :max	data 00 00 00 00
 :grid
