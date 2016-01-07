@@ -10,12 +10,27 @@
 
 # r0 will be current location 0 - > 399
 
-	set r0 0
-	set r1 0
-	set r2 0
-	set r3 0
+	set r0 grid
+	set r1 prod
+	set r2 grid
+	add r2 r2 20
+# Basic method to multiply
+	rmem r4 r2   # load first number into grid
+	wmem r1 r4
 
-	set r3 grid
+	add r2 r2 1
+	rmem r3 r2
+	call mult
+
+	add r2 r2 1
+	rmem r3 r2
+	call mult
+
+	add r2 r2 1
+	rmem r3 r2
+	call mult
+
+	set r3 prod
 	call print
 	halt
 
@@ -129,9 +144,64 @@
 
 :right
 
+	# multiplies curr by the number in r3
+	# r3 will be the head of the 4 numbers we
+	# are multiplying. The remaining 3 will be
+	# in curr
+:mult
+	push r0
+	push r1
+	push r2
+	push r4
+	push r5
+	set r0 prod
+	rmem r1 r0	# load bottom digits into r1
+	mult r1 r1 r3
+	mod r2 r1 100
+	wmem r0 r2
+	call hundreds
+	add r4 r4 32767	# subtract 1
+
+	add r0 r0 1
+	rmem r1 r0
+	mult r1 r1 r3
+	add r1 r1 r4	# add the carry
+	mod r2 r1 100	# get the bottom 2 digits
+	wmem r0 r2	# save it
+	call hundreds
+	add r4 r4 32767
+
+	add r0 r0 1
+	rmem r1 r0
+	mult r1 r1 r3
+	add r1 r1 r4
+	mod r2 r1 100
+	wmem r0 r2
+	call hundreds
+	add r4 r4 32767
+	add r0 r0 1
+	wmem r0 r4	# top numbers
+
+	pop r5
+	pop r4
+	pop r2
+	pop r1
+	pop r0
+	ret
+
+:hundreds
+	set r4 1
+:hstart
+	mult r5 r4 100
+	gt r5 r5 r1
+	jt r5 hunddone
+	add r4 r4 1
+	jmp hstart
+:hunddone
+	ret
 
 :ascii0 data 48			# the ASCII for 0
-:curr   data 00 00 00 00	# product will be kept in 4 words
+:prod   data 00 00 00 00  	# product will be kept in 4 words
 :max	data 00 00 00 00
 :grid
 	data 08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
