@@ -8,15 +8,62 @@
 
 .origin 0
 
-# r0 will be row (0 - 19)
-# r1 will be col (0 - 19)
-# r2 will be rowoffset
-# r3 will be coloffset
+# r0 will be current location 0 - > 399
 
 	set r0 0
 	set r1 0
 	set r2 0
 	set r3 0
+
+	set r3 grid
+	call print
+	halt
+
+	# print() prints the 4 digit number, starting at
+	# r3, to the output, followed by a newline.
+:print
+	push r0
+	push r2
+	push r3
+	push r4
+	push r5
+	add r3 r3 3	# r1 is the place we work on
+	call pnum
+	add r3 r3 32767
+	call pnum
+	add r3 r3 32767
+	call pnum
+	add r3 r3 32767
+	call pnum
+	out 10
+	pop r5
+	pop r4
+	pop r3
+	pop r2
+	pop r0
+	ret
+
+	# pnum() is a helper function that prints a
+	# number pair
+:pnum
+	rmem r2 r3	# r2 is the number
+	mod r5 r2 10	# r5 is ones place
+	set r4 0
+	:ploop
+	add r4 r4 1
+	mult r0 r4 10
+	gt r0 r0 r2
+	jt r0 pdone
+	jmp ploop
+	:pdone
+	add r4 r4 32767	# subtract one
+	add r4 r4 48	# add '0'
+	add r5 r5 48	# add '0'
+	out r4
+	out r5
+	ret
+
+
 :loopr
 	
 

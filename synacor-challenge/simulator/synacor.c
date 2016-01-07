@@ -12,16 +12,25 @@ int main(int argc, char *argv[]) {
   struct STACKOBJ *obottom;
   char *test;
   int retval = 0;
+  int source = 0;
   
-  if( argc != 2 ) {
+  init_machine();
+
+  for( retval = 1; retval < argc; ++retval ) {
+    if( strcmp(argv[retval],"-s") == 0 ) {
+      stepmode = 1;
+    } else {
+      source = retval;
+    }
+  }
+
+  if( argc < 2 || source == 0 ) {
     fprintf(stderr,"Usage: %s {challenge.bin}\n",argv[0]);
     return 1;
   }
 
-  init_machine();
-  
-  if( !read_in_file(argv[1])) {
-    fprintf(stderr,"Could not read file: %s\n",argv[1]);
+  if( !read_in_file(argv[source])) {
+    fprintf(stderr,"Could not read file: %s\n",argv[source]);
     return 1;
   }
 
