@@ -22,14 +22,8 @@
 	rmem r3 r2
 	call mult
 
-	add r2 r2 1
-	rmem r3 r2
-	call mult
-
-	add r2 r2 1
-	rmem r3 r2
-	call mult
-
+	# ENTER THE MAIN PROGRAM
+	call main_loop
 	set r3 prod
 	call print
 	halt
@@ -118,52 +112,114 @@
 	ret
 
 :down
-	gt r7 r0 16
-	jt r7 done		# if we are at row 17+, return
-	mult r4 r0 20   	# r4 = row * 20
-	add r4 r4 r1		# r4 = row * 20 + col
-	rmem r5 r4		# read value of r4 into r5
-	set r6 curr		# r6 = address of curr product
-	wmem r6 0
-	add r6 r6 1
-	wmem r6 0
-	add r6 r6 1
-	wmem r6 0
-	add r6 r6 1
-	wmem r6 r5		# Reset the curr number to 00 00 00 row*20+col
-	add r4 r4 20		# Add 20 to go down a row
-	call getprod    	# multiply curr by this number
-	add r4 r4 20		# Add 20 to go down a row
-	call getprod		# multiply curr by this number
-	add r4 r4 20		# Add 20 to go down a row
-	call getprod		# multiply curr by this number
-	call checklarg		# check if it is larger
-:done
+	# Zero out the 3 higher digit pairs
+	set r5 prod
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	set r5 prod
+	set r2 r0		# r2 = curr number
+	rmem r3 r2
+	wmem r5 r3		# save first number in prod
+
+	add r5 r5 20		# next row down
+	rmem r3 r5
+	call mult
+
+	add r5 r5 20
+	rmem r3 r5
+	call mult
+
+	add r5 r5 20
+	rmem r3 r5
+	call mult
 	ret
 
 :downl
-	gt r7 r0 16
-	jt r7 done
-	gt r7 r0 2
-	jf r7 done		# only rectangle 0,3 - 16,19
-	mult r4 r0 20		# r4 = row * 20
-	add r4 r4 1		# r4 = r4 + col
-	rmem r5 r4
-	set r6 curr	        # r6 = address of curr product
-	wmem r6	0
-	add r6 r6 1
-	wmem r6	0
-	add r6 r6 1
-	wmem r6	0
-	add r6 r6 1
-	wmem r6	r5	        # Reset	the curr number	to 00 00 00 row*20+col
-	######
+	        # Zero out the 3 higher digit pairs
+	        set r5 prod
+	        add r5 r5 1
+	        wmem r5 0
+	        add r5 r5 1
+	        wmem r5 0
+	        add r5 r5 1
+	        wmem r5 0
+	        set r5 prod
+	        set r2 r0               # r2 = curr number
+	        rmem r3 r2
+	        wmem r5 r3              # save first number in prod
+
+	        add r5 r5 19            # next row down and left
+	        rmem r3 r5
+	        call mult
+
+	        add r5 r5 19
+	        rmem r3 r5
+	        call mult
+
+	        add r5 r5 19
+	        rmem r3 r5
+	call mult
+	ret
 	
 :downr
+        # Zero out the 3 higher digit pairs
+	        set r5 prod
+	        add r5 r5 1
+	        wmem r5 0
+	        add r5 r5 1
+	        wmem r5 0
+	        add r5 r5 1
+	        wmem r5 0
+	        set r5 prod
+	        set r2 r0               # r2 = curr number
+	        rmem r3 r2
+	        wmem r5 r3              # save first number in prod
 
+	        add r5 r5 21            # next row down
+	        rmem r3 r5
+	        call mult
+
+	add r5 r5 21
+	        rmem r3 r5
+	        call mult
+
+	        add r5 r5 21
+	        rmem r3 r5
+	        call mult
+	        ret
 
 :right
+        # Zero out the 3 higher digit pairs
+	        set r5 prod
+	        add r5 r5 1
+	        wmem r5 0
+	        add r5 r5 1
+	        wmem r5 0
+	        add r5 r5 1
+	        wmem r5 0
+	        set r5 prod
+	        set r2 r0             # r2 = curr number
+	        rmem r3 r2
+	        wmem r5 r3		# save first number in prod
 
+	        add r5 r5 1            # next row down
+	        rmem r3 r5
+	        call mult
+
+	        add r5 r5 1
+	        rmem r3 r5
+	        call mult
+
+	        add r5 r5 1
+	        rmem r3 r5
+	        call mult
+	        ret
+
+	
 	
 	##
 	# multiplies curr by the number in r3
@@ -175,7 +231,6 @@
 	push r0
 	push r1
 	push r2
-	push r4
 	push r5
 
 	# The first pair of digits
@@ -212,7 +267,6 @@
 	wmem r0 r4		# top numbers
 
 	pop r5
-	pop r4
 	pop r2
 	pop r1
 	pop r0
