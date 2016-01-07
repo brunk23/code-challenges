@@ -34,15 +34,17 @@
 	call print
 	halt
 
+	##
 	# print() prints the 4 digit number, starting at
 	# r3, to the output, followed by a newline.
+	##
 :print
 	push r0
 	push r2
 	push r3
 	push r4
 	push r5
-	add r3 r3 3	# r1 is the place we work on
+	add r3 r3 3		# r1 is the place we work on
 	call pnum
 	add r3 r3 32767
 	call pnum
@@ -61,8 +63,8 @@
 	# pnum() is a helper function that prints a
 	# number pair
 :pnum
-	rmem r2 r3	# r2 is the number
-	mod r5 r2 10	# r5 is ones place
+	rmem r2 r3		# r2 is the number
+	mod r5 r2 10		# r5 is ones place
 	set r4 0
 	:ploop
 	add r4 r4 1
@@ -71,31 +73,34 @@
 	jt r0 pdone
 	jmp ploop
 	:pdone
-	add r4 r4 32767	# subtract one
-	add r4 r4 48	# add '0'
-	add r5 r5 48	# add '0'
+	add r4 r4 32767		# subtract one
+	add r4 r4 48		# add '0'
+	add r5 r5 48		# add '0'
 	out r4
 	out r5
 	ret
 
-
-:loopr
-	
-
-:loopc
+	##
+	# Main loop, will check every number, not efficient
+	##
+:main_loop
 	call down
+	call compare
+
 	call downl
+	call compare
+	
 	call downr
+	call compare
+	
 	call right
+	call compare
 
 
-	add r1 r1 1
-	gt r7 20 r1
-	jt r7 loopc
-	set r1 0		# Reset col to 0
-	add r0 r0 1		# Increment row
-	gt r7 20 r0		# Loop while under 20
-	jt ry loopr
+	add r0 r0 1
+	eql r7 r0 gstop 
+	jf r7 main_loop
+	ret
 
 :down
 	gt r7 r0 16
@@ -144,33 +149,40 @@
 
 :right
 
+	
+	##
 	# multiplies curr by the number in r3
 	# r3 will be the head of the 4 numbers we
 	# are multiplying. The remaining 3 will be
 	# in curr
+	##
 :mult
 	push r0
 	push r1
 	push r2
 	push r4
 	push r5
+
+	# The first pair of digits
 	set r0 prod
-	rmem r1 r0	# load bottom digits into r1
+	rmem r1 r0		# load bottom digits into r1
 	mult r1 r1 r3
 	mod r2 r1 100
 	wmem r0 r2
 	call hundreds
-	add r4 r4 32767	# subtract 1
+	add r4 r4 32767		# subtract 1
 
-	add r0 r0 1
-	rmem r1 r0
-	mult r1 r1 r3
-	add r1 r1 r4	# add the carry
-	mod r2 r1 100	# get the bottom 2 digits
-	wmem r0 r2	# save it
-	call hundreds
-	add r4 r4 32767
+	# The second pair of digits
+	add r0 r0 1		# move to the next digits
+	rmem r1 r0		# load next digit pair
+	mult r1 r1 r3		# multiply the digit pair by current factor
+	add r1 r1 r4		# add the carry
+	mod r2 r1 100		# get the bottom 2 digits
+	wmem r0 r2		# save them to this spot
+	call hundreds		# split the hundreds off for the carry
+	add r4 r4 32767		# subtract 1, because hundreds is always 1 high
 
+	# The third pair of digits
 	add r0 r0 1
 	rmem r1 r0
 	mult r1 r1 r3
@@ -179,8 +191,10 @@
 	wmem r0 r2
 	call hundreds
 	add r4 r4 32767
+
+	# The top pair will always be the carry alone
 	add r0 r0 1
-	wmem r0 r4	# top numbers
+	wmem r0 r4		# top numbers
 
 	pop r5
 	pop r4
@@ -192,14 +206,19 @@
 :hundreds
 	set r4 1
 :hstart
-	mult r5 r4 100
-	gt r5 r5 r1
-	jt r5 hunddone
-	add r4 r4 1
+	mult r5 r4 100		# we're going to loop until we find a
+	gt r5 r5 r1		# number that times 100 will be larger
+	jt r5 hunddone		# than the current partial product
+	add r4 r4 1		# this is probably a bottleneck.
 	jmp hstart
 :hunddone
 	ret
 
+
+	##
+	# compare() will see if the current product is larger than the
+	# old max
+	##
 :compare
 	push r0
 	push r1
@@ -214,22 +233,22 @@
 	rmem r2 r0
 	rmem r3 r1
 	gt r7 r3 r2
-	jt compare_done
+	jt compare_done		# The new product is smaller
 	gt r7 r2 r3
-	jt r7 compare_copy
-	add r0 r0 32767
+	jt r7 compare_copy	# The new product is larger!
+	add r0 r0 32767		# They were equal, go to the next digits
 	add r1 r1 32767
 	gt r7 prod r0
-	jt compare_done
-	jmp compare_start
+	jt compare_done		# We've run out of digits to check
+	jmp compare_start	# loop to check the new digits
 :compare_copy
-	wmem r1 r2
-	add r0 r0 32767
+	wmem r1 r2		# We only need to copy the digits we're at and down
+	add r0 r0 32767		# Shift both indexes down
 	add r1 r1 32767
-	gt r7 prod r0
-	jt r7 compare_done
-	rmem r2 r0
-	jmp compare_copy
+	gt r7 prod r0		# check to see if we're done
+	jt r7 compare_done	# jump to done if we are
+	rmem r2 r0		# read the next didit pair in
+	jmp compare_copy	# loop to copy next pair
 :compare_done
 	pop r7
 	pop r3
@@ -239,7 +258,6 @@
 	ret
 	
 	
-:ascii0 data 48			# the ASCII for 0
 :prod   data 00 00 00 00  	# product will be kept in 4 words
 :max	data 00 00 00 00
 :grid
@@ -263,3 +281,4 @@
 	data 20 69 36 41 72 30 23 88 34 62 99 69 82 67 59 85 74 04 36 16
 	data 20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
 	data 01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48
+:gstop
