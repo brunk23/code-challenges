@@ -83,22 +83,37 @@
 	##
 	# Main loop, will check every number, not efficient
 	##
+	set r1 grid
+	add r1 r1 339		# MAXDOWN
 :main_loop
+	gt r7 r0 r1
+	jt r7 main_right	# skip all down routines if past grid+339
+
 	call down
 	call compare
 
+	mod r7 r0 20
+	gt r7 r7 2
+	jf r7 main_downr
 	call downl
 	call compare
-	
+
+:main_dright
+	mod r7 r0 20
+	gt r7 r7 16
+	jt r7 main_noright
 	call downr
 	call compare
-	
+:main_right
+	mod r7 r0 20
+	gt r7 r7 16
+	jt r7 main_noright
 	call right
 	call compare
 
-
+:main_noright
 	add r0 r0 1
-	eql r7 r0 gstop 
+	eql r7 r0 gstop
 	jf r7 main_loop
 	ret
 
@@ -218,13 +233,11 @@
 	##
 	# compare() will see if the current product is larger than the
 	# old max
+	# called from main_loop, only needs to preserve r0 and r1
 	##
 :compare
 	push r0
 	push r1
-	push r2
-	push r3
-	push r7
 	set r0 prod		# set the numbers up to point to the
 	set r1 max		# highest pair of digits
 	add r0 r0 3		# will go down from here
@@ -250,9 +263,6 @@
 	rmem r2 r0		# read the next didit pair in
 	jmp compare_copy	# loop to copy next pair
 :compare_done
-	pop r7
-	pop r3
-	pop r2
 	pop r1
 	pop r0
 	ret
