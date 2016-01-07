@@ -200,6 +200,45 @@
 :hunddone
 	ret
 
+:compare
+	push r0
+	push r1
+	push r2
+	push r3
+	push r7
+	set r0 prod		# set the numbers up to point to the
+	set r1 max		# highest pair of digits
+	add r0 r0 3		# will go down from here
+	add r1 r1 3
+:compare_start
+	rmem r2 r0
+	rmem r3 r1
+	gt r7 r3 r2
+	jt compare_done
+	gt r7 r2 r3
+	jt r7 compare_copy
+	add r0 r0 32767
+	add r1 r1 32767
+	gt r7 prod r0
+	jt compare_done
+	jmp compare_start
+:compare_copy
+	wmem r1 r2
+	add r0 r0 32767
+	add r1 r1 32767
+	gt r7 prod r0
+	jt r7 compare_done
+	rmem r2 r0
+	jmp compare_copy
+:compare_done
+	pop r7
+	pop r3
+	pop r2
+	pop r1
+	pop r0
+	ret
+	
+	
 :ascii0 data 48			# the ASCII for 0
 :prod   data 00 00 00 00  	# product will be kept in 4 words
 :max	data 00 00 00 00
