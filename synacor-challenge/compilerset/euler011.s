@@ -79,6 +79,7 @@
 	##
 	set r1 grid
 	add r1 r1 339		# MAXDOWN
+	set r6 0
 :main_loop
 	gt r7 r0 r1
 	jt r7 main_right	# skip all down routines if past grid+339
@@ -86,20 +87,20 @@
 	call down
 	call compare
 
-	mod r7 r0 20
+	mod r7 r6 20
 	gt r7 r7 2
 	jf r7 main_downr
 	call downl
 	call compare
 
 :main_dright
-	mod r7 r0 20
+	mod r7 r6 20
 	gt r7 r7 16
 	jt r7 main_noright
 	call downr
 	call compare
 :main_right
-	mod r7 r0 20
+	mod r7 r6 20
 	gt r7 r7 16
 	jt r7 main_noright
 	call right
@@ -107,6 +108,7 @@
 
 :main_noright
 	add r0 r0 1
+	add r6 r6 1
 	eql r7 r0 gstop
 	jf r7 main_loop
 	ret
@@ -139,85 +141,85 @@
 	ret
 
 :downl
-	        # Zero out the 3 higher digit pairs
-	        set r5 prod
-	        add r5 r5 1
-	        wmem r5 0
-	        add r5 r5 1
-	        wmem r5 0
-	        add r5 r5 1
-	        wmem r5 0
-	        set r5 prod
-	        set r2 r0               # r2 = curr number
-	        rmem r3 r2
-	        wmem r5 r3              # save first number in prod
+	# Zero out the 3 higher digit pairs
+	set r5 prod
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	set r5 prod
+	set r2 r0               # r2 = curr number
+	rmem r3 r2
+	wmem r5 r3              # save first number in prod
 
-	        add r5 r5 19            # next row down and left
-	        rmem r3 r5
-	        call mult
+	add r5 r5 19            # next row down and left
+	rmem r3 r5
+	call mult
 
-	        add r5 r5 19
-	        rmem r3 r5
-	        call mult
+	add r5 r5 19
+	rmem r3 r5
+	call mult
 
-	        add r5 r5 19
-	        rmem r3 r5
+	add r5 r5 19
+	rmem r3 r5
 	call mult
 	ret
 	
 :downr
         # Zero out the 3 higher digit pairs
-	        set r5 prod
-	        add r5 r5 1
-	        wmem r5 0
-	        add r5 r5 1
-	        wmem r5 0
-	        add r5 r5 1
-	        wmem r5 0
-	        set r5 prod
-	        set r2 r0               # r2 = curr number
-	        rmem r3 r2
-	        wmem r5 r3              # save first number in prod
+	set r5 prod
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	set r5 prod
+	set r2 r0               # r2 = curr number
+	rmem r3 r2
+	wmem r5 r3              # save first number in prod
 
-	        add r5 r5 21            # next row down
-	        rmem r3 r5
-	        call mult
+	add r5 r5 21            # next row down
+	rmem r3 r5
+	call mult
 
 	add r5 r5 21
-	        rmem r3 r5
-	        call mult
+	rmem r3 r5
+	call mult
 
-	        add r5 r5 21
-	        rmem r3 r5
-	        call mult
-	        ret
+	add r5 r5 21
+	rmem r3 r5
+	call mult
+	ret
 
 :right
         # Zero out the 3 higher digit pairs
-	        set r5 prod
-	        add r5 r5 1
-	        wmem r5 0
-	        add r5 r5 1
-	        wmem r5 0
-	        add r5 r5 1
-	        wmem r5 0
-	        set r5 prod
-	        set r2 r0             # r2 = curr number
-	        rmem r3 r2
-	        wmem r5 r3		# save first number in prod
+	set r5 prod
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	add r5 r5 1
+	wmem r5 0
+	set r5 prod
+	set r2 r0		# r2 = curr number
+	rmem r3 r2
+	wmem r5 r3		# save first number in prod
 
-	        add r5 r5 1            # next row down
-	        rmem r3 r5
-	        call mult
+	add r5 r5 1		# next row down
+	rmem r3 r5
+	call mult
 
-	        add r5 r5 1
-	        rmem r3 r5
-	        call mult
+	add r5 r5 1
+	rmem r3 r5
+	call mult
 
-	        add r5 r5 1
-	        rmem r3 r5
-	        call mult
-	        ret
+	add r5 r5 1
+	rmem r3 r5
+	call mult
+	ret
 
 	
 	
