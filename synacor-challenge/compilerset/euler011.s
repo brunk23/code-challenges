@@ -10,21 +10,9 @@
 
 # r0 will be current location 0 - > 399
 
-	set r0 grid
-	set r1 prod
-	set r2 grid
-	add r2 r2 20
-# Basic method to multiply
-	rmem r4 r2   # load first number into grid
-	wmem r1 r4
-
-	add r2 r2 1
-	rmem r3 r2
-	call mult
-
 	# ENTER THE MAIN PROGRAM
-	call main_loop
-	set r3 prod
+	call main
+	set r3 max
 	call print
 	halt
 
@@ -77,8 +65,9 @@
 	##
 	# Main loop, will check every number, not efficient
 	##
-	set r1 grid
-	add r1 r1 339		# MAXDOWN
+:main
+	set r0 grid
+	add r1 r0 339    #		# MAXDOWN
 	set r6 0
 :main_loop
 	gt r7 r0 r1
@@ -93,7 +82,7 @@
 	call downl
 	call compare
 
-:main_dright
+:main_downr
 	mod r7 r6 20
 	gt r7 r7 16
 	jt r7 main_noright
@@ -109,7 +98,7 @@
 :main_noright
 	add r0 r0 1
 	add r6 r6 1
-	eql r7 r0 gstop
+	eq r7 r0 gstop		# should be gstop not r1
 	jf r7 main_loop
 	ret
 
@@ -127,16 +116,16 @@
 	rmem r3 r2
 	wmem r5 r3		# save first number in prod
 
-	add r5 r5 20		# next row down
-	rmem r3 r5
+	add r2 r2 20		# next row down
+	rmem r3 r2
 	call mult
 
-	add r5 r5 20
-	rmem r3 r5
+	add r2 r2 20
+	rmem r3 r2
 	call mult
 
-	add r5 r5 20
-	rmem r3 r5
+	add r2 r2 20
+	rmem r3 r2
 	call mult
 	ret
 
@@ -154,16 +143,16 @@
 	rmem r3 r2
 	wmem r5 r3              # save first number in prod
 
-	add r5 r5 19            # next row down and left
-	rmem r3 r5
+	add r2 r2 19            # next row down and left
+	rmem r3 r2
 	call mult
 
-	add r5 r5 19
-	rmem r3 r5
+	add r2 r2 19
+	rmem r3 r2
 	call mult
 
-	add r5 r5 19
-	rmem r3 r5
+	add r2 r2 19
+	rmem r3 r2
 	call mult
 	ret
 	
@@ -181,16 +170,16 @@
 	rmem r3 r2
 	wmem r5 r3              # save first number in prod
 
-	add r5 r5 21            # next row down
-	rmem r3 r5
+	add r2 r2 21            # next row down
+	rmem r3 r2
 	call mult
 
-	add r5 r5 21
-	rmem r3 r5
+	add r2 r2 21
+	rmem r3 r2
 	call mult
 
-	add r5 r5 21
-	rmem r3 r5
+	add r2 r2 21
+	rmem r3 r2
 	call mult
 	ret
 
@@ -208,20 +197,19 @@
 	rmem r3 r2
 	wmem r5 r3		# save first number in prod
 
-	add r5 r5 1		# next row down
-	rmem r3 r5
+	add r2 r2 1		# next row down
+	rmem r3 r2
 	call mult
 
-	add r5 r5 1
-	rmem r3 r5
+	add r2 r2 1
+	rmem r3 r2
 	call mult
 
-	add r5 r5 1
-	rmem r3 r5
+	add r2 r2 1
+	rmem r3 r2
 	call mult
 	ret
 
-	
 	
 	##
 	# multiplies curr by the number in r3
@@ -302,13 +290,13 @@
 	rmem r2 r0
 	rmem r3 r1
 	gt r7 r3 r2
-	jt compare_done		# The new product is smaller
+	jt r7 compare_done	# The new product is smaller
 	gt r7 r2 r3
 	jt r7 compare_copy	# The new product is larger!
 	add r0 r0 32767		# They were equal, go to the next digits
 	add r1 r1 32767
 	gt r7 prod r0
-	jt compare_done		# We've run out of digits to check
+	jt r7 compare_done	# We've run out of digits to check
 	jmp compare_start	# loop to check the new digits
 :compare_copy
 	wmem r1 r2		# We only need to copy the digits we're at and down
