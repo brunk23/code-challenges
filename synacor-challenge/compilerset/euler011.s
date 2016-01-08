@@ -8,13 +8,49 @@
 
 .origin 0
 
-# r0 will be current location 0 - > 399
+	##
+	# Main loop, will check every number, not efficient
+	##
+	set r0 grid		# r0 will be current location 0 - > 399
+	add r1 r0 339		# MAXDOWN
+	set r6 0
+:main_loop
+	gt r7 r0 r1
+	jt r7 main_right	# skip all down routines if past grid+339
 
-	# ENTER THE MAIN PROGRAM
-	call main
+	call down
+	call compare
+
+	mod r7 r6 20
+	gt r7 r7 2
+	jf r7 main_downr
+	call downl
+	call compare
+
+:main_downr
+	mod r7 r6 20
+	gt r7 r7 16
+	jt r7 main_noright
+	call downr
+	call compare
+:main_right
+	mod r7 r6 20
+	gt r7 r7 16
+	jt r7 main_noright
+	call right
+	call compare
+
+:main_noright
+	add r0 r0 1
+	add r6 r6 1
+	eq r7 r0 gstop		# should be gstop not r1
+	jf r7 main_loop
+
+# End of the main block... print the number
 	set r3 max
 	call print
 	halt
+#################  END PROGRAM  #################
 
 	##
 	# print() prints the 4 digit number, starting at
@@ -60,46 +96,6 @@
 	add r5 r5 48		# add '0'
 	out r4
 	out r5
-	ret
-
-	##
-	# Main loop, will check every number, not efficient
-	##
-:main
-	set r0 grid
-	add r1 r0 339    #		# MAXDOWN
-	set r6 0
-:main_loop
-	gt r7 r0 r1
-	jt r7 main_right	# skip all down routines if past grid+339
-
-	call down
-	call compare
-
-	mod r7 r6 20
-	gt r7 r7 2
-	jf r7 main_downr
-	call downl
-	call compare
-
-:main_downr
-	mod r7 r6 20
-	gt r7 r7 16
-	jt r7 main_noright
-	call downr
-	call compare
-:main_right
-	mod r7 r6 20
-	gt r7 r7 16
-	jt r7 main_noright
-	call right
-	call compare
-
-:main_noright
-	add r0 r0 1
-	add r6 r6 1
-	eq r7 r0 gstop		# should be gstop not r1
-	jf r7 main_loop
 	ret
 
 :down
