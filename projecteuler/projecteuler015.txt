@@ -1,0 +1,5 @@
+This is a simple calculation.
+
+It is a binomial coefficient. (a + b over a) ... or 40 choose 20.
+
+5 choose 3 is 5!/( 3!*(5-3)! )
