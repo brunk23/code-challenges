@@ -7,10 +7,11 @@ int d(int);
 
 int main()
 {
-  int x = 0, sum = 0;
+  int x = 0, sum = 0, a = 0;
 
   for( x = 2; x <= 10000; ++x ) {
-    if( x == d(d(x)) && x != d(x) ) {
+    a = d(x);
+    if( x!= a && x == d(a) ) {
       sum += x;
     }
   }
