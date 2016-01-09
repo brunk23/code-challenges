@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
       inbuffindex = 0;
       if( inbuffer[inbuffindex] == '#' ) {
 	enter_debug_mode();
+	continue;
       }
     }
 
