@@ -6,7 +6,7 @@ int main()
 {
   unsigned long long y;
   long x;
-  for( x = 1000000000; x < 1414213562; ++x ) {
+  for( x = 1000000000; x < 1414213560; x+=10 ) {
     y = x*x;
     if( y % 10 != 0 ) {
       continue;
