@@ -16,12 +16,19 @@ int b(int);
  */
 int main()
 {
-  cout << "b1: " << b(1) << endl
-       << "b2: " << b(2) << endl;
+  int x, sum = 0;
+  /*
+   * I haven't worked out the algo for getting the
+   * sum of the moves. And, this can't possibly be
+   * expected to be solved with brute force. There are
+   * 1533708 beans!
+   */
 
-  cout << "t1: " << t(1) << endl
-       << "t2: " << t(2) << endl;
+  for( x = 1; x <= 1500; ++x ) {
+    sum += b(x);
+  }
 
+  cout << sum << " beans." << endl;
   
   return 0;
 }
