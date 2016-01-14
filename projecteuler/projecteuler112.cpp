@@ -21,11 +21,11 @@ int main()
       cout << "Equal at: " << i << endl;
       f50 = true;
     }
-    if( bouncy*9 == notbouncy && !f90 ) {
+    if( bouncy == notbouncy*9 && !f90 ) {
       cout << "90% at: " << i << endl;
       f90 = true;
     }
-    if( bouncy*99 == notbouncy ) {
+    if( bouncy == notbouncy*99 ) {
       cout << "99% at: " << i << endl;
       break;
     }
@@ -34,7 +34,13 @@ int main()
   return 0;
 }
 
-
+/*
+ * Returns true if the number is bouncy, that is
+ * the digits aren't strictly increasing or
+ * decreasing. We return true as soon as we see a
+ * digit that goes in the wrong opposite direction
+ * of what we have been going.
+ */
 bool isbouncy(int n)
 {
   int increasing = 0;
@@ -45,13 +51,13 @@ bool isbouncy(int n)
       curr = n % 10;
       if( curr > prev ) {
 	if( increasing < 0 ) {
-	  return false;
+	  return true;
 	}
 	increasing = 1;
       } else {
 	if( curr < prev ) {
 	  if( increasing > 0 ) {
-	    return false;
+	    return true;
 	  }
 	  increasing = -1;
 	}
@@ -64,5 +70,5 @@ bool isbouncy(int n)
     }
   }
 
-  return true;
+  return false;
 }
