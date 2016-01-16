@@ -25,7 +25,7 @@ int main()
    */
 
   for( x = 1; x <= 1500; ++x ) {
-    sum += b(x);
+    cout <<  b(x) << endl;
   }
 
   cout << sum << " beans." << endl;
