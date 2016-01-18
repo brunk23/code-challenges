@@ -10,3 +10,4 @@ sml_sim
 bin
 notes
 utilities
+lex.yy.c
