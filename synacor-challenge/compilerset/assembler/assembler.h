@@ -25,7 +25,8 @@ enum REGISTERS {
 
 enum INSTSET {
   halt = 0, set, push, pop, eq, gt, jmp, jt, jf, add, mult,
-  mod, and, or, not, rmem, wmem, call, ret, out, in, nop
+  mod, and, or, not, rmem, wmem, call, ret, out, in, nop,
+  dread, dwrite
 };
 
 struct symstack {

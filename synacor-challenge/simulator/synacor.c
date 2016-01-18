@@ -13,29 +13,37 @@ int main(int argc, char *argv[]) {
   char *test;
   int retval = 0;
   int source = 0;
-  
+
+  fprintf(stderr,"Initializing Machine...\n");
   init_machine();
 
   for( retval = 1; retval < argc; ++retval ) {
     if( strcmp(argv[retval],"-s") == 0 ) {
       stepmode = 1;
     } else {
-      source = retval;
+      if( source == MAXDEV ) {
+	fprintf(stderr,"Too many devices!\n");
+	return 0;
+      }
+      if( !( devices[source] = fopen(argv[retval], "r"))) {
+	fprintf(stderr,"Could not open file for reading.\n");
+	return 0;
+      }
+      ++source;
     }
   }
 
-  if( argc < 2 || source == 0 ) {
+  if( argc < 2 || devices[0] == 0 ) {
     fprintf(stderr,"Usage: %s {challenge.bin}\n",argv[0]);
     return 1;
   }
 
-  if( !read_in_file(argv[source])) {
-    fprintf(stderr,"Could not read file: %s\n",argv[source]);
-    return 1;
-  }
-
   while( 1 ) {
-    if( memory[pc] > 21 ) {
+
+    /* Make sure pc loops down correctly */
+    pc %= 32768;
+
+    if( memory[pc] > 23 ) {
       fprintf(stderr,"Error: Invalid operation %i",pc);
       break;
     }
@@ -75,6 +83,15 @@ int main(int argc, char *argv[]) {
     stack = stack->next;
     free(obottom);
   }
+
+  /*
+   * Close open files
+   */
+  for(retval = 0; retval < MAXDEV; ++retval) {
+    if( devices[retval] ) {
+      fclose( devices[retval] );
+    }
+  }
   
   return 0;
 }
@@ -103,6 +120,8 @@ int init_machine() {
   inst_tble[19] = op_out;
   inst_tble[20] = op_in;
   inst_tble[21] = op_nop;
+  inst_tble[22] = op_dread;
+  inst_tble[23] = op_dwrite;
   stack = 0;
   pc = 0;
   stepmode = 0;
@@ -119,28 +138,58 @@ int init_machine() {
     memory[x] = 0;
   }
 
+  /* This initial memory state will cause the contents
+   * of the first segment of the first file to be loaded
+   * to memory and start executing at location 0
+   */
+  memory[0] = jmp;
+  memory[1] = 32762;
+  memory[32762] = dread;
+
   /* Reset Registers */
   for( x = 0; x < 8; ++x ) {
     reg[x] = 0;
   } 
+
+  for( x = 0; x < MAXDEV; ++x ) {
+    devices[x] = 0;
+  }
+
   return 0;
 }
 
-int read_in_file(const char *filename) {
-  FILE *source;
+int read_in_file(FILE *source,
+		 SWORD dest,
+		 long start,
+		 size_t words) {
   int words_read = 0;
+  int diff = 0;
 
-  if( !( source = fopen(filename, "r"))) {
-    fprintf(stderr,"Could not open file for reading.\n");
+  if( fseek(source, start*sizeof(unsigned short int), SEEK_SET) ){
+    fprintf(stderr,"Unable to access location on device\n");
     return 0;
   }
 
-  words_read = fread(memory,
-		     sizeof(unsigned short int),
-		     REGOFFSET,
-		     source);
-  fprintf(stderr,"Initializing Machine...\n");
-  fprintf(stderr,"Read %i words into memory\n",words_read);
+  /*
+   * This needs to be fixed
+   */
+  if( dest+words > REGOFFSET ) {
+    /* we need to wrap memory */
+    diff = (words + dest - REGOFFSET);
+    words_read = fread(&memory[dest],
+		       sizeof(unsigned short int),
+		       words - diff,
+		       source);
+    words_read += fread(memory,
+			sizeof(unsigned short int),
+			diff,
+			source);
+  } else {
+    words_read = fread(&memory[dest],
+		       sizeof(unsigned short int),
+		       words,
+		       source);
+  }
 
   /*  We don't need to worry about the order as
    * little endian is read in correctly.
@@ -149,10 +198,7 @@ int read_in_file(const char *filename) {
    * y += memory[x] / 0x100;
    * }
    */
-  
-  if( source ) {
-    fclose(source);
-  }
+
   return words_read;
 }
 
