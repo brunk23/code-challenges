@@ -6,5 +6,5 @@
 	jmp start
 .origin 32762
 :start
-	dread 0 1 0 0 0
+	dread 0 0 2 0 32767
 
