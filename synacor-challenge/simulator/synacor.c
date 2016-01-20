@@ -170,9 +170,6 @@ int read_in_file(FILE *source,
     return 0;
   }
 
-  /*
-   * This needs to be fixed
-   */
   if( dest+words > REGOFFSET ) {
     /* we need to wrap memory */
     diff = (words + dest - REGOFFSET);
@@ -200,6 +197,51 @@ int read_in_file(FILE *source,
    */
 
   return words_read;
+}
+
+/*
+ * This should work
+ * Untested
+ */
+int write_out_file(FILE *dest,
+		 SWORD source,
+		 long start,
+		 size_t words) {
+  int words_wrote = 0;
+  int diff = 0;
+
+  if( fseek(dest, start*sizeof(unsigned short int), SEEK_SET) ){
+    fprintf(stderr,"Unable to access location on device\n");
+    return 0;
+  }
+
+  if( source+words > REGOFFSET ) {
+    /* we need to wrap memory */
+    diff = (words + source - REGOFFSET);
+    words_wrote = fwrite(&memory[source],
+		       sizeof(unsigned short int),
+		       words - diff,
+		       dest);
+    words_wrote += fwrite(memory,
+			sizeof(unsigned short int),
+			diff,
+			dest);
+  } else {
+    words_wrote = fwrite(&memory[source],
+		       sizeof(unsigned short int),
+		       words,
+		       dest);
+  }
+
+  /*  We don't need to worry about the order as
+   * little endian is read in correctly.
+   * for( x = 0; x < 8; ++x ) {
+   * y = memory[x] << 8;
+   * y += memory[x] / 0x100;
+   * }
+   */
+
+  return words_wrote;
 }
 
 /*

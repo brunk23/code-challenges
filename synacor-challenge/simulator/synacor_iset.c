@@ -240,8 +240,8 @@ int op_dread() {
     len = REGOFFSET;
   }
 
-  read_in_file(devices[ get_add(pc + 2) ],
-	       get_add(pc + 1),
+  read_in_file(devices[ get_add( pc + 2 ) ],
+	       get_add( pc + 1 ),
 	       start,
 	       len );
   pc += 6;
@@ -253,6 +253,21 @@ int op_dread() {
  * read_in_file
  */
 int op_dwrite() {
+
+  long start = 0;
+  SWORD len = 0;
+  start = get_add( pc + 2 );
+  start = start << 15;
+  start += get_add( pc + 3 );
+  len = get_add( pc + 5 );
+  if( !len ) {
+    len = REGOFFSET;
+  }
+
+  write_out_file(devices[ get_add( pc + 1 ) ],
+		 get_add( pc + 4 ),
+		 start,
+		 len);
 
   pc += 6;
   return 0;

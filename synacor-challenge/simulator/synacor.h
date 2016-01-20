@@ -46,6 +46,7 @@ int inbuffindex;
 int breakpoint;
 
 int read_in_file(FILE *, SWORD, long, size_t);
+int write_out_file(FILE *, SWORD, long, size_t);
 int init_machine();
 int enter_debug_mode();
 int printstack();
