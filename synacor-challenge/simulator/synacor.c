@@ -170,7 +170,7 @@ int read_in_file(FILE *source,
     return 0;
   }
 
-  if( dest+words > REGOFFSET ) {
+  if( dest + words > REGOFFSET ) {
     /* we need to wrap memory */
     diff = (words + dest - REGOFFSET);
     words_read = fread(&memory[dest],
@@ -215,6 +215,15 @@ int write_out_file(FILE *dest,
     return 0;
   }
 
+  /*
+   * This doesn't work at all right now (the overflow)
+   * Perhaps I shouldn't worry about going about 2^30 words
+   * and instead should focus on the wrapping around memory,
+   * which is the original intent.
+   *
+   * Technically, we can read/write above the addressable
+   * limit with these functions
+   */
   if( source+words > REGOFFSET ) {
     /* we need to wrap memory */
     diff = (words + source - REGOFFSET);
