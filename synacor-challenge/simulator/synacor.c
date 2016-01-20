@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
 	fprintf(stderr,"Too many devices!\n");
 	return 0;
       }
-      if( !( devices[source] = fopen(argv[retval], "r"))) {
-	fprintf(stderr,"Could not open file for reading.\n");
+      if( !( devices[source] = fopen(argv[retval], "r+"))) {
+	fprintf(stderr,"Could not open file for reading/writing.\n");
 	return 0;
       }
       ++source;

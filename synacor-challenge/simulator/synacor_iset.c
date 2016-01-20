@@ -248,6 +248,10 @@ int op_dread() {
   return 0;
 }
 
+/*
+ * Need to create a write_out_file that complements
+ * read_in_file
+ */
 int op_dwrite() {
 
   pc += 6;
