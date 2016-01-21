@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   }
 
   for( pc = 0; pc < retval; ) {
-    if( memory[pc] > 21 ) {
+    if( memory[pc] > 23 ) {
       if( data == 0 ) {
 	printf("%05i:\tdata\t%05i\t",pc,memory[pc]);
       } else {
@@ -86,6 +86,8 @@ int init_machine() {
   inst_tble[19] = op_out;
   inst_tble[20] = op_in;
   inst_tble[21] = op_nop;
+  inst_tble[22] = op_dread;
+  inst_tble[23] = op_dwrite;
   pc = 0;
   
   for( x = 0; x < REGOFFSET; ++x ) {
@@ -346,5 +348,18 @@ int op_in() {
 int op_nop() {
   printf("nop");
   ++pc;
+  return 0;
+}
+
+/* Not sure how I want to print these */
+int op_dread() {
+
+  pc += 6;
+  return 0;
+}
+
+int op_dwrite() {
+
+  pc += 6;
   return 0;
 }
