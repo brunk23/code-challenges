@@ -1,7 +1,7 @@
 ## Synacor v2
 
-I might extend the Synacor machine to allow device access. These devices
-would be the file name(s) listed on the command line when you run the
+I extended the Synacor machine to allow device access. These devices
+are the file name(s) listed on the command line when you run the
 simiulator.  For example: "synacor challenge.bin" would have a one device
 (number 0) that connects to the challenge.bin file.  The default operation
 of the synacor machine, on boot, will be to load the first addressable
