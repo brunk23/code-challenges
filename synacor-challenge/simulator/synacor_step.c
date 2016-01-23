@@ -34,7 +34,7 @@ int print_addr(SWORD r,const char *sep) {
  */
 SWORD print_instruction(SWORD addr) {
   SWORD delta = 0;
-  if( memory[addr] > 21 ) {
+  if( memory[addr] > 23 ) {
     fprintf(stderr,"%05i:\tdata\t%05i\n",addr,memory[addr]);
     delta = 1;
   } else {
@@ -186,6 +186,26 @@ SWORD print_instruction(SWORD addr) {
     case nop:
       fprintf(stderr,"%05i:\tnop\n",addr);
       delta = 1;
+      break;
+
+    case dread:
+      fprintf(stderr,"%05i:\tdread\t",addr);
+      print_addr(addr+1,",\t");
+      print_addr(addr+2,",\t");
+      print_addr(addr+3,",\t");
+      print_addr(addr+4,",\t");
+      print_addr(addr+5,"\n");
+      delta = 6;
+      break;
+
+    case dwrite:
+      fprintf(stderr,"%05i:\tdwrite\t",addr);
+      print_addr(addr+1,",\t");
+      print_addr(addr+2,",\t");
+      print_addr(addr+3,",\t");
+      print_addr(addr+4,",\t");
+      print_addr(addr+5,"\n");
+      delta = 6;
       break;
 
     default:

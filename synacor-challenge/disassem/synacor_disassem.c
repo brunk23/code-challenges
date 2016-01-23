@@ -12,7 +12,7 @@ int prev;
 
 int main(int argc, char *argv[]) {
   int retval = 0;
-  unsigned short int oldpc;
+  unsigned short int oldpc, data=0;
   prev = 0;
   if( argc != 2 ) {
     fprintf(stderr,"Usage: %s {challenge.bin}\n",argv[0]);
@@ -27,12 +27,26 @@ int main(int argc, char *argv[]) {
   }
 
   for( pc = 0; pc < retval; ) {
-    if( memory[pc] > 21 ) {
-      printf("%05i:\t\t%i\n",pc,memory[pc]);
+    if( memory[pc] > 23 ) {
+      if( data == 0 ) {
+	printf("%05i:\tdata\t%05i\t",pc,memory[pc]);
+      } else {
+	printf("%05i\t",memory[pc]);
+      }
+      ++data;
       ++pc;
+      if( data >= 8 ) {
+	printf("\n");
+	data = 0;
+      }
       continue;
     }
 
+    if(data > 0 ) {
+      printf("\n");
+    }
+    data = 0;
+    
     oldpc = pc;
     if( !((prev == 19) && memory[pc]==19) ) {
       printf("%05i:\t", pc);
@@ -71,20 +85,13 @@ int init_machine() {
   inst_tble[18] = op_ret;
   inst_tble[19] = op_out;
   inst_tble[20] = op_in;
-  inst_tble[21] = op_noop;
-  stack = 0;
+  inst_tble[21] = op_nop;
+  inst_tble[22] = op_dread;
+  inst_tble[23] = op_dwrite;
   pc = 0;
-
-  for( x = 0; x < BUFFSIZE; ++x ) {
-    inbuffer[x] = 0;
-  }
   
   for( x = 0; x < REGOFFSET; ++x ) {
     memory[x] = 0;
-  }
-
-  for( x = 0; x < 8; ++x ) {
-    reg[x] = 0;
   }
   
   return 0;
@@ -103,8 +110,6 @@ int read_in_file(const char *filename) {
 		     sizeof(unsigned short int),
 		     REGOFFSET,
 		     source);
-  fprintf(stderr,"Initializing Machine...\n");
-  fprintf(stderr,"Read %i words into memory\n",words_read);
 
   if( source ) {
     fclose(source);
@@ -115,59 +120,42 @@ int read_in_file(const char *filename) {
 unsigned short int get_add(unsigned short int a) {
   switch (memory[a]) {
   case 32768:
-    printf("r0, ");
+    printf("r0");
     break;
 
   case 32769:
-    printf("r1, ");
+    printf("r1");
     break;
 
   case 32770:
-    printf("r2, ");
+    printf("r2");
     break;
 
   case 32771:
-    printf("r3, ");
+    printf("r3");
     break;
 
   case 32772:
-    printf("r4, ");
+    printf("r4");
     break;
 
   case 32773:
-    printf("r5, ");
+    printf("r5");
     break;
 
   case 32774:
-    printf("r6, ");
+    printf("r6");
     break;
 
   case 32775:
-    printf("r7, ");
+    printf("r7");
     break;
 
   default:
-    printf("%i, ",memory[a]);
+    printf("%i",memory[a]);
     break;
   }
   return 0;
-}
-
-unsigned short int set_add(unsigned short int a,
-			   unsigned short int b) {
-  unsigned short int c;
-  c = memory[a];
-
-  if( c >= REGOFFSET ) {
-    c -= REGOFFSET;
-    if( c >= 8 ) {
-      fprintf(stderr,"Invalid access request: %i at %i\n",
-	      a+REGOFFSET, pc);
-      return 0;
-    }
-    return reg[c] = b;
-  }
-  return memory[c] = b;
 }
 
 /* Just return 1 to end the program */
@@ -179,8 +167,8 @@ int op_halt() {
 
 /* set a b :: set register a to value of b */
 int op_set() {
-  printf("set ");
   get_add(pc+1);
+  printf(" = ");
   get_add(pc+2);
   pc += 3;
   return 0;
@@ -201,18 +189,20 @@ int op_pop() {
 }
 
 int op_eq() {
-  printf("eq ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" == ");
   get_add(pc + 3);
   pc += 4;
   return 0;
 }
 
 int op_gt() {
-  printf("gt ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" > ");
   get_add(pc + 3);
   pc += 4; 
   return 0;
@@ -220,7 +210,7 @@ int op_gt() {
 
 /* jmp a :: jump to a */
 int op_jmp() {
-  printf("jmp ");
+  printf("goto ");
   get_add(pc + 1);
   pc += 2;
   return 0;
@@ -228,8 +218,9 @@ int op_jmp() {
 
 /* jt a b :: if a is non-zero, jump to b */
 int op_jt() {
-  printf("jt ");
+  printf("if ( ");
   get_add(pc + 1);
+  printf(" ) goto ");
   get_add(pc + 2);
   pc += 3;
   return 0;
@@ -237,77 +228,86 @@ int op_jt() {
 
 /* jf a b :: if a is zero, jump to b */
 int op_jf() {
-  printf("jf ");
+  printf("if !( ");
   get_add(pc + 1);
+  printf(" ) goto ");
   get_add(pc + 2);
   pc += 3;
   return 0;
 }
 
 int op_add() {
-  printf("add ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" + ");
   get_add(pc + 3);
   pc += 4;
   return 0;
 }
 
 int op_mult() {
-  printf("mult ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" * ");
   get_add(pc + 3);
   pc += 4;
   return 0;
 }
 
 int op_mod() {
-  printf("mod ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" %% ");
   get_add(pc + 3);
   pc += 4;
   return 0;
 }
 
 int op_and() {
-  printf("and ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" & ");
   get_add(pc + 3);
   pc += 4;
   return 0;
 }
 
 int op_or() {
-  printf("or ");
   get_add(pc + 1);
+  printf(" = ");
   get_add(pc + 2);
+  printf(" | ");
   get_add(pc + 3);
   pc += 4;
   return 0;
 }
 
 int op_not() {
-  printf("not ");
   get_add(pc + 1);
+  printf(" = ~( ");
   get_add(pc + 2);
+  printf(" )");
   pc += 3;
   return 0;
 }
 
 int op_rmem() {
-  printf("rmem ");
   get_add(pc + 1);
+  printf(" = [ ");
   get_add(pc + 2);
+  printf(" ]");
   pc += 3;
   return 0;
 }
 
 int op_wmem() {
-  printf("wmem ");
+  printf("[ ");
   get_add(pc + 1);
+  printf(" ] = ");
   get_add(pc + 2);
   pc += 3;
   return 0;
@@ -329,7 +329,7 @@ int op_ret() {
 /* out <a> :: print ascii value of a to screen */
 int op_out() {
   if( !(prev == 19)) {
-    printf("out --->\t%c", memory[pc+1]);
+    printf("print %c", memory[pc+1]);
   } else {
     printf("%c", memory[pc+1]);
   }
@@ -338,15 +338,28 @@ int op_out() {
 }
 
 int op_in() {
-  printf("in ");
   get_add(pc + 1);
+  printf(" = getch();");
   pc += 2;
   return 0;
 }
 
 /* Just increment the program counter and return */
-int op_noop() {
+int op_nop() {
   printf("nop");
   ++pc;
+  return 0;
+}
+
+/* Not sure how I want to print these */
+int op_dread() {
+
+  pc += 6;
+  return 0;
+}
+
+int op_dwrite() {
+
+  pc += 6;
   return 0;
 }

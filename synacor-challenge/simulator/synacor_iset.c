@@ -211,3 +211,64 @@ int op_nop() {
   ++pc;
   return 0;
 }
+
+/*
+ * The following two instructions (dread/dwrite) are
+ * extensions to the standard synacor instruction set
+ * that allow us to read/write from "devices", that is
+ * files that are connected. Each device has 1 gigaword
+ * of addressable space (2^30 words) addressed through
+ * segments.
+ *
+ * dread address dev segment address words
+ * dread 0 0 0 0 0
+ * would be the default normal command. It reads into
+ * memory location 0 from device 0 (first file on the
+ * command line) segment 0, address 0 (start of the file)
+ * for a full segment (0 = 32768 words).
+ *
+ */
+int op_dread() {
+
+  long start = 0;
+  SWORD len = 0;
+  start = get_add( pc + 3 );
+  start = start << 15;
+  start += get_add( pc + 4 );
+  len = get_add( pc + 5 );
+  if( !len ) {
+    len = REGOFFSET;
+  }
+
+  read_in_file(devices[ get_add( pc + 2 ) ],
+	       get_add( pc + 1 ),
+	       start,
+	       len );
+  pc += 6;
+  return 0;
+}
+
+/*
+ * Need to create a write_out_file that complements
+ * read_in_file
+ */
+int op_dwrite() {
+
+  long start = 0;
+  SWORD len = 0;
+  start = get_add( pc + 2 );
+  start = start << 15;
+  start += get_add( pc + 3 );
+  len = get_add( pc + 5 );
+  if( !len ) {
+    len = REGOFFSET;
+  }
+
+  write_out_file(devices[ get_add( pc + 1 ) ],
+		 get_add( pc + 4 ),
+		 start,
+		 len);
+
+  pc += 6;
+  return 0;
+}

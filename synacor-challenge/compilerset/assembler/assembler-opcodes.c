@@ -51,6 +51,27 @@ int opcode(int len) {
       process_data_line();
       return 0;
     }
+    if( len == 5 && inbuffer[strind+1] == 'r' &&
+	inbuffer[strind+2] == 'e' &&
+	inbuffer[strind+3] == 'a' &&
+	inbuffer[strind+4] == 'd' ) {
+      /* DREAD */
+      memory[pc++] = dread;
+      strind += len;
+      fill(5);
+      return 0;
+    }
+    if( len == 6 && inbuffer[strind+1] == 'w' &&
+	inbuffer[strind+2] == 'r' &&
+	inbuffer[strind+3] == 'i' &&
+	inbuffer[strind+4] == 't' &&
+	inbuffer[strind+5] == 'e' ) {
+      /* DWRITE */
+      memory[pc++] = dwrite;
+      strind += len;
+      fill(5);
+      return 0;
+    }
     inv_op();
     break;
 
