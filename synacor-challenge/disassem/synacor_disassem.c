@@ -190,20 +190,22 @@ int op_pop() {
 
 int op_eq() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" == ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4;
   return 0;
 }
 
 int op_gt() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" > ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4; 
   return 0;
 }
@@ -238,50 +240,55 @@ int op_jf() {
 
 int op_add() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" + ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4;
   return 0;
 }
 
 int op_mult() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" * ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4;
   return 0;
 }
 
 int op_mod() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" %% ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4;
   return 0;
 }
 
 int op_and() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" & ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4;
   return 0;
 }
 
 int op_or() {
   get_add(pc + 1);
-  printf(" = ");
+  printf(" = ( ");
   get_add(pc + 2);
   printf(" | ");
   get_add(pc + 3);
+  printf(" )");
   pc += 4;
   return 0;
 }
@@ -351,15 +358,35 @@ int op_nop() {
   return 0;
 }
 
-/* Not sure how I want to print these */
+/* Very Wordy Output, but conforms to the destination
+ * on the left style of the rest of the lines */
 int op_dread() {
-
+  printf("[");
+  get_add( pc + 1 );
+  printf("]+");
+  get_add( pc + 5 );
+  printf(" words <-- Read Dev{");
+  get_add( pc + 2 );
+  printf("} ");
+  get_add( pc + 3 );
+  printf(":");
+  get_add( pc + 4 );
   pc += 6;
   return 0;
 }
 
 int op_dwrite() {
-
+  printf("Write Dev{");
+  get_add( pc + 1 );
+  printf("} ");
+  get_add( pc + 2 );
+  printf(":");
+  get_add( pc + 3 );
+  printf(" <-- [");
+  get_add( pc + 4 );
+  printf("]+");
+  get_add( pc + 5 );
+  printf(" words");
   pc += 6;
   return 0;
 }
