@@ -40,3 +40,5 @@ ret
 rmem a b
 set a b
 wmem a b
+dread a b c d e
+dwrite a b c d e
