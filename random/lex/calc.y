@@ -46,3 +46,4 @@ expression:  expression '+' expression { $$ = $1 + $3; }
 int main(void) {
   return yyparse();
 }
+
