@@ -1,0 +1,19 @@
+#!/usr/bin/dc
+2.25 dsa	# Amount of error in each individual measurement
+sf		# f is our current estimate of precision
+
+20k		# digits of precision
+
+# x(): calculates sqrt( f^2 * 9 + a^2)/10
+[
+lfd		# load most recent estimate of error
+2^		# square that estimate
+9*		# give it a weight of 90%
+la		# the error in each measurement
+2^		# square it
++		# add it to the old value
+v		# find sqrt
+10/p		# print it
+dsf		# we stop when we stop improving precision
+!=x		# loop if we improved over last precision
+]dsxx
