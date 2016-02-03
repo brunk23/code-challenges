@@ -2,6 +2,7 @@
 
 struct symtab {
   char *name;
+  double (*funcptr)();
   double value;
 } symtab[NSYMS];
 

@@ -1,5 +1,6 @@
 %{
   #include <stdio.h>
+  #include <math.h>
   #include <string.h>
   #include "calc.h"
 %}
@@ -9,7 +10,7 @@
   struct symtab *symp;
 }
 
-%token <symp> NAME
+%token <symp> NAME FUNC
 %token <dval> NUMBER
 %left '+' '-'
 %left '*' '/'
@@ -41,9 +42,16 @@ expression:  expression '+' expression { $$ = $1 + $3; }
      | '(' expression ')' { $$ = $2; }
      | NUMBER { $$ = $1; }
      | NAME { $$ = $1->value; }
+     | FUNC '(' expression ')' { $$ = ($1->funcptr)($3); }
      ;
 
 %%
+
+int addfunc(char *name, double (*func)() ) {
+  struct symtab *sp = symlook(name);
+  sp->funcptr = func;
+  return 0;
+}
 
 struct symtab *symlook(char *s) {
   char *p;
@@ -68,6 +76,13 @@ struct symtab *symlook(char *s) {
 }
 
 int main(void) {
-  return yyparse();
+  extern double sqrt(double), exp(double), log(double);
+
+  addfunc("sqrt", sqrt);
+  addfunc("exp", exp);
+  addfunc("log", log);
+  yyparse();
+
+  return 0;
 }
 

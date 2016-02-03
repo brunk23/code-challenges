@@ -16,8 +16,15 @@
 [ \t] ;    /* ignore whitespace */
 
 [A-Za-z][A-Za-z0-9]* {  /* return symbol pointer */
-  yylval.symp = symlook(yytext);
-  return NAME; }
+  struct symtab *sp = symlook(yytext);
+  yylval.symp = sp;
+  if( sp->funcptr ) {
+    /* it is a function */
+    return FUNC;
+  } else {
+    return NAME;
+  }
+}
 
 "$"   { return 0; /* end of input */ }
 
