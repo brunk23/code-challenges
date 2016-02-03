@@ -1,3 +1,7 @@
+#LEX = lex
+#YACC = yacc -d
+
+CC = gcc
 
 calc: calc.y calc.lex
-	yacc -d calc.y && lex calc.lex && gcc -o calc y.tab.c lex.yy.c -ll -ly -lm
+	$(YACC) calc.y && $(LEX) calc.lex && $(CC) -o calc y.tab.c lex.yy.c -ll -ly -lm

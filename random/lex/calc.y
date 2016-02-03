@@ -10,7 +10,7 @@
   struct symtab *symp;
 }
 
-%token <symp> NAME FUNC
+%token <symp> NAME
 %token <dval> NUMBER
 %left '+' '-'
 %left '*' '/'
@@ -42,7 +42,14 @@ expression:  expression '+' expression { $$ = $1 + $3; }
      | '(' expression ')' { $$ = $2; }
      | NUMBER { $$ = $1; }
      | NAME { $$ = $1->value; }
-     | FUNC '(' expression ')' { $$ = ($1->funcptr)($3); }
+     | NAME '(' expression ')' {
+         if( $1->funcptr ) {
+	   $$ = ($1->funcptr)($3);
+         } else {
+	   printf("%s not a function\n",$1->name);
+	   $$ = 0.0;
+         }
+       }
      ;
 
 %%
