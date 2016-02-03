@@ -1,14 +1,15 @@
 %{
   #include <stdio.h>
-  double vbltable[26];
+  #include <string.h>
+  #include "calc.h"
 %}
 
 %union {
   double dval;
-  int vblno;
+  struct symtab *symp;
 }
 
-%token <vblno> NAME
+%token <symp> NAME
 %token <dval> NUMBER
 %left '+' '-'
 %left '*' '/'
@@ -22,7 +23,7 @@ statementList: statement '\n'
      | statementList statement '\n'
      ;
 
-statement: NAME '=' expression { vbltable[$1] = $3; }
+statement: NAME '=' expression { $1->value = $3; }
      | expression      { printf("= %g\n", $1); }
      ;
 
@@ -39,10 +40,33 @@ expression:  expression '+' expression { $$ = $1 + $3; }
      | '-' expression %prec UMINUS { $$ = -$2; }
      | '(' expression ')' { $$ = $2; }
      | NUMBER { $$ = $1; }
-     | NAME { $$ = vbltable[$1]; }
+     | NAME { $$ = $1->value; }
      ;
 
 %%
+
+struct symtab *symlook(char *s) {
+  char *p;
+  struct symtab *sp;
+
+  for( sp = symtab; sp < &symtab[NSYMS]; sp++ ) {
+    /* is it already here? */
+    if( sp->name && !strcmp(sp->name, s)) {
+      return sp;
+    }
+
+    /* is it free */
+    if( !sp->name ) {
+      sp->name = strdup(s);
+      return sp;
+    }
+    /* otherwise continue to next */
+  }
+
+  yyerror("too many symbols");
+  exit(1);   /* cannot continue */
+}
+
 int main(void) {
   return yyparse();
 }

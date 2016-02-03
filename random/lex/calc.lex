@@ -1,6 +1,7 @@
 %{
 #include <stdlib.h>
 #include <math.h>
+#include "calc.h"
 #include "y.tab.h"
   extern double vbltable[26];
 %}
@@ -14,7 +15,9 @@
 
 [ \t] ;    /* ignore whitespace */
 
-[a-z] { yylval.vblno = yytext[0] - 'a'; return NAME; }
+[A-Za-z][A-Za-z0-9]* {  /* return symbol pointer */
+  yylval.symp = symlook(yytext);
+  return NAME; }
 
 "$"   { return 0; /* end of input */ }
 
