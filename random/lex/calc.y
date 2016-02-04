@@ -83,11 +83,15 @@ struct symtab *symlook(char *s) {
 }
 
 int main(void) {
-  extern double sqrt(double), exp(double), log(double);
+  extern double sqrt(double), exp(double), log(double),
+    sin(double), cos(double), tan(double);
 
   addfunc("sqrt", sqrt);
   addfunc("exp", exp);
   addfunc("log", log);
+  addfunc("sin", sin);
+  addfunc("cos", cos);
+  addfunc("tan", tan);
   yyparse();
 
   return 0;
