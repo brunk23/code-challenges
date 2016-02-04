@@ -13,7 +13,7 @@
 %token <symp> NAME
 %token <dval> NUMBER
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %nonassoc UMINUS
 
 %type <dval> expression
@@ -37,6 +37,13 @@ expression:  expression '+' expression { $$ = $1 + $3; }
          yyerror("divide by zero");
        else
          $$ = $1 / $3;
+     }
+     | expression '%' expression
+     {
+       if( $3 == 0.0 )
+	 yyerror("modulus of zero");
+       else
+	 $$ = (int)$1 % (int)$3;
      }
      | '-' expression %prec UMINUS { $$ = -$2; }
      | '(' expression ')' { $$ = $2; }
