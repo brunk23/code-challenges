@@ -6,7 +6,11 @@ inline long M(long);
 inline long y(long,long);
 
 int main() {
-  cout << M(6) << endl;
+  long i, sum = 0;
+  for( i = 1; i <= 50; ++i ) {
+    cout << i << ": " << M(i) << endl;;
+  }
+  cout << sum << endl;
 
   return 0;
 }
