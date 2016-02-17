@@ -6,6 +6,8 @@
 
 /*
  * Synacor Disassmbler
+ *
+ * This is updated to make the output clear
  */
 
 int prev;
@@ -117,6 +119,9 @@ int read_in_file(const char *filename) {
   return words_read;
 }
 
+/*
+ * Pretty print the address
+ */
 unsigned short int get_add(unsigned short int a) {
   switch (memory[a]) {
   case 32768:

@@ -1,0 +1,20 @@
+#!/bin/ksh
+
+# This was found on a discussion of functional programming.
+# It originally did not include the uniq -c line, but it
+# didn't work without it. I liked the program and it's neat.
+
+# The first two lines change all non-alphabetic characters into
+# newlines. The third line makes everything lowercase. The fourth
+# line sorts the words so all the same ones are next to each other.
+# The fifth line counts the number of unique occurances of each
+# word. The sixth line sorts them, by count, greatest to least.
+# the seventh line prints out the first ${1} lines from the output
+
+tr -cs A-Za-z '
+' |
+tr A-Z a-z |
+sort |
+uniq -c |
+sort -rn |
+sed ${1}q
