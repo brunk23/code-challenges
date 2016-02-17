@@ -6,9 +6,11 @@ inline long M(long);
 inline long y(long,long);
 
 int main() {
-  long i, sum = 0;
-  for( i = 1; i <= 50; ++i ) {
-    cout << i << ": " << M(i) << endl;;
+  long i, sum = 0, temp;
+  for( i = 1; i <= 10000000; ++i ) {
+    temp = M(i);
+    sum += temp;
+    cout << i << ": " << temp << endl;;
   }
   cout << sum << endl;
 
