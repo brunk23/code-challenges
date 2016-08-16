@@ -72,6 +72,10 @@ function displayStones() {
  * This will make the perfect move, if such a move exists.
  * If it can't make a perfect move, it will remove one stone from a
  * random pile.  This is the computer player.
+ *
+ * We will win the game if stone[0]^stone[1]^stone[2] == 0, so we do
+ * our best to make it equal zero at the end of each turn.
+ *
  * returns [pile, amount removed]
  */
 function perfectMove() {
