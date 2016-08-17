@@ -206,14 +206,14 @@ function perfectMove() {
     if( (stones[0] + stones[1] + stones[2]) == 0 ) {
 	return [-1,-1];
     }
-    if( (stones[0] ^ stones[1] ^ stones[2]) == 0 ) {
+    if( score(stones[0], stones[1], stones[2]) == 0 ) {
 	// There is no perfect move, instead of just removing one stone
 	// we remove a random number up to half the pile
 	console.log("I can't move perfectly, so just take random.");
 	var amount;
 	n = randBetween(0,2);
 	while( stones[n] == 0 ) {
-	    n = (n+1)%3;
+	    n = (n + 1) % 3;
 	}
 	if(stones[n] > 1) {
 	    amount = randBetween(1, Math.floor( stones[n]/2 ) );
@@ -228,17 +228,13 @@ function perfectMove() {
     // The following finds the best move. I feel like there is a more
     // optimal way than this brute force method.
     for( n = 0; n < 3; ++n ) {
+    	var w;
+    	var z;
+    	w = (n + 1) % 3;
+    	z = (n + 2) % 3;
 	for( var removed=1; removed <= stones[n]; ++removed ) {
 	    var x;
-	    if( n == 0 ) {
-		x = stones[1] ^ stones[2] ^ (stones[n] - removed);
-	    }
-	    if( n == 1 ) {
-		x = stones[0] ^ stones[2] ^ (stones[n] - removed);
-	    }
-	    if( n == 2 ) {
-		x = stones[1] ^ stones[0] ^ (stones[n] - removed);
-	    }
+	    x = score(stones[n]-removed, stones[w], stones[z]);
 	    if( x == 0 ) {
 		stones[n] -= removed;
 		displayInfo(n, removed);
@@ -248,6 +244,10 @@ function perfectMove() {
     }
     // There was an optimal move but we did not find it! Error!!!
     return [-1, -1];
+}
+
+function score(a, b, c) {
+	return (a ^ b ^ c);
 }
 
 /*
