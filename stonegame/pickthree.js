@@ -149,8 +149,8 @@ function displayInfo(n, move) {
  * This is just a function that will show whose turn it is.
  */
 function displayPlayer() {
-    document.getElementById("gamesetup").innerHTML = '<h2>' +
-	p[whoseturn].name + "'s Turn</h2>";
+    document.getElementById("gamesetup").innerHTML = '<h1>' +
+	p[whoseturn].name + "'s Turn</h1>";
 }
 
 /*
