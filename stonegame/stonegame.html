@@ -1,14 +1,36 @@
+<!DOCTYPE html>
 <html>
+  <meta charset="UTF-8">
+  <!-- Basic empty HTML file for game -->
   <head>
     <script src="pickthree.js"></script>
+    <style>
+      table, th, td {
+      text-align: center;
+      border: 1px solid black;
+      }
+    </style>
     <title>The Stone Game</title>
   </head>
   <body>
-    <div id="box1">
-    </div>
-    <div id="box2">
-    </div>
-    <div id="box3">
-    </div>
+    <div id="gamesetup"></div>
+    <table style="width:100%">
+      <tr style="font-size:25px">
+	<td id="box1"></td>
+	<td id="box2"></td>
+	<td id="box3"></td>
+      </tr>
+      <tr>
+	<td id="but1"></td>
+	<td id="but2"></td>
+	<td id="but3"></td>
+      </tr>
+      <tr>
+	<td id="info1"></td>
+	<td id="info2"></td>
+	<td id="info3"></td>
+      </tr>
+    </table>
+    
   </body>
 </html>
