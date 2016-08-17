@@ -5,9 +5,9 @@ var whoseturn = 0;
 var turn = 0;
 var p = [];
 p[0] = { human: 1,
-	 name: "Kevin" };
+	 name: "Students" };
 p[1] = { human: 0,
-	 name: "Computer" };
+	 name: "Teacher" };
 
 /*
  * A random number between two values inclusive.
@@ -107,10 +107,12 @@ function nextTurn() {
 	turn++;
 	whoseturn = (whoseturn + 1) % 2;
 	if(p[whoseturn].human == 0) {
+	    displayStones();
 	    perfectMove();
+	} else {
+	    displayStones();
 	}
 	displayButtons();
-	displayStones();
 	displayPlayer();
     }
 }
@@ -186,14 +188,21 @@ function perfectMove() {
     }
     if( (stones[0] ^ stones[1] ^ stones[2]) == 0 ) {
 	// There is no perfect move
-	console.log("I can't move perfectly, so just take one.");
+	console.log("I can't move perfectly, so just take random.");
+	var amount;
 	n = randBetween(0,2);
 	while( stones[n] == 0 ) {
 	    n = (n+1)%3;
 	}
-	stones[n]--;
-	displayInfo(n, 1);
-	return [n, 1];
+	if(stones[n] > 1) {
+	    amount = randBetween(1, Math.floor( stones[n]/2 ) );
+	    stones[n] -= amount;
+	} else {
+	    amount = 1;
+	    stones[n]--;
+	}
+	displayInfo(n, amount);
+	return [n, amount];
     }
     for( n = 0; n < 3; ++n ) {
 	for( var removed=1; removed <= stones[n]; ++removed ) {
