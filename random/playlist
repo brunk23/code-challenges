@@ -1,0 +1,47 @@
+#!/bin/sh
+/usr/bin/osascript -e 'set volume 4'
+
+key="$1"
+
+case $key in
+	ela)
+		FILE="/Users/brunellek/classsongs/ela.mp3"
+		TIME=""
+	;;
+	endofday)
+		FILE="/Users/brunellek/classsongs/endofday.mp3"
+		TIME=""
+	;;
+	lineup)
+		FILE="/Users/brunellek/classsongs/lineup.mp3"
+		TIME=""
+	;;
+	math)
+		FILE="/Users/brunellek/classsongs/math.mp3"
+		TIME="-t 40"
+	;;
+	morning)
+		FILE="/Users/brunellek/classsongs/morning.mp3"
+		TIME=""
+	;;
+	science)
+		FILE="/Users/brunellek/classsongs/science.mp3"
+		TIME=""
+	;;
+	socialstudies)
+		FILE="/Users/brunellek/classsongs/socialstudies.mp3"
+		TIME="-t 32"
+	;;
+	*)
+		FILE="/Users/brunellek/classsongs/endofday.mp3"
+		TIME=""
+	;;
+esac
+
+# PLAY THE SONG
+/usr/bin/afplay ${TIME} ${FILE}
+
+
+# LOG THE ACTION
+/bin/echo -n "Run ${KEY} song: " >> /Users/brunellek/song.log
+/bin/date >> /Users/brunellek/song.log
