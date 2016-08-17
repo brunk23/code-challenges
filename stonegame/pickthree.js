@@ -1,6 +1,12 @@
+/*
+ * TITLE: Play Stone Game (Nim)
+ * AUTHOR: Kevin Brunelle (brunellek _at_ gmail.com)
+ * DATE: August 17, 2016
+ */
+
 // CONSTANTS
-var lowest = 5;
-var highest = 25;
+var lowest = 3;
+var highest = 15;
 
 // GLOBAL VARIABLES -- BAD FORM
 var stones;
@@ -203,7 +209,7 @@ function displayButtons() {
  */
 function perfectMove() {
     var n = 0;
-    if( (stones[0] + stones[1] + stones[2]) == 0 ) {
+    if( stoneCount() == 0 ) {
 	return [-1,-1];
     }
     if( score(stones[0], stones[1], stones[2]) == 0 ) {
@@ -228,14 +234,10 @@ function perfectMove() {
     // The following finds the best move. I feel like there is a more
     // optimal way than this brute force method.
     for( n = 0; n < 3; ++n ) {
-    	var w;
-    	var z;
-    	w = (n + 1) % 3;
-    	z = (n + 2) % 3;
+    	var w = (n + 1) % 3;
+    	var z = (n + 2) % 3;
 	for( var removed=1; removed <= stones[n]; ++removed ) {
-	    var x;
-	    x = score(stones[n]-removed, stones[w], stones[z]);
-	    if( x == 0 ) {
+	    if( 0 == score(stones[n]-removed, stones[w], stones[z]) ) {
 		stones[n] -= removed;
 		displayInfo(n, removed);
 		return [n, removed];
@@ -246,29 +248,33 @@ function perfectMove() {
     return [-1, -1];
 }
 
+/*
+ * This produces a score for a scenario of piles, it helps
+ * the computer make its move. 
+ */
 function score(a, b, c) {
-	return (a ^ b ^ c);
+    return (a ^ b ^ c);
 }
 
 /*
  * This will reset the game.
  */
 function newGame() {
-	p = [];
-	p[0] = { human: 1,
-	 	name: "Student" };
-	p[1] = { human: 0,
-		name: "Teacher" };
-	stones = pickthree( lowest, highest );
-	whoseturn = randBetween(0,1);
-	turn = 0;
-	document.getElementById("info1").innerHTML += "<b>Start Amount: "
-		+ stones[0] + "</b><br>";
-	document.getElementById("info2").innerHTML += "<b>Start Amount: "
-		+ stones[1] + "</b><br>";
-	document.getElementById("info3").innerHTML += "<b>Start Amount: "
-		+ stones[2] + "</b><br>";
-	nextTurn();
+    p = [];
+    p[0] = { human: 1,
+	     name: "Student" };
+    p[1] = { human: 0,
+	     name: "Teacher" };
+    stones = pickthree( lowest, highest );
+    whoseturn = randBetween(0,1);
+    turn = 0;
+    document.getElementById("info1").innerHTML += "<b>Start Amount: "
+	+ stones[0] + "</b><br>";
+    document.getElementById("info2").innerHTML += "<b>Start Amount: "
+	+ stones[1] + "</b><br>";
+    document.getElementById("info3").innerHTML += "<b>Start Amount: "
+	+ stones[2] + "</b><br>";
+    nextTurn();
 }
 
 /*
