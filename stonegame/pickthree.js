@@ -79,7 +79,6 @@ function displayStones() {
 function bPress(numb) {
     var x;
     x = document.getElementById("in" + numb).value;
-    console.log("[ " + numb + ", " + x + " ]");
     if( x <= stones[numb] ) {
 	stones[numb] -= x;
 	displayInfo(numb,x);
@@ -118,7 +117,6 @@ function nextTurn() {
 
 function displayInfo(n, move) {
     id = "info" + (n+1);
-    console.log(p[whoseturn]);
     document.getElementById(id).innerHTML += "<b>Turn " + turn + ": "
 	+ p[whoseturn].name + " took " + move + " stones.</b><br>";
 }
