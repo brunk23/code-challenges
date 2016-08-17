@@ -1,13 +1,12 @@
-var lowest = 3;
-var highest = 18;
+// CONSTANTS
+var lowest = 5;
+var highest = 25;
+
+// GLOBAL VARIABLES -- BAD FORM
 var stones;
-var whoseturn = 0;
-var turn = 0;
-var p = [];
-p[0] = { human: 1,
-	 name: "Students" };
-p[1] = { human: 0,
-	 name: "Teacher" };
+var whoseturn;
+var turn;
+var p;
 
 /*
  * A random number between two values inclusive.
@@ -75,21 +74,31 @@ function displayStones() {
 
 /*
  * Button press
+ * This function will handle the button entry.  If the value is not accurate,
+ * the program will ignore the input and will not progress to the next turn.
  */
 function bPress(numb) {
     var x;
     x = document.getElementById("in" + numb).value;
-    if( x <= stones[numb] ) {
+    x = Math.floor(x);
+    if( x <= stones[numb] && x > 0 ) {
 	stones[numb] -= x;
 	displayInfo(numb,x);
 	nextTurn();
     }
 }
 
+/*
+ * This is used to determine the number of stones remaining. It is useful for checking
+ * to make sure the game has not been won.
+ */
 function stoneCount() {
     return (stones[0]+stones[1]+stones[2]);
 }
 
+/*
+ * If the game has been won, display the name of the winning player.
+ */
 function winner() {
     displayStones();
     displayButtons(p[whoseturn].human);
@@ -98,7 +107,9 @@ function winner() {
 }
 
 /*
- * Next Turn
+ * This function handles the next turn for both players. It will increment the turn
+ * count, check to see if we have a winner, change the player, and update the display.
+ * When it is the computer's turn, it will call the function to make the computer play.
  */
 function nextTurn() {
     if ( stoneCount() == 0 ) {
@@ -117,19 +128,28 @@ function nextTurn() {
     }
 }
 
+/*
+ * We want to be able to see which player took which stones last.  We keep
+ * a running log of turns.  It might be best to start the information log
+ * with the number of stones each pile contained.
+ */
 function displayInfo(n, move) {
     id = "info" + (n+1);
     document.getElementById(id).innerHTML += "<b>Turn " + turn + ": "
 	+ p[whoseturn].name + " took " + move + " stones.</b><br>";
 }
 
+/*
+ * This is just a function that will show whose turn it is.
+ */
 function displayPlayer() {
     document.getElementById("gamesetup").innerHTML = '<h2>' +
 	p[whoseturn].name + "'s Turn</h2>";
 }
 
 /*
- *
+ * We want buttons to continue, but we need different ones for the player
+ * and he computer.  This function handles that.
  */
 function displayButtons() {
     if(p[whoseturn].human == 0) {
@@ -187,7 +207,8 @@ function perfectMove() {
 	return [-1,-1];
     }
     if( (stones[0] ^ stones[1] ^ stones[2]) == 0 ) {
-	// There is no perfect move
+	// There is no perfect move, instead of just removing one stone
+	// we remove a random number up to half the pile
 	console.log("I can't move perfectly, so just take random.");
 	var amount;
 	n = randBetween(0,2);
@@ -204,6 +225,8 @@ function perfectMove() {
 	displayInfo(n, amount);
 	return [n, amount];
     }
+    // The following finds the best move. I feel like there is a more
+    // optimal way than this brute force method.
     for( n = 0; n < 3; ++n ) {
 	for( var removed=1; removed <= stones[n]; ++removed ) {
 	    var x;
@@ -223,11 +246,34 @@ function perfectMove() {
 	    }
 	}
     }
+    // There was an optimal move but we did not find it! Error!!!
     return [-1, -1];
 }
 
-stones = pickthree( lowest, highest );
+/*
+ * This will reset the game.
+ */
+function newGame() {
+	p = [];
+	p[0] = { human: 1,
+	 	name: "Student" };
+	p[1] = { human: 0,
+		name: "Teacher" };
+	stones = pickthree( lowest, highest );
+	whoseturn = randBetween(0,1);
+	turn = 0;
+	document.getElementById("info1").innerHTML += "<b>Start Amount: "
+		+ stones[0] + "</b><br>";
+	document.getElementById("info2").innerHTML += "<b>Start Amount: "
+		+ stones[1] + "</b><br>";
+	document.getElementById("info3").innerHTML += "<b>Start Amount: "
+		+ stones[2] + "</b><br>";
+	nextTurn();
+}
+
+/*
+ * Initialize and run the game.
+ */
 window.onload = function() {
-    whoseturn = randBetween(0,1);
-    nextTurn();
+    newGame();
 }
