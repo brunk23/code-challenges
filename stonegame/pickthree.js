@@ -106,8 +106,13 @@ function stoneCount() {
  * If the game has been won, display the name of the winning player.
  */
 function winner() {
+    document.getElementById("but1").innerHTML = '<button type="button"'
+	+ 'onclick="newGame()"' + '>NEW GAME</button>';
+    document.getElementById("but2").innerHTML = '<button type="button"'
+	+ 'onclick="newGame()"' + '>NEW GAME</button>';
+    document.getElementById("but3").innerHTML = '<button type="button"'
+	+ 'onclick="newGame()"' + '>NEW GAME</button>';
     displayStones();
-    displayButtons(p[whoseturn].human);
     document.getElementById("gamesetup").innerHTML = "<h2>" + p[whoseturn].name
 	+ " won!</h2>";
 }
