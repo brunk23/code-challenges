@@ -43,5 +43,8 @@ esac
 
 
 # LOG THE ACTION
-/bin/echo -n "Run ${KEY} song: " >> /Users/brunellek/song.log
+/bin/echo -n "Run ${key} song: " >> /Users/brunellek/song.log
 /bin/date >> /Users/brunellek/song.log
+
+# TURN OFF SLEEPING FOR 3 HOURS
+/usr/bin/caffeinate sleep 10800 &
