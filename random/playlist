@@ -47,4 +47,5 @@ esac
 /bin/date >> /Users/brunellek/song.log
 
 # TURN OFF SLEEPING FOR 3 HOURS
-/usr/bin/caffeinate sleep 10800 &
+# -s is no sleep, default is -i (do not idle sleep)
+/usr/bin/caffeinate -s sleep 10800 &
