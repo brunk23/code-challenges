@@ -48,4 +48,4 @@ esac
 
 # TURN OFF SLEEPING FOR 3 HOURS
 # -s is no sleep, default is -i (do not idle sleep)
-/usr/bin/caffeinate -s sleep 10800 &
+/usr/bin/caffeinate -u -t 10800 &
