@@ -16,10 +16,10 @@ unsigned long long fsubk(unsigned int, long long);
 unsigned long long fsubk(unsigned int k, long long n) {
   long long extra = ( n % k ) + 1;
   long long sets = n / k;     /* We are going to group things */
-  long long sum = 0;
+  long long sum = k;
 
-  for( long long i = 0; i < sets; ++i ) {
-    sum += ( i + 1 ) * k;
+  for( long long i = 1; i < sets; ++i ) {
+    sum += ( i * k) * (sets - i + 1);
   }
 
   sum += ( sets + 1 ) * extra;
@@ -28,6 +28,6 @@ unsigned long long fsubk(unsigned int k, long long n) {
 }
 
 int main(int argc, char *argv[]) {
-  cout << fsubk(2,1000) << endl;
+  cout << fsubk(5,20) << endl;
   return 0;
 }
