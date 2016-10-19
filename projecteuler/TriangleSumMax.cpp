@@ -45,7 +45,7 @@ int main() {
     }
   }
   
-  cout << "The max found was " << numbers[0] << endl;
+  cout << "The maximum sum found was " << numbers[0] << endl;
   
   return 0;
 }
