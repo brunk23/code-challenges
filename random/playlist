@@ -1,50 +1,41 @@
 #!/bin/sh
 /usr/bin/osascript -e 'set volume 4'
 
+LOGPATH="/Users/brunellek/song.log"
+TMPLOG="/tmp/song.log"
 key="$1"
+FILE="/Users/brunellek/classsongs/${1}.mp3"
+TIME=""
+
+/usr/bin/tail -n 10 ${LOGPATH} > ${TMPLOG}
+/bin/mv ${TMPLOG} ${LOGPATH}
 
 case $key in
-	ela)
-		FILE="/Users/brunellek/classsongs/ela.mp3"
-		TIME=""
-	;;
-	endofday)
-		FILE="/Users/brunellek/classsongs/endofday.mp3"
-		TIME=""
-	;;
-	lineup)
-		FILE="/Users/brunellek/classsongs/lineup.mp3"
-		TIME=""
+	lunch)
+		/usr/bin/osascript -e 'set volume 8'
 	;;
 	math)
-		FILE="/Users/brunellek/classsongs/math.mp3"
 		TIME="-t 40"
 	;;
-	morning)
-		FILE="/Users/brunellek/classsongs/morning.mp3"
-		TIME=""
-	;;
-	science)
-		FILE="/Users/brunellek/classsongs/science.mp3"
-		TIME=""
-	;;
 	socialstudies)
-		FILE="/Users/brunellek/classsongs/socialstudies.mp3"
 		TIME="-t 32"
 	;;
 	*)
-		FILE="/Users/brunellek/classsongs/endofday.mp3"
-		TIME=""
 	;;
 esac
 
-# PLAY THE SONG
-/usr/bin/afplay ${TIME} ${FILE}
-
-
-# LOG THE ACTION
-/bin/echo -n "Run ${key} song: " >> /Users/brunellek/song.log
-/bin/date >> /Users/brunellek/song.log
+if [ -e ${FILE} ]
+then
+	# LOG THE ACTION
+	/bin/echo -n "Run ${key} song: " >> ${LOGPATH}
+	/bin/date >> ${LOGPATH}
+	# PLAY THE SONG
+	/usr/bin/afplay ${TIME} ${FILE}
+else
+	# LOG THE FAILURE
+	/bin/echo -n "Run ${key} song: FAILED {DOES NOT EXIST} " >> ${LOGPATH}
+	/bin/date >> ${LOGPATH}
+fi
 
 # TURN OFF SLEEPING FOR 3 HOURS
 # -s is no sleep, default is -i (do not idle sleep)
