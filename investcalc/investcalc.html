@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Investment Calculator</title>
+<style>
+p {}
+
+div {}
+
+h1 {
+	text-align: center;
+
+}
+</style>
+<script src="investcalc.js"></script>
+</head>
+<body onload="update()">
+<h1>Enter the requested values below</h1>
+<p>Amount per month:
+<input type="number" step="0.01" value="100" id="amountInput"
+	onchange="setAmount()"><br>
+Interest Rate:
+<input type="number" step="0.001" value="5" id="rateInput"
+	onchange="setRate()"><br>
+How many years:
+<input type="number" step="1" value="10" id="yearsInput"
+	onchange="setTerm()"><br>
+Previous amount at end:
+<input type="number" step="0.01" value="0" id="previousInput"
+	onchange="setPrevious()"><br>
+</p>
+<div id="outputBox"></div>
+</body>
+</html>
