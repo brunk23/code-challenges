@@ -3,10 +3,6 @@
 <head>
 <title>Investment Calculator</title>
 <style>
-p {}
-
-div {}
-
 h1 {
 	text-align: center;
 
@@ -16,19 +12,44 @@ h1 {
 </head>
 <body onload="update()">
 <h1>Enter the requested values below</h1>
-<p>Amount per month:
-<input type="number" step="0.01" value="100" id="amountInput"
-	onchange="setAmount()"><br>
-Interest Rate:
-<input type="number" step="0.001" value="5" id="rateInput"
-	onchange="setRate()"><br>
-How many years:
-<input type="number" step="1" value="10" id="yearsInput"
-	onchange="setTerm()"><br>
-Previous amount at end:
-<input type="number" step="0.01" value="0" id="previousInput"
-	onchange="setPrevious()"><br>
-</p>
+<table border="1">
+	<tr align="center">
+		<td>
+			<strong>Investment #1</strong>
+		</td>
+		<td>
+			<strong>Investment #2</strong>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		Amount per month:
+		<input type="number" step="0.01" value="100" id="amountInput0"
+			onchange="setAmount(0)"><br>
+		Interest Rate:
+		<input type="number" step="0.001" value="5" id="rateInput0"
+			onchange="setRate(0)"><br>
+		How many years:
+		<input type="number" step="1" value="20" id="yearsInput0"
+			onchange="setTerm(0)">
+		</td>
+		<td>
+		Amount per month:
+		<input type="number" step="0.01" value="100" id="amountInput1"
+			onchange="setAmount(1)"><br>
+		Interest Rate:
+		<input type="number" step="0.001" value="6" id="rateInput1"
+			onchange="setRate(1)"><br>
+		How many years:
+		<input type="number" step="1" value="20" id="yearsInput1"
+			onchange="setTerm(1)">
+		</td></tr>
+		<tr>
+			<td id="loan0"></td>
+			<td id="loan1"></td>
+		</tr>
+	<tr align="center"><td colspan="2">
 <div id="outputBox"></div>
+		</td></tr></table>
 </body>
 </html>
