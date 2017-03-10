@@ -3,6 +3,8 @@
 using namespace std;
 
 bool isPrime(int);
+int removedups(int [], int);
+void findwinners(int [], int);
 int value(int, int, int, int);
 void test(int, int, int, int);
 void winner(int, int, int);
@@ -33,7 +35,7 @@ int value(int th, int hu, int te, int on) {
 }
 
 void winner(int a, int b, int c) {
-  cout << a << b << c << endl;
+  cout << a << " " << b << " " << c << endl;
 }
 
 /*
@@ -69,7 +71,7 @@ void test(int a, int b, int c, int d) {
   /*
    * Populate the array with all primes of these 4 digits
    */
-  for( i = 0; i < 4; i++ ) {
+  for( i = 1; i < 4; i++ ) {
     for( j = 0; j < 4; j++ ) {
       if( i==j ) continue;
       for( k = 0; k < 4; k++ ) {
@@ -86,10 +88,46 @@ void test(int a, int b, int c, int d) {
     }
   }
   
-  for( i = 0; i < pindex; i++ ) {
-    cout << p[i] << " ";
+  pindex = removedups(p,pindex);
+
+  if( pindex < 3 ) {
+    return;
   }
-  cout << endl;
+  findwinners( p, pindex);
+}
+
+void findwinners(int p[], int pindex) {
+  int a, b, c;
+  for( a = 0; a < pindex-2; a++) {
+    for( b = a+1; b < pindex-1; b++) {
+      for( c = b+1; c < pindex; c++) {
+	if( p[b]-p[a] == p[c]-p[b] ) {
+	  winner(p[a], p[b], p[c]);
+	}
+      }
+    }
+  }
+}
+
+int removedups(int p[], int pindex) {
+  int i, j, tmp;
+
+  for( i = 0; i < pindex; i++ ) {
+    for( j = i+1; j < pindex; j++ ) {
+      if( p[j] == p[i] ) {
+	p[j] = p[pindex-1];
+	pindex--;
+	j--;
+	continue;
+      }
+      if( p[j] < p[i] ) {
+	tmp = p[i];
+	p[i] = p[j];
+	p[j] = tmp;
+      }
+    }
+  }
+  return pindex;
 }
 
 /*
