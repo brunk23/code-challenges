@@ -17,7 +17,7 @@ bool isPrime(int number) {
   if( 0 == number % 2 ) {
     return false;
   }
-  for( n = 3; (n*n) < number; n += 2 ) {
+  for( n = 3; (n*n) <= number; n += 2 ) {
     if( 0 == number % n ) {
       return false;
     }
