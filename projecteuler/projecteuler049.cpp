@@ -33,7 +33,7 @@ int value(int th, int hu, int te, int on) {
 }
 
 void winner(int a, int b, int c) {
-  cout << a << " " << b << " " << c << endl;
+  cout << a << b << c << endl;
 }
 
 /*
@@ -44,14 +44,15 @@ void winner(int a, int b, int c) {
  * is caught by this faulty function.
  */
 void test(int a, int b, int c, int d) {
-  int v0, v1, v2, i, j, k, l, temp;
+  int pindex, i, j, k, l, temp;
+  int p[24];
   int val[4];
 
-  v0 = value(a,b,c,d);
-  v1 = 0;
-  v2 = 0;
-
-  if( !isPrime(v0)) {
+  /*
+   * We only care if the value of this is prime.
+   */
+  p[0] = value(a,b,c,d);
+  if( !isPrime(p[0])) {
     return;
   }
 
@@ -60,6 +61,14 @@ void test(int a, int b, int c, int d) {
   val[2] = c;
   val[3] = d;
 
+  for( i = 1; i <24; i++ ) {
+    p[i] = 0;
+  }
+  pindex = 1;
+
+  /*
+   * Populate the array with all primes of these 4 digits
+   */
   for( i = 0; i < 4; i++ ) {
     for( j = 0; j < 4; j++ ) {
       if( i==j ) continue;
@@ -68,28 +77,19 @@ void test(int a, int b, int c, int d) {
 	for( l = 0; l < 4; l++ ) {
 	  if( l==k || l==j || l==i ) continue;
 	  temp = value(val[i], val[j], val[k], val[l]);
-	  if( temp > v0 ) {
-	    if( isPrime(temp) ) {
-	      if( v1 == 0 ) {
-		v1 = temp;
-	      } else {
-		if( temp == v1 ) continue;
-		if( temp < v1 ) {
-		  v2 = v1;
-		  v1 = temp;
-		} else {
-		  v2 = temp;
-		}
-		if( v1-v0 == v2-v1 ) {
-		  winner(v0, v1, v2);
-		}
-	      }
-	    }
+	  if( isPrime(temp) ) {
+	    p[pindex] = temp;
+	    pindex++;
 	  }
 	}
-      }      
+      }
     }
   }
+  
+  for( i = 0; i < pindex; i++ ) {
+    cout << p[i] << " ";
+  }
+  cout << endl;
 }
 
 /*
@@ -108,9 +108,6 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-
-  cout << "Testing 1487: ";
-  test(1,4,8,7);
 
   return 0;
 }
