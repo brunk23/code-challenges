@@ -14,13 +14,12 @@ loans[1] = new Loan(20, 100, 6, 1);
 
 function total(loan) {
 	var sum = 0;
+	var monthlyRate = Math.pow(1 + loans[loan].rate / 100, 1/12);
 	invested(loan);
 	for(var n = loans[loan].delay;
 			n <= ((loans[loan].term * 12) + loans[loan].delay);
 			++n) {
-		sum += loans[loan].amount * Math.pow(
-				(1 + loans[loan].rate / 1200),
-				n );
+		sum += loans[loan].amount * Math.pow( monthlyRate, n );
 	}
 	return sum;
 }
