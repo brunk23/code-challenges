@@ -151,7 +151,7 @@ int op_not() {
 }
 
 int op_rmem() {
-  unsigned short int source;
+  SWORD source;
   source = get_add(pc+2);
   set_add(pc+1, memory[source]);
   pc += 3;
@@ -159,7 +159,7 @@ int op_rmem() {
 }
 
 int op_wmem() {
-  unsigned short int dest;
+  SWORD dest;
   dest = get_add(pc+1);
   memory[dest] = get_add(pc+2);
   pc += 3;

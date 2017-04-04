@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
   while( 1 ) {
 
     /* Make sure pc loops down correctly */
-    pc %= 32768;
+    pc %= REGOFFSET;
 
     if( memory[pc] > 23 ) {
       fprintf(stderr,"Error: Invalid operation %i",pc);
@@ -165,7 +165,7 @@ int read_in_file(FILE *source,
   int words_read = 0;
   int diff = 0;
 
-  if( fseek(source, start*sizeof(unsigned short int), SEEK_SET) ){
+  if( fseek(source, start*sizeof(SWORD), SEEK_SET) ){
     fprintf(stderr,"Unable to access location on device\n");
     return 0;
   }
@@ -174,16 +174,16 @@ int read_in_file(FILE *source,
     /* we need to wrap memory */
     diff = (words + dest - REGOFFSET);
     words_read = fread(&memory[dest],
-		       sizeof(unsigned short int),
+		       sizeof(SWORD),
 		       words - diff,
 		       source);
     words_read += fread(memory,
-			sizeof(unsigned short int),
+			sizeof(SWORD),
 			diff,
 			source);
   } else {
     words_read = fread(&memory[dest],
-		       sizeof(unsigned short int),
+		       sizeof(SWORD),
 		       words,
 		       source);
   }
@@ -210,7 +210,7 @@ int write_out_file(FILE *dest,
   int words_wrote = 0;
   int diff = 0;
 
-  if( fseek(dest, start*sizeof(unsigned short int), SEEK_SET) ){
+  if( fseek(dest, start*sizeof(SWORD), SEEK_SET) ){
     fprintf(stderr,"Unable to access location on device\n");
     return 0;
   }
@@ -228,16 +228,16 @@ int write_out_file(FILE *dest,
     /* we need to wrap memory */
     diff = (words + source - REGOFFSET);
     words_wrote = fwrite(&memory[source],
-		       sizeof(unsigned short int),
+		       sizeof(SWORD),
 		       words - diff,
 		       dest);
     words_wrote += fwrite(memory,
-			sizeof(unsigned short int),
+			  sizeof(SWORD),
 			diff,
 			dest);
   } else {
     words_wrote = fwrite(&memory[source],
-		       sizeof(unsigned short int),
+		       sizeof(SWORD),
 		       words,
 		       dest);
   }
@@ -257,9 +257,15 @@ int write_out_file(FILE *dest,
  * Helper function for memory access to return
  * register values when those are requested.
  */
-unsigned short int get_add(unsigned short int a) {
-  unsigned short int b;
+SWORD get_add(SWORD a) {
+  SWORD b;
+
+  /* a should be within memory, but if pc was near the top of
+   * memory and we pass ( pc + 5 ) or similar, we could read
+   * outside the array, protect against that by wrapping down */
+  a %= REGOFFSET;
   b = memory[a];
+
   if( b < REGOFFSET ) {
     return b;
   } else {
@@ -277,9 +283,12 @@ unsigned short int get_add(unsigned short int a) {
  * Helper function for memory setting. It also sets
  * registers correctly.
  */
-unsigned short int set_add(unsigned short int a,
-			   unsigned short int b) {
-  unsigned short int c;
+SWORD set_add(SWORD a, SWORD b) {
+  SWORD c;
+
+  /* ensure both are inside memory */
+  a %= REGOFFSET;
+  b %= REGOFFSET;
   c = memory[a];
 
   if( c >= REGOFFSET ) {
