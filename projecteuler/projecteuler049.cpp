@@ -11,6 +11,7 @@ void winner(int, int, int);
 
 /*
  * An ugly but quick prime tester
+ * BROKEN: says 2 is not prime (not fixed in this project)
  */
 bool isPrime(int number) {
   int n;
