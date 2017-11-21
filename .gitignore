@@ -1,5 +1,6 @@
 *~
 a.out
+#*
 *.core
 *.bin
 *.swp
