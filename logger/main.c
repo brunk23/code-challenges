@@ -3,6 +3,10 @@
 #include <string.h>
 
 /*
+ * Abandoned?  I totally forget what I started this for.
+ */
+
+/*
  * Will be a program which logs various information
  */
 
