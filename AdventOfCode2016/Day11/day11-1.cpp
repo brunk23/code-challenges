@@ -7,12 +7,11 @@ enum kind {microchip, generator};
 enum element {thu, plu, str, pro, rut};
 
 class Component {
-private:
+public:
   bool exists;
   int type;
   int isotope;
 
-public:
   Component() {
     exists = false;
     type = -1;
@@ -148,14 +147,40 @@ public:
 
   }
 
+  
+  
   /// This is NOT RIGHT. We need to check for floors
   /// That have a microchip and a non-matching generator
   bool safe() {
+    bool generatorOnFloor = false;
     int i,j,k, g,m;
+    
     for( i = 0; i < 4; i++ ) {
-      for( j=0; j<10; j++ ) {
+      generatorOnFloor = false;
 
+      // check for generator
+      for( j=0; j<10; j++ ) {
+	if( !floor[i].has[j].exists ) {
+	  break;
+	}
+	if( floor[i].has[j].type == generator ) {
+	  generatorOnFloor == true;
+	}
       }
+      if( elev.floor == i ) {
+	if( (elev.has[0].type == generator) ||
+	    (elev.has[1].type == generator) ) {
+	  generatorOnFloor = true;
+	}
+      }
+      if( !generatorOnFloor ) {
+	// No generator is always safe
+	continue;
+      }
+      ///
+      ///  Now we need to see if there is a microchip.
+      ///  If so, it needs matching generator
+      ///
     }
     return true;
   }
