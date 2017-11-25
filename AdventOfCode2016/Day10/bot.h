@@ -13,6 +13,7 @@ class Bot {
  public:
   Bot();
 
+  void print();
   bool winner();
   bool exists();
   bool hasBoth();

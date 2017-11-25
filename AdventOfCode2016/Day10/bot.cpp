@@ -9,6 +9,11 @@ Bot::Bot() {
   chips[1] = -1;
 }
 
+void Bot::print() {
+  std::cout << "Bot: " << number << "\tLow to: " << givesLowTo
+	    << "\tHigh to: " << givesHighTo << std::endl;
+}
+
 bool Bot::exists() {
   if( number > -1 ) {
     return true;
@@ -46,7 +51,6 @@ bool Bot::winner() {
 
 bool Bot::hasBoth() {
   if( (chips[0] > 0) && (chips[1] > 0) ) {
-    std::cerr << "Had both" << std::endl;
     return true;
   }
   return false;
