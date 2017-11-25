@@ -148,6 +148,18 @@ public:
 
   }
 
+  /// This is NOT RIGHT. We need to check for floors
+  /// That have a microchip and a non-matching generator
+  bool safe() {
+    int i,j,k, g,m;
+    for( i = 0; i < 4; i++ ) {
+      for( j=0; j<10; j++ ) {
+
+      }
+    }
+    return true;
+  }
+
   friend std::ostream& operator<<(std::ostream &out, Building b) {
     int i;
     out << "Building\n" << b.elev << "\n";
