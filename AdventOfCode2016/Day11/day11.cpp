@@ -1,19 +1,18 @@
 #include <iostream>
 
-enum kind {generator=10, microchip};
-enum elements {thu=1, plu, str, pro, rut);
+enum kind {generator=0, microchip};
+enum elements {thu=2, plu=4, str=8, pro=16, rut=32};
 
-struct Item {
-  int type;
-  int isotope;
+struct attempt {
+  int moves;
+  int currentFloor;
+  int floor[4][10];
+  attempt *next;
 };
-
-int currentFloor;
-Item floor[4][10];
 
 void moveUP( int, int);
 void moveDown( int, int );
-void init();
+attempt *newAttempt(int, int, int [4][10]);
 
 void moveUP( int a, int b ) {
 
@@ -23,21 +22,32 @@ void moveDown( int a, int b ) {
 
 }
 
-void init() {
+attempt *newAttempt(int fl, int m, const int c[4][10]) {
+  attempt *r = new attempt;
   int f,i;
 
-  currentFloor = 0;
+  r->moves = m;
+  r->currentFloor = fl;
+
   for(f = 0; f < 4; f++) {
-    for( i = 0; i < 10; i++) {
-      floor[f][i].type = 0;
-      floor[f][i].isotope = 0;
+    for(i = 0; i < 10; i++) {
+      r->floor[f][i] = c[f][i];
     }
   }
+  r->next = 0;
 }
 
-int main() {
+const int startingState[4][10] = {
+  {thu+generator, thu+microchip, plu+generator, str+generator,0,0,0,0,0,0},
+  {plu+microchip, str+microchip, 0, 0, 0, 0, 0, 0, 0, 0},
+  {pro+generator, pro+microchip, rut+generator, rut+microchip,0,0,0,0,0,0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-  init();
+int main() {
+  attempt *head = newAttempt(0, 0, startingState);
+  attempt *tail = head;
+  attempt *curr = head;
+  
   
   return 0;
 }
