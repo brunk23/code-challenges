@@ -1,0 +1,7 @@
+I had a hard time visualizing what was being asked.  I got impatient,
+and I went looking for a description.  I ran into this.
+
+https://codepen.io/anon/pen/BQEZzK
+
+This allows me to visualize and play with the code.  I was able
+to do my solution, by hand, with the visual code.
