@@ -18,7 +18,7 @@ void printLoc(string [ROWS]);
 void duplicate(int [ROWS][COLS]);
 void duppoints(location [8], location [8]);
 void stepAway(int [ROWS][COLS], int, int);
-int minDist(int [ROWS][COLS], location);
+int minDist(int [ROWS][COLS], location, int);
 
 /**
  * LOCATIONS FROM INPUT
@@ -95,6 +95,10 @@ int minDist(location points[8], location curr, int count) {
   int i, newcount = count, lcount = 0;
   location tmppoints[8], newloc;
 
+  if( (count > 700) ) {
+    return count;
+  }
+  
   for( i = 0; i < 8; i++ ) {
     if( !(points[i].visited) ) {
       break;
@@ -113,9 +117,7 @@ int minDist(location points[8], location curr, int count) {
   }
   // The last one, return to start
   if( i == 8 ) {
-    std::cout << count << "\t";
     count += room[ points[0].row ][ points[0].col ] - 1;
-    std::cout << count << std::endl;
     return count;
   }
 
@@ -125,7 +127,8 @@ int minDist(location points[8], location curr, int count) {
       tmppoints[i].visited = true;
       newloc.row = tmppoints[i].row;
       newloc.col = tmppoints[i].col;
-      newcount = minDist( tmppoints, newloc, count + room[ points[i].row ][ points[i].col ] - 1);
+      newcount = count + room[ points[i].row][ points[i].col ] - 1;
+      newcount = minDist( tmppoints, newloc, newcount);
       if( lcount == 0 ) {
 	lcount = newcount;
       }
