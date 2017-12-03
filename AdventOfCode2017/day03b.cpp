@@ -1,5 +1,7 @@
 #include <iostream>
 
+#define MEMSIZE 10000
+
 using namespace std;
 
 /*
@@ -39,8 +41,33 @@ xxx 72  43  44  45  46  47  48  49  50  83
    6 | 33   6 | 35
  */
 
+int BRC(int);
+int BLC(int);
+int TLC(int);
+int TRC(int);
+int SL(int);
 int newsquares(int);
 int abs(int);
+
+int SL(int n) {
+  return (2 * n - 1);
+}
+
+int BLC(int n) {
+  return (BRC(n) - (SL(n) - 1 ));
+}
+
+int TLC(int n) {
+  return (BRC(n) - 2 * (SL(n) -1 ));
+}
+
+int TRC(int n) {
+  return (BRC(n) - 3 * (SL(n) -1 ));
+}
+
+int BRC(int n) {
+  return SL(n)*SL(n);
+}
 
 int abs(int n) {
   if( n < 0 ) {
@@ -56,23 +83,80 @@ int newsquares( int length ) {
 enum dir{ RIGHT, UP, LEFT, DOWN};
 
 int main() {
-  int goal;
-  int s, e, len, mid, direction = RIGHT;
-  s = e = len =1;
+  int goal, tmp, a, b, c;
+  int memory[MEMSIZE];
+  int location, curr;
   // goal = 347991;
-
+  
   cin >> goal;
 
-  while( e < goal ) {
-    s = e +1;
-    e += newsquares(len);
-    len += 2;
+  memory[1] = 1;
+  curr = 1;
+  
+  for(location = 2; location < MEMSIZE; location++) {
+    memory[location] = memory[location-1];
+
+    /*
+     * Bottom Right Corner
+     */
+    if( location > BRC(curr) ) {
+      curr++;
+      continue;
+    }
+
+    /*
+     * Right side, no corner.
+     */
+    if( (location > BRC( curr -1 )) &&
+	(location < TRC( curr )) ) {
+      // Right side, no corner
+      tmp = 8*(n-2) + 1;
+      a = location - tmp;      // Left
+      b = location - tmp - 1;  // Left Down
+      c = location - tmp + 1;  // Left Up
+      // This should always be safe, if we're
+      // not adding the bottom right corner again.
+      if( a < BRC( curr - 1 ) ) {
+	memory[location] += memory[a];
+      }
+      // We sometimes have to add the bottom
+      // right corner of the previous row.
+      if( b == BRC( curr - 2 ) ) {
+	memory[location] += memory[ BRC(curr-1) ];
+      } else {
+	memory[location] += memory[b];
+      }
+      // Can't add row not generated yet.
+      if( a != TRC(curr -1) ) {
+	memory[location] += memory[c];
+      }
+    }
+
+    /*
+     * Top Right Corner
+     */
+
+    /*
+     * Top No Corners
+     */
+
+    /*
+     * Top Left Corner
+     */
+
+    /*
+     * Left No Corners
+     */
+
+    /*
+     * Bottom Left Corner
+     */
+
+    /*
+     * Bottom No Corners
+     */
+    
   }
-  cout << "Length: " << len << "\tMin: " << s
-       << "\tMax: " << e << endl;
-  // Where is goal
-  mid = len/2;
-  cout << mid + abs(((goal-s)%(len-1))+1-mid) << endl;
   
   return 0;
 }
