@@ -100,6 +100,9 @@ int main() {
      * Bottom Right Corner
      */
     if( location > BRC(curr) ) {
+      if( curr > 1 ) {
+	memory[location] = memory[ BRC(curr-1) + 1 ];
+      }
       curr++;
       continue;
     }
@@ -110,7 +113,7 @@ int main() {
     if( (location > BRC( curr -1 )) &&
 	(location < TRC( curr )) ) {
       // Right side, no corner
-      tmp = 8*(n-2) + 1;
+      tmp = 8*(curr-2) + 1;
       a = location - tmp;      // Left
       b = location - tmp - 1;  // Left Down
       c = location - tmp + 1;  // Left Up
@@ -135,14 +138,27 @@ int main() {
     /*
      * Top Right Corner
      */
+    if( location == TRC( curr ) ) {
+      memory[location] += TRC( curr - 1 );
+    }
 
     /*
      * Top No Corners
      */
+    if( location > TRC(curr) && location < TLC(curr) ) {
+      tmp = 8*(curr - 2) + 3;
+      a = location - tmp;
+      b = location - tmp - 1;
+      c = location - tmp + 1;
+      
+    }
 
     /*
      * Top Left Corner
      */
+    if(location = TLC(curr)) {
+      memory[location] += memory[ TLC(curr -1) ];
+    }
 
     /*
      * Left No Corners
@@ -151,10 +167,20 @@ int main() {
     /*
      * Bottom Left Corner
      */
+    if(location == BLC(curr)) {
+      memory[location] += memory[ BLC(curr - 1) ];
+    }
 
     /*
      * Bottom No Corners
      */
+
+    /*
+     * Bottom Right Corner
+     */
+    if( location == BRC(curr)) {
+      memory[location] += memory[ BRC(curr -1) ];
+    }
     
   }
   
