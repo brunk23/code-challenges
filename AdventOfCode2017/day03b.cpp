@@ -5,17 +5,17 @@
 using namespace std;
 
 /*
-101 100 99  98  97  96  95  94  93  92  91
-xxx 65  64  63  62  61  60  59  58  57  90
-xxx 66  37  36  35  34  33  32  31  56  89
-xxx 67  38  17  16  15  14  13  30  55  88
-xxx 68  39  18   5   4   3  12  29  54  87
-xxx 69  40  19   6   1   2  11  28  53  86
-xxx 70  41  20   7   8   9  10  27  52  85
-xxx 71  42  21  22  23  24  25  26  51  84
-xxx 72  43  44  45  46  47  48  49  50  83
-110 73  74  75  76  77  78  79  80  81  82
- */
+  101 100 99  98  97  96  95  94  93  92  91
+  xxx 65  64  63  62  61  60  59  58  57  90
+  xxx 66  37  36  35  34  33  32  31  56  89
+  xxx 67  38  17  16  15  14  13  30  55  88
+  xxx 68  39  18   5   4   3  12  29  54  87
+  xxx 69  40  19   6   1   2  11  28  53  86
+  xxx 70  41  20   7   8   9  10  27  52  85
+  xxx 71  42  21  22  23  24  25  26  51  84
+  xxx 72  43  44  45  46  47  48  49  50  83
+  110 73  74  75  76  77  78  79  80  81  82
+*/
 
 /*
   Notes:
@@ -30,24 +30,22 @@ xxx 72  43  44  45  46  47  48  49  50  83
   Left side, directly right:  LOC - ( 8(n-2) + 5 )
   Bottom side, directly up:   LOC - ( 8(n-2) + 7 )
 
-   R -> L   U -> D   L -> R  D -> U
-   ------   ------   ------  ------
-   n | c    n | c    n | c   n | c
-   1 | -    1 | -    1 | -   1 | -
-   2 | 1    2 | 3    2 | 5   2 | 7
-   3 | 9    3 | 11   3 | 13  3 | 15
-   4 | 17   4 | 19   4 | 21
-   5 | 25   5 | 27   5 | 29
-   6 | 33   6 | 35
- */
+  R -> L   U -> D   L -> R  D -> U
+  ------   ------   ------  ------
+  n | c    n | c    n | c   n | c
+  1 | -    1 | -    1 | -   1 | -
+  2 | 1    2 | 3    2 | 5   2 | 7
+  3 | 9    3 | 11   3 | 13  3 | 15
+  4 | 17   4 | 19   4 | 21
+  5 | 25   5 | 27   5 | 29
+  6 | 33   6 | 35
+*/
 
 int BRC(int);
 int BLC(int);
 int TLC(int);
 int TRC(int);
 int SL(int);
-int newsquares(int);
-int abs(int);
 
 int SL(int n) {
   return (2 * n - 1);
@@ -69,17 +67,6 @@ int BRC(int n) {
   return SL(n)*SL(n);
 }
 
-int abs(int n) {
-  if( n < 0 ) {
-    return n * -1;
-  }
-  return n;
-}
-
-int newsquares( int length ) {
-  return ( 4 * length + 4 );
-}
-
 enum dir{ RIGHT, UP, LEFT, DOWN};
 
 int main() {
@@ -90,6 +77,7 @@ int main() {
   
   cin >> goal;
 
+  memory[0] = 0;
   memory[1] = 1;
   curr = 1;
   
@@ -101,7 +89,7 @@ int main() {
      */
     if( location > BRC(curr) ) {
       if( curr > 1 ) {
-	memory[location] = memory[ BRC(curr-1) + 1 ];
+	memory[location] += memory[ BRC(curr-1) + 1 ];
       }
       curr++;
       continue;
@@ -139,7 +127,7 @@ int main() {
      * Top Right Corner
      */
     if( location == TRC( curr ) ) {
-      memory[location] += TRC( curr - 1 );
+      memory[location] += memory[TRC( curr - 1 )];
     }
 
     /*
@@ -150,38 +138,86 @@ int main() {
       a = location - tmp;
       b = location - tmp - 1;
       c = location - tmp + 1;
-      
+      memory[location] += memory[a];
+      if( b >= TRC( curr-1 ) ) {
+	memory[location] += memory[b];
+      } else {
+	memory[location] += memory[location-2];
+      }
+
+      if( c <= TLC( curr-1 ) ) {
+	memory[location] += memory[c];
+      }
     }
 
     /*
      * Top Left Corner
      */
-    if(location = TLC(curr)) {
+    if(location == TLC(curr)) {
       memory[location] += memory[ TLC(curr -1) ];
     }
 
     /*
      * Left No Corners
      */
-
+    if( location > TLC(curr) && location < BLC(curr) ) {
+      tmp = 8*(curr - 2) + 5;
+      a = location - tmp;
+      b = location - tmp - 1;
+      c = location - tmp + 1;
+      memory[location] += memory[a];
+      if( b >= TLC( curr-1 ) ) {
+	memory[location] += memory[b];
+      } else {
+	memory[location] += memory[location-2];
+      }
+      if( c <= BLC( curr-1 ) ) {
+	memory[location] += memory[c];
+      }
+    }
+    
     /*
      * Bottom Left Corner
      */
     if(location == BLC(curr)) {
       memory[location] += memory[ BLC(curr - 1) ];
     }
-
+    
     /*
      * Bottom No Corners
      */
+    if( location > BLC(curr) && location < BRC(curr) ) {
+      tmp = 8*(curr - 2) + 7;
+      a = location - tmp;
+      b = location - tmp - 1;
+      c = location - tmp + 1;
+      memory[location] += memory[a];
+      if( b >= BLC( curr-1 ) ) {
+	memory[location] += memory[b];
+      } else {
+	memory[location] += memory[location-2];
+      }
+      if( c <= BRC( curr-1 ) ) {
+	memory[location] += memory[c];
+      } else {
+	memory[location] += memory[BRC(curr-1)+1];
+      }
+    }
+	
 
     /*
      * Bottom Right Corner
      */
     if( location == BRC(curr)) {
       memory[location] += memory[ BRC(curr -1) ];
+      memory[location] += memory[ BRC(curr -1) +1];
     }
-    
+
+    if( memory[location] > goal ) {
+      cout << "Location: " << location << " is " << memory[location]
+	   << endl;
+      break;
+    }
   }
   
   return 0;
