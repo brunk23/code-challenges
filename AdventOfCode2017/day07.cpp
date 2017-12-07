@@ -27,6 +27,50 @@ bool strequal(string, string);
 bool parseLine(string, Node, int);
 int parseNumber(string);
 
+int weight(Node n[NUMBER], int i) {
+  int j, k, weights[10], index[10];
+
+  if( n[i].totalWeight > 0 ) {
+    return n[i].totalWeight;
+  }
+  if( n[i].holding == 0 ) {
+    n[i].totalWeight = n[i].weight;
+    return n[i].weight;
+  }
+  for(j = 0; j < n[i].holding; j++) {
+    for(k = 0; k < NUMBER; k++) {
+      if( n[k].name == n[i].holds[j] ) {
+	index[j] = k;
+	if( -1 == (weights[j] = weight(n, k) ) ) {
+	  return -1;
+	}
+	break;
+      }
+    }
+  }
+  if( n[i].holding == 1 ) {
+    n[i].totalWeight = weights[0] + n[i].weight;
+    return n[i].totalWeight;
+  }
+  n[i].totalWeight = n[i].weight;
+  for( j = 0; j < n[i].holding; j++ ) {
+    n[i].totalWeight += weights[j];
+    if( j > 0 ) {
+      if( weights[j] == weights[j-1] ) {
+	continue;
+      } else {
+	// NOT EQUAL
+	for( j = 0; j < n[i].holding; j++ ) {
+	  cout << n[index[j]].name << ": " << n[index[j]].weight
+	       << ": " << n[index[j]].totalWeight << endl;
+	}
+	return -1;
+      }
+    }
+  }
+  return n[i].totalWeight;
+}
+
 bool strequal( string a, string b ) {
   int i;
   if( a.length() != b.length() ) {
@@ -114,5 +158,7 @@ int main() {
 
   cout << "Begin at: " << begin << endl;
 
+  weight(n, begin);
+  
   return 0;
 }
