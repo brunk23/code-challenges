@@ -59,10 +59,12 @@ int weight(Node n[NUMBER], int i) {
       if( weights[j] == weights[j-1] ) {
 	continue;
       } else {
-	// NOT EQUAL
+	cout << "Found the unbalanced branch\n\n";
+	cout << "Name\tWeight\tTotal weight\n";
+	cout << "----\t------\t------------\n";
 	for( j = 0; j < n[i].holding; j++ ) {
-	  cout << n[index[j]].name << ": " << n[index[j]].weight
-	       << ": " << n[index[j]].totalWeight << endl;
+	  cout << n[index[j]].name << "\t" << n[index[j]].weight
+	       << "\t" << n[index[j]].totalWeight << endl;
 	}
 	return -1;
       }
@@ -72,7 +74,7 @@ int weight(Node n[NUMBER], int i) {
 }
 
 bool strequal( string a, string b ) {
-  int i;
+  unsigned int i;
   if( a.length() != b.length() ) {
     return false;
   }
@@ -155,8 +157,6 @@ int main() {
     }
     i++;
   }
-
-  cout << "Begin at: " << begin << endl;
 
   weight(n, begin);
   
