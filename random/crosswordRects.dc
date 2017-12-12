@@ -1,0 +1,20 @@
+#!/usr/bin/dc
+
+# macro to count rectangles in a word
+[d 1+ * 2/]sR
+
+# Prompt for the word length
+[[Next word length: ]n?
+lRx
+la + sa
+lb 1- dsb
+0<P]sP
+
+[How many words? ]n?
+sb
+0sa
+lPx
+la
+[How many overlapping? ]n?
+-
+[The are ]nn[ possible rectangles.]p
