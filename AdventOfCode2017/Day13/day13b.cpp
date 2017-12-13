@@ -20,6 +20,7 @@ public:
   Layer() {
     depth = 0;
     length = 0;
+    next = 0;
   }
 
   Layer(int d, int l) {
@@ -48,33 +49,23 @@ public:
     return 0;
   }
 
+  /*
+   * This is not needed, but I wanted to
+   * put the code in for where the scanner
+   * is at a certain time.
+   */
+  int scannerPosition(int time) {
+    int n = time % ( 2 * (length - 1) );
+    if( n < length ) {
+      return n;
+    }
+    return (2 * (length - 1) - n);
+  }
+
 };
 
 Layer *readInput();
-int gcd(int, int);
-int lcm(int, int);
 int cost(Layer *, int);
-
-int gcd(int a, int b) {
-  int t;
-  if( (a<1) || (b<1) ) {
-    return 1;
-  }
-  while( b != 1 ) {
-    t = a % b;
-    if( 0 == t ) {
-      return b;
-    }
-    a = b;
-    b = t;
-  }
-  return 1;
-}
- 
-int lcm(int a, int b) {
-  int t = gcd(a,b);
-  return (a*b)/t;
-}  
 
 Layer *readInput() {
   int i, dep, len;
@@ -106,7 +97,6 @@ Layer *readInput() {
 
 int cost(Layer *head, int t) {
   int i = 0;
-  int cost = 0;
   Layer *curr = head;
   while(curr) {
     if( i > curr->getDepth() ) {
@@ -114,14 +104,13 @@ int cost(Layer *head, int t) {
       continue;
     }
     if( i == curr->getDepth() ) {
-      cost += curr->cost(i + t);
-      if( cost > 0 ) {
-	return cost;
+      if( curr->cost(i + t) > 0 ) {
+	return 1;
       }
     }
     i++;
   }
-  return cost;
+  return 0;
 }
 
 int main() {

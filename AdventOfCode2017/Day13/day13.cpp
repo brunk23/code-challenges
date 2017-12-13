@@ -20,6 +20,7 @@ public:
   Layer() {
     depth = 0;
     length = 0;
+    next = 0;
   }
 
   Layer(int d, int l) {
