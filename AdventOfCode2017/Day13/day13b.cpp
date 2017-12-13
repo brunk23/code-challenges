@@ -115,6 +115,9 @@ int cost(Layer *head, int t) {
     }
     if( i == curr->getDepth() ) {
       cost += curr->cost(i + t);
+      if( cost > 0 ) {
+	return cost;
+      }
     }
     i++;
   }
