@@ -77,7 +77,7 @@ int lcm(int a, int b) {
 }  
 
 Layer *readInput() {
-  int repeat = 1, i, dep, len;
+  int i, dep, len;
   Layer *head = 0;
   Layer *curr = 0;
   string input;
@@ -100,9 +100,7 @@ Layer *readInput() {
       curr->addNext(new Layer(dep, len));
       curr = curr->getNext();
     }
-    repeat = lcm(repeat, (len - 1) * 2);
   }
-  cout << "LCM: " << repeat << endl;
   return head;
 }
 
@@ -133,7 +131,6 @@ int main() {
     i++;
   }
 
-  cout << "It cost: " << cost(head,i) << endl;
   cout << "It is safe after " << i << " picoseconds." << endl;
   return 0;
 }
