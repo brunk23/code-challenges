@@ -176,8 +176,9 @@ void hash(int list[SIZE], string input) {
 int main() {
   int list[SIZE], disk[GRID][GRID];
   unsigned int i;
-  string input = "vbqugkhl";
-  //  string input = "flqrgnkx";
+  string input = "oundnydw";  // Test account
+  //  string input = "vbqugkhl";  // My normal account
+  //  string input = "flqrgnkx";  // The test code
 
   for( i = 0; i < GRID; i++ ) {
     hash(list, input + "-" + to_string(i) );
