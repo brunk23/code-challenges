@@ -13,11 +13,15 @@ private:
 public:
   Generator(long fact, int div, long seed) {
     modulus = 2147483647;     // Given by the problem
-    factor = fact;
-    value = seed;
-    divider = div;
+    factor = fact;            // Diff for each object, given in problem
+    value = seed;             // Individual to each user
+    divider = div;            // Part of the new problem description
   }
 
+  /*
+   * Generate the next number according to the updated rules
+   * for part b.
+   */
   long next() {
     do {
       value *= factor;
@@ -26,20 +30,22 @@ public:
 
     return value;
   }
-};
 
-bool match(long, long);
-
-bool match(long a, long b) {
-  if( (a & 0xffff) == (b & 0xffff) ) {
-    return true;
+  /*
+   * Overload == to perform the match operation. This removes
+   * the need for extra variables and contains this method with
+   * the object definition.
+   */
+  bool operator==(const Generator &rhs) {
+    if( (value & 0xffff) == (rhs.value & 0xffff) ) {
+      return true;
+    }
+    return false;
   }
-  return false;
-}
+};
 
 int main() {
   int i, count = 0;
-  long avalue, bvalue;
   // Given by the problem set.
   //  Generator a(16807, 4, 65);
   //  Generator b(48271, 8, 8921);
@@ -49,9 +55,9 @@ int main() {
   Generator b(48271, 8, 325);                                                                         
 
   for( i = 0; i < 5000000; i++ ) {
-    avalue = a.next();
-    bvalue = b.next();
-    if( match(avalue, bvalue) ) {
+    a.next();
+    b.next();
+    if( a == b ) {
       count++;
     }
   }
