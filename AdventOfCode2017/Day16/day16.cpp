@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 #include <string>
 
 using std::cout;
@@ -8,62 +7,60 @@ using std::endl;
 using std::cerr;
 using std::getline;
 using std::string;
-using std::stringstream;
-
-struct PRG {
-  char name;
-  PRG *prev;
-  PRG *next;
-};
 
 class Programs {
+private:
   int length;
-  PRG *head;
-  PRG *tail;
+  int *list;
+  int *dest;
+
+  void rot() {
+    int i, tmp;
+
+    tmp = list[length - 1];
+    for( i = length - 2; i >= 0; i-- ) {
+      list[i+1] = list[i];
+    }
+    list[0] = tmp;
+  }
   
 public:
   Programs(int number) {
     int i = 0;
     char n = 'a';
-    PRG *curr = 0, *tmp;
-    head = 0;
-    tail = 0;
-    tmp = 0;
     length = number;
+
+    list = new int[number];
+    dest = new int[number];
     
     while( i < number ) {
-      tmp = new PRG;
-
-      tmp->name = n;
+      list[i] = n;
+      dest[i] = 0;
       n++;
-      tmp->prev = 0;
-      tmp->next = 0;
-      
-      if( head == 0 ) {
-	head = tmp;
-	curr = tmp;
-      } else {
-	curr->next = tmp;
-	tmp->prev = curr;
-	curr = tmp;
-      }
       i++;
     }
-    tail = tmp;
   }
 
+  bool isRestart() {
+    int i;
+    for( i = 0; i < length; i++ ) {
+      if(list[i] != ('a' + i)) {
+	return false;
+      }
+    }
+    return true;
+  }
+  
   void partner(char a, char b) {
     int i, p = 0, q = 0;
-    PRG *curr = head;
-    
+ 
     for( i = 0; i < length; i++ ) {
-      if( curr->name == a ) {
+      if( list[i] == a ) {
 	p = i;
       }
-      if( curr->name == b ) {
+      if( list[i] == b ) {
 	q = i;
       }
-      curr = curr->next;
     }
     exchange(p,q);
   }
@@ -72,122 +69,160 @@ public:
    * Exchange was a little tricky.
    */
   void exchange(int a, int b) {
-    int i;
-    PRG *aspot = 0;
-    PRG *bspot = 0;
-    PRG *tmp = head;
+    int tmp;
 
     if( b == a ) {
       return;
     }
-    
-    if( b < a ) {
-      i = a;
-      a = b;
-      b = a;
-    }
-    
-    for(i = 0; i < length; i++ ) {
-      if( i == a ) {
-	aspot = tmp;
-      }
-      if( i == b ) {
-	bspot = tmp;
-      }
-      tmp = tmp->next;
-    }
-    // fails when swapping 1,0
-    if(aspot->prev) {
-      aspot->prev->next = bspot;
-    } else {
-      head = bspot;
-    }
-    if(aspot->next) {
-      aspot->next->prev = bspot;
-    } else {
-      tail = bspot;
-    }
-    if(bspot->prev) {
-      bspot->prev->next = aspot;
-    } else {
-      head = aspot;
-    }
-    if(bspot->next) {
-      bspot->next->prev = aspot;
-    } else {
-      tail = aspot;
-    }
-    
-    tmp = aspot->prev;
-    aspot->prev = bspot->prev;
-    bspot->prev = tmp;
-    tmp = aspot->next;
-    aspot->next = bspot->next;
-    bspot->next = tmp;
+
+    tmp = list[a];
+    list[a] = list[b];
+    list[b] = tmp;
   }
 
   /*
    * Implement the spin
    */
   void spin(int n) {
-    int i = 1;
-    PRG *curr = tail;
-    
-    while( i != n ) {
-      curr = curr->prev;
-      i++;
-    }
+    int i;
 
-    tail->next = head;
-    head->prev = tail;
-    head = curr;
-    tail = curr->prev;
-    head->prev = 0;
-    tail->next = 0;
+    for( i = 0; i < n; i++ ) {
+      rot();
+    }
+  }
+
+  void findDest() {
+    int i;
+    for( i = 0; i < length; i++ ) {
+      dest[ list[i]-'a' ] = i;
+    }
+  }
+
+  void dance() {
+    int tmp[length];
+    int i;
+    for( i = 0; i < length; i++ ) {
+      tmp[ dest[i] ] = list[i];
+    }
+    for( i = 0; i < length; i++ ) {
+      list[i] = tmp[i];
+    }
   }
   
-  char getName(int n) {
-    int i = 0;
-    PRG *curr = head;
-    while( i != n ) {
-      curr = curr->next;
-      i++;
-    }
-    if( n > 0 && n < length-1 ) {
-      if( curr->prev == 0 || curr->next == 0 ) {
-	return '#';
-      }
-    }
-    return curr->name;
-  }
-
   int getlen() {
     return length;
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, const Programs &a) {
+    int i;
+    for( i = 0; i < a.length; i++ ) {
+      os << static_cast<char>(a.list[i]);
+    }
+    return os;
   }
   
 };
 
-void process(Programs &);
-void printall(Programs &);
+struct Demand {
+  char opt;
+  int v1;
+  int v2;
+  char c1;
+  char c2;
+  Demand *next;
+};
+  
+class Command {
+private:
+  Demand *head;
+  Demand *tail;
 
-void printall(Programs &a) {
-  int i;
-
-  for( i = 0; i < a.getlen(); i++ ) {
-    cout << a.getName(i) << "  ";
+  void attach(Demand *tmp) {
+    if( head == 0 ) {
+      head = tmp;
+      tail = tmp;
+      return;
+    }
+    tail->next = tmp;
+    tail = tmp;
   }
-  cout << endl;
-}
+  
+public:
+  Command() {
+    head = 0;
+    tail = 0;
+  }
+
+  void add(int n) {
+    Demand *tmp = new Demand;
+    tmp->opt = 's';
+    tmp->v1 = n;
+    tmp->next = 0;
+    tmp->v2 = -1;
+    tmp->c1 = '#';
+    tmp->c2 = '#';
+
+    attach(tmp);
+  }
+
+  void add(int n, int p) {
+    Demand *tmp = new Demand;
+    tmp->opt = 'x';
+    tmp->v1 = n;
+    tmp->next = 0;
+    tmp->v2 = p;
+    tmp->c1 = '#';
+    tmp->c2 = '#';
+
+    attach(tmp);
+  }
+
+  void add(char n, char p) {
+    Demand *tmp = new Demand;
+    tmp->opt = 'p';
+    tmp->v1 = -1;
+    tmp->next = 0;
+    tmp->v2 = -1;
+    tmp->c1 = n;
+    tmp->c2 = p;
+
+    attach(tmp);
+  }
+
+  void run(Programs &p) {
+    Demand *curr = head;
+
+    while(curr) {
+      switch( curr->opt ) {
+      case 'x':
+	p.exchange(curr->v1, curr->v2);
+	break;
+      case 's':
+	p.spin(curr->v1);
+	break;
+      case 'p':
+	p.partner(curr->c1, curr->c2);
+	break;
+      default:
+	cerr << "Command not found" << endl;
+	return;
+      }
+      curr = curr->next;
+    }
+  }
+};
+
+void process(Programs &);
 
 void process(Programs &prog) {
   string input;
-
+  Command commands;
+  unsigned int i;
   int a, b;
   char p, q;
   
   while( getline(cin, input) ) {
-    for(unsigned int i = 0; i < input.length(); i++ ) {
-      printall(prog);
+    for(i = 0; i < input.length(); i++ ) {
       if(input[i] == 'x' ) {
 	i++;
 	a = 0;
@@ -203,7 +238,8 @@ void process(Programs &prog) {
 	  b += input[i] -'0';
 	  i++;
 	}
-	prog.exchange(a,b);
+ 
+	commands.add(a,b);
 	continue;
       }
       if( input[i] == 'p' ) {
@@ -211,7 +247,7 @@ void process(Programs &prog) {
 	p = input[i];
 	i += 2;
 	q = input[i];
-	prog.partner(p,q);
+	commands.add(p,q);
 	continue;
       }
       if( input[i] == 's' ) {
@@ -222,24 +258,33 @@ void process(Programs &prog) {
 	  a += input[i] - '0';
 	  i++;
 	}
-	prog.spin(a);
+	commands.add(a);
 	continue;
       }
-    } 
+    }
   }
+
+  for( i = 0; i < 1000000000; i++ ) {
+    commands.run(prog);
+    if( prog.isRestart() ) {
+      cout << "We repeat at " << i+1 << " steps so we only need "
+	   << 1000000000 % (i+1) << " iterations." << endl;
+      break;
+    }
+  }
+  a = 1000000000 % (i+1);
+  for( b = 0; b < a; b++ ) {
+    commands.run(prog);
+    cout << b+1 << ": " << prog << endl;
+  }
+  
 }
 
 int main() {
   static int NUMBER = 16;
   Programs a( NUMBER );
 
-  //process(a);
+  process(a);
 
-  printall(a);
-  a.exchange(1,0);
-  printall(a);
-  a.exchange(0,1);
-  printall(a);
-  
   return 0;
 }
