@@ -76,6 +76,16 @@ public:
     PRG *aspot = 0;
     PRG *bspot = 0;
     PRG *tmp = head;
+
+    if( b == a ) {
+      return;
+    }
+    
+    if( b < a ) {
+      i = a;
+      a = b;
+      b = a;
+    }
     
     for(i = 0; i < length; i++ ) {
       if( i == a ) {
