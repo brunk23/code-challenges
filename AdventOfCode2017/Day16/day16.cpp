@@ -12,7 +12,6 @@ class Programs {
 private:
   int length;
   int *list;
-  int *dest;
 
   void rot() {
     int i, tmp;
@@ -31,11 +30,9 @@ public:
     length = number;
 
     list = new int[number];
-    dest = new int[number];
-    
+
     while( i < number ) {
       list[i] = n;
-      dest[i] = 0;
       n++;
       i++;
     }
@@ -90,24 +87,6 @@ public:
       rot();
     }
   }
-
-  void findDest() {
-    int i;
-    for( i = 0; i < length; i++ ) {
-      dest[ list[i]-'a' ] = i;
-    }
-  }
-
-  void dance() {
-    int tmp[length];
-    int i;
-    for( i = 0; i < length; i++ ) {
-      tmp[ dest[i] ] = list[i];
-    }
-    for( i = 0; i < length; i++ ) {
-      list[i] = tmp[i];
-    }
-  }
   
   int getlen() {
     return length;
@@ -155,36 +134,47 @@ public:
 
   void add(int n) {
     Demand *tmp = new Demand;
+
     tmp->opt = 's';
+
     tmp->v1 = n;
-    tmp->next = 0;
     tmp->v2 = -1;
+
     tmp->c1 = '#';
     tmp->c2 = '#';
 
+    tmp->next = 0;
     attach(tmp);
   }
 
   void add(int n, int p) {
     Demand *tmp = new Demand;
+
     tmp->opt = 'x';
+
     tmp->v1 = n;
-    tmp->next = 0;
     tmp->v2 = p;
+
     tmp->c1 = '#';
     tmp->c2 = '#';
+
+    tmp->next = 0;
 
     attach(tmp);
   }
 
   void add(char n, char p) {
     Demand *tmp = new Demand;
+
     tmp->opt = 'p';
+
     tmp->v1 = -1;
-    tmp->next = 0;
     tmp->v2 = -1;
+
     tmp->c1 = n;
     tmp->c2 = p;
+
+    tmp->next = 0;
 
     attach(tmp);
   }
@@ -275,9 +265,11 @@ void process(Programs &prog) {
   a = 1000000000 % (i+1);
   for( b = 0; b < a; b++ ) {
     commands.run(prog);
-    cout << b+1 << ": " << prog << endl;
+    if( b == 0 ) {
+      cout << b+1 << ": " << prog << endl;
+    }
   }
-  
+  cout << b << ": " << prog << endl;
 }
 
 int main() {
