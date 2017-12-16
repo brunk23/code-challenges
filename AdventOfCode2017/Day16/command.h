@@ -20,8 +20,10 @@ private:
 
   Demand *head;
   Demand *tail;
+  int count;
   
   void attach(Demand *tmp) {
+    count++;
     if( head == 0 ) {
       head = tmp;
       tail = tmp;
@@ -35,6 +37,7 @@ public:
   Command() {
     head = 0;
     tail = 0;
+    count = 0;
   }
 
   void add(int n) {
@@ -105,6 +108,11 @@ public:
       curr = curr->next;
     }
   }
+
+  int commandLength() {
+    return count;
+  }
+
 };
 
 #endif

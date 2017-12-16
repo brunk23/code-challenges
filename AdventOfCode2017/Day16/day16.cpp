@@ -61,6 +61,8 @@ void process(Programs &prog) {
     }
   }
 
+  cout << "There are " << commands.commandLength() << " commands" << endl;
+
   for( i = 0; i < 1000000000; i++ ) {
     commands.run(prog);
     if( prog.isRestart() ) {
