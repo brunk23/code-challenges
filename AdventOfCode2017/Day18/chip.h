@@ -23,11 +23,12 @@ enum commands {snd=1, set, rset, madd, radd, mul, rmul,
 class Chip {
  private:
   int code[CODESIZE];
-  int registers[REGNUM];
+  long registers[REGNUM];
   int lastSnd;
   int instPtr;
   int highestInst;
 
+  int isnd(int);
   int iset(int, int);
   int iadd(int, int);
   int imul(int, int);
@@ -40,12 +41,13 @@ class Chip {
 
  public:
   Chip();
+  ~Chip();
   int add(string);
   int step();
   int run();
   int watch();
   void dump();
-
+  void regs();
 };
 
 #endif

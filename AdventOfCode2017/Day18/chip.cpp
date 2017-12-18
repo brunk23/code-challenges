@@ -25,6 +25,10 @@ Chip::Chip() {
   lastSnd = 0;
 }
 
+Chip::~Chip() {
+  cerr << "The chip is dead. Long live the chip." << endl;
+}
+
 /*
  * Will add a command to the chip memory.
  */
@@ -104,7 +108,56 @@ int Chip::add(string command) {
  * The actual commands will be run here
  */
 int Chip::step() {
+  int cmd, dest, arg;
+  
+  cmd = mem(instPtr) / OPFACT;
+  dest = mem(instPtr) % OPFACT;
+  arg = mem(instPtr + 1);
 
+  switch( cmd ) {
+  case snd:
+    isnd(dest);
+    break;
+  case set:
+    iset(dest, arg);
+    break;
+  case rset:
+    iset(dest, reg(arg));
+    break;
+  case madd:
+    iadd(dest, arg);
+    break;
+  case radd:
+    iadd(dest, reg(arg));
+    break;
+  case mul:
+    imul(dest, arg);
+    break;
+  case rmul:
+    imul(dest, reg(arg));
+    break;
+  case mod:
+    imod(dest, arg);
+    break;
+  case rmod:
+    imod(dest, reg(arg));
+    break;
+  case rcv:
+    ircv(dest);
+    break;
+  case jgz:
+    ijgz(dest, arg);
+    return 0; // Do NOT break, instPtr already updates
+  case rjgz:
+    ijgz(dest, reg(arg));
+    return 0;
+  default:
+    cerr << "Invalid instruction " << instPtr << endl;
+    dump();
+    return -1;
+  }
+
+  instPtr += 2;
   return 0;
 }
 
@@ -120,12 +173,39 @@ int Chip::run() {
  * Repeatedly call step watching for rcv
  */
 int Chip::watch() {
-  
+  int cmd, dest;
+
+  while( true) {
+    cmd = mem(instPtr) / OPFACT;
+    dest = mem(instPtr) % OPFACT;
+    if( cmd == rcv && reg(dest) != 0 ) {
+      cerr << "recalled " << lastSnd << endl;
+      break;
+    }
+    if( step() == -1 ) {
+      break;
+    }
+  }
   return 0;
+}
+
+void Chip::regs() {
+  int i;
+  cerr << "iPtr: " << instPtr << endl;
+  cerr << "Nonzero Registers:" << endl;
+  for( i = 0; i < REGNUM; i++ ) {
+    if( registers[i] != 0 ) {
+      cerr << i << ": " << registers[i] << ", ";
+    }
+  }
+  cerr << endl;
 }
 
 void Chip::dump() {
   int i;
+
+  regs();
+
   for( i = 0; i < CODESIZE; i++ ) {
     cerr << code[i] << "\t";
     if( i % 10 == 9 ) {
@@ -137,6 +217,10 @@ void Chip::dump() {
 /********
  * BEGIN PRIVATE METHODS
  *******/
+
+int Chip::isnd(int r) {
+  return lastSnd = reg(r);
+}
 
 int Chip::iset(int r, int v) {
   return registers[r] = v;
@@ -160,21 +244,23 @@ int Chip::imod(int r, int v) {
 
 int Chip::ijgz(int r, int v) {
   if(registers[r] > 0 ) {
-    instPtr += v;
+    instPtr += 2 * v;
+  } else {
+    instPtr += 2;
   }
   return 0;
 }
 
 int Chip::ircv(int r) {
-  if( registers[r] != 0 ) {
+  if( reg(r) != 0 ) {
     cerr << "rcv " << static_cast<char>('a'+r) << " " << lastSnd << endl;
-    return lastSnd;
+    return reg(r);
   }
   return 0;
 }
 
 int Chip::reg(int addr) {
-  return registers[ mem(addr) ];
+  return registers[ addr ];
 }
 
 int Chip::mem(int addr) {

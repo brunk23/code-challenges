@@ -15,7 +15,7 @@ int main() {
     prog.add(input);
   }
 
-  prog.dump();
+  prog.watch();
 
   return 0;
 }
