@@ -15,5 +15,7 @@ int main() {
     prog.add(input);
   }
 
+  prog.dump();
+
   return 0;
 }
