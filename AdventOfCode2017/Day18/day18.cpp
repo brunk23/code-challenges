@@ -5,17 +5,24 @@
 using std::cin;
 using std::getline;
 using std::string;
-
+using std::cout;
+using std::endl;
 
 int main() {
-  Chip prog;
+  Chip c1;
   string input;
 
   while( getline(cin, input) ) {
-    prog.add(input);
+    c1.add(input);
   }
 
-  prog.watch();
+  Chip c2(c1);
+  c1.pair(c2);
+
+  while( (c1.status() != stopped) || (c2.status() != stopped) ) {
+    c1.step();
+    c2.step();
+  }
 
   return 0;
 }

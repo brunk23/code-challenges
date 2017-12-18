@@ -11,22 +11,94 @@ using std::string;
  */
 Chip::Chip() {
   int i;
-  
+
   for( i = 0; i < CODESIZE; i++ ) {
     code[i] = 0;
   }
-  
+
   for( i = 0; i < REGNUM; i++ ) {
     registers[i] = 0;
   }
   registers[26] = 1;
   highestInst = 0;
   instPtr = 0;
-  lastSnd = 0;
+  sent = 0;
+  received = 0;
+  messages = 0;
+  head = 0;
+  tail = 0;
+  id = 0;
+  stat = running;
+  partner = 0;
+}
+
+Chip::Chip(Chip& other) {
+  *this = other;
+}
+
+Chip& Chip::operator=(Chip& other) {
+  int i;
+
+  for( i = 0; i < CODESIZE; i++ ) {
+    code[i] = other.code[i];
+  }
+
+  for( i = 0; i < REGNUM; i++ ) {
+    registers[i] = other.registers[i];
+  }
+  highestInst = other.highestInst;
+  instPtr = other.instPtr;
+  stat = other.stat;
+  id = other.id + 1;
+  registers[15] = id;
+
+  partner = &other;
+
+  // Chips never share message queue.
+  sent = 0;
+  received = 0;
+  messages = 0;
+  head = 0;
+  tail = 0;
+  return *this;
 }
 
 Chip::~Chip() {
-  cerr << "The chip is dead. Long live the chip." << endl;
+  if( messages > 0 ) {
+    while( head ) {
+      tail = head->next;
+      delete head;
+      head = tail;
+    }
+  }
+  cerr << "Chip " << id << ":\tSent: " << sent
+       << "\tReceived: " << received << endl;
+}
+
+void Chip::pair(Chip &other) {
+  partner = &other;
+}
+
+int Chip::status() {
+  return stat;
+}
+
+int Chip::numMessages() {
+  return messages;
+}
+
+long Chip::nextMessage() {
+  long val = head->value;
+  Message *tmp = head;
+  head = head->next;
+  delete tmp;
+  messages--;
+
+  if( messages == 0 ) {
+    head = 0;
+    tail = 0;
+  }
+  return val;
 }
 
 /*
@@ -109,6 +181,10 @@ int Chip::add(string command) {
  */
 int Chip::step() {
   int cmd, dest, arg;
+
+  if( stat == stopped ) {
+    return -1;
+  }
   
   cmd = mem(instPtr) / OPFACT;
   dest = mem(instPtr) % OPFACT;
@@ -162,14 +238,6 @@ int Chip::step() {
 }
 
 /*
- * Repeatedly call step until done
- */
-int Chip::run() {
-
-  return 0;
-}
-
-/*
  * Repeatedly call step watching for rcv
  */
 int Chip::watch() {
@@ -219,7 +287,19 @@ void Chip::dump() {
  *******/
 
 int Chip::isnd(int r) {
-  return lastSnd = reg(r);
+  Message *tmp = new Message;
+  tmp->next = 0;
+  tmp->value = reg(r);
+  sent++;
+  if( messages == 0 ) {
+    head = tmp;
+    tail = tmp;
+  } else {
+    tail->next = tmp;
+    tail = tmp;
+  }
+  messages++;
+  return messages;
 }
 
 int Chip::iset(int r, int v) {
@@ -252,9 +332,17 @@ int Chip::ijgz(int r, int v) {
 }
 
 int Chip::ircv(int r) {
-  if( reg(r) != 0 ) {
-    cerr << "rcv " << static_cast<char>('a'+r) << " " << lastSnd << endl;
-    return reg(r);
+  if( partner->numMessages() > 0 ) {
+    registers[ r ] = partner->nextMessage();
+    stat = running;
+    received++;
+  } else {
+    if( (messages == 0) && (partner->status() != running) ) {
+      stat = stopped;
+    } else {
+      stat = waiting;
+    }
+    instPtr -= 2;
   }
   return 0;
 }

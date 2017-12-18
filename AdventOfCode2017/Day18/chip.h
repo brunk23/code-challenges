@@ -18,15 +18,29 @@ using std::endl;
  * a = 0, b = 1, etc.
  */
 enum commands {snd=1, set, rset, madd, radd, mul, rmul,
-	       mod, rmod, rcv, jgz, rjgz};
+	       mod, rmod, rcv, jgz, rjgz, running, waiting,
+	       stopped};
 
 class Chip {
  private:
+  struct Message {
+    long value;
+    Message *next;
+  };
+
   int code[CODESIZE];
   long registers[REGNUM];
   int lastSnd;
   int instPtr;
   int highestInst;
+  int stat;
+  int id;
+  int sent;
+  int received;
+  int messages;
+  Chip *partner;
+  Message *head;
+  Message *tail;
 
   int isnd(int);
   int iset(int, int);
@@ -41,13 +55,18 @@ class Chip {
 
  public:
   Chip();
+  Chip(Chip&);
   ~Chip();
   int add(string);
   int step();
-  int run();
   int watch();
   void dump();
   void regs();
+  int status();
+  int numMessages();
+  long nextMessage();
+  void pair(Chip &);
+  Chip& operator=(Chip&);
 };
 
 #endif
