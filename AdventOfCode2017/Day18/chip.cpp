@@ -237,26 +237,6 @@ int Chip::step() {
   return 0;
 }
 
-/*
- * Repeatedly call step watching for rcv
- */
-int Chip::watch() {
-  int cmd, dest;
-
-  while( true) {
-    cmd = mem(instPtr) / OPFACT;
-    dest = mem(instPtr) % OPFACT;
-    if( cmd == rcv && reg(dest) != 0 ) {
-      cerr << "recalled " << lastSnd << endl;
-      break;
-    }
-    if( step() == -1 ) {
-      break;
-    }
-  }
-  return 0;
-}
-
 void Chip::regs() {
   int i;
   cerr << "iPtr: " << instPtr << endl;
@@ -347,7 +327,7 @@ int Chip::ircv(int r) {
   return 0;
 }
 
-int Chip::reg(int addr) {
+long Chip::reg(int addr) {
   return registers[ addr ];
 }
 

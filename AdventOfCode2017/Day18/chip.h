@@ -30,7 +30,6 @@ class Chip {
 
   int code[CODESIZE];
   long registers[REGNUM];
-  int lastSnd;
   int instPtr;
   int highestInst;
   int stat;
@@ -49,7 +48,7 @@ class Chip {
   int imod(int, int);
   int ijgz(int, int);
   int ircv(int);
-  int reg(int);
+  long reg(int);
   int mem(int);
   int getint(string);
 
@@ -59,7 +58,6 @@ class Chip {
   ~Chip();
   int add(string);
   int step();
-  int watch();
   void dump();
   void regs();
   int status();
