@@ -43,7 +43,22 @@ int validdirections(string map[LINES], int row, int col, int dir) {
     }
   }
   // Don't turn around.
-  ndir -= dir;
+  switch( dir ) {
+  case up:
+    ndir -= down;
+    break;
+  case down:
+    ndir -= up;
+    break;
+  case right:
+    ndir -= left;
+    break;
+  case left:
+    ndir -= right;
+    break;
+  default:
+    break;
+  }
 
   return ndir;
 }
@@ -54,6 +69,9 @@ int validdirections(string map[LINES], int row, int col, int dir) {
  */
 bool canDown(string map[LINES], int row, int col) {
   if( (row < LINES - 2) && (map[row+1][col] != ' ' )) {
+    if( map[row][col] == '+' && map[row+1][col] == '+' ) {
+      return false;
+    }
       return true;
   }
   return false;
@@ -61,6 +79,9 @@ bool canDown(string map[LINES], int row, int col) {
 
 bool canUp(string map[LINES], int row, int col) {
   if( (row > 0) && (map[row-1][col] != ' ') ) {
+    if( map[row][col] == '+' && map[row-1][col] == '+' ) {
+      return false;
+    }
     return true;
   }
   return false;
@@ -68,6 +89,9 @@ bool canUp(string map[LINES], int row, int col) {
 
 bool canRight(string map[LINES], int row, int col) {
   if( (col < map[row].length() - 2) && (map[row][col+1] != ' ') ) {
+    if( map[row][col] == '+' && map[row][col+1] == '+' ) {
+      return false;
+    }
     return true;
   }
   return false;
@@ -75,6 +99,9 @@ bool canRight(string map[LINES], int row, int col) {
 
 bool canLeft(string map[LINES], int row, int col) {
   if( (col > 0) && (map[row][col-1] != ' ') ) {
+    if( map[row][col] == '+' && map[row][col-1] == '+' ) {
+      return false;
+    }
     return true;
   }
   return false;
