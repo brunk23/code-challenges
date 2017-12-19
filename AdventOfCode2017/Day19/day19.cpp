@@ -61,13 +61,14 @@ bool validDest(string map[LINES], int row, int col) {
 }
 
 void walker(string map[LINES]) {
-  int row = 0, col = 0;
+  int row = 0, col = 0, steps = 0;
   int direction = down;
   bool deadend = false;
 
   col = findStart(map[row]);
 
   while( !deadend ) {
+    steps++;
     if( map[row][col] >= 'A' && map[row][col] <= 'Z' ) {
       cout << map[row][col];
     }
@@ -144,9 +145,8 @@ void walker(string map[LINES]) {
       cout << "How did you get here?" << endl;
       break;
     }    
-}
-
-  cout << endl;
+  }
+  cout << endl << "We went " << steps << " steps." << endl;
 }
 
 int main() {
