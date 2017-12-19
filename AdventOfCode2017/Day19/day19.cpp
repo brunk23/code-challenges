@@ -9,200 +9,141 @@ using std::endl;
 
 #define LINES 201
 
-void walker(string[LINES]);
-bool canDown(string[LINES], int, int);
-bool canUp(string[LINES], int, int);
-bool canRight(string[LINES], int, int);
-bool canLeft(string[LINES], int, int);
+enum dirs { up = 1, down = 2, right = 4, left = 8 };
+
 int findStart(string);
-int validdirections(string[LINES],int, int, int);
+void walker(string[LINES]);
+bool validDest(string[LINES], int, int);
+bool validLR(string[LINES], int, int);
+bool validUD(string[LINES], int, int);
 
-enum dirs { down = 1, up = 2, right = 4, left = 8 };
-
-int validdirections(string map[LINES], int row, int col, int dir) {
-  int ndir = 0;
-  
-  if( canDown(map, row, col) ) {
-    ndir += down;
-  }
-  if( canUp(map, row, col) ) {
-    ndir += up;
-  }
-  if( canRight(map, row, col) ) {
-    ndir += right;
-  }
-  if( canLeft(map, row, col) ) {
-    ndir += left;
-  }
-
-  if( map[row][col] != '+' ) {
-    if( dir == right || dir == left ) {
-      ndir |= (right+left);
-    } else {
-      ndir |= (up + down);
-    }
-  } else {
-    ndir -= dir;
-  }
-  // Don't turn around.
-  switch( dir ) {
-  case up:
-    ndir &= (up+right+left);
-    break;
-  case down:
-    ndir &= (down+left+right);
-    break;
-  case right:
-    ndir &= (right+up+down);
-    break;
-  case left:
-    ndir &= (left+up+down);
-    break;
-  default:
-    break;
-  }
-
-  return ndir;
-}
-
-/*
- * I am not sure these are correct, right now.  Should test that
- * we don't try and cross.
- */
-bool canDown(string map[LINES], int row, int col) {
-  if( (row < LINES - 2) && (map[row+1][col] != ' ' )) {
-    return true;
-  }
-  return false;
-}
-
-bool canUp(string map[LINES], int row, int col) {
-  if( (row > 0) && (map[row-1][col] != ' ') ) {
-    return true;
-  }
-  return false;
-}
-
-bool canRight(string map[LINES], int row, int col) {
-  if( (col < map[row].length() - 2) && (map[row][col+1] != ' ') ) {
-    return true;
-  }
-  return false;
-}
-
-bool canLeft(string map[LINES], int row, int col) {
-  if( (col > 0) && (map[row][col-1] != ' ') ) {
-    return true;
-  }
-  return false;
-}
-
-int findStart(string a) {
+int findStart(string s) {
   int i;
-
-  for( i = 0; i < a.length(); i++ ) {
-    if( '|' == a[i] ) {
+  for( i = 0; i < s.length(); i++ ) {
+    if( s[i] == '|' ) {
       return i;
     }
   }
   return -1;
 }
 
+bool validUD(string map[LINES], int row, int col) {
+  if( !validDest(map, row, col) ) {
+    return false;
+  }
+  if( map[row][col] == '-' ) {
+    return false;
+  }
+  return true;
+}
+
+bool validLR(string map[LINES], int row, int col) {
+  if( !validDest(map, row, col) ) {
+    return false;
+  }
+  if( map[row][col] == '|' ) {
+    return false;
+  }
+  return true;
+}
+
+bool validDest(string map[LINES], int row, int col) {
+  if( row < 0 || row >= LINES ) {
+    return false;
+  }
+  if( col < 0 || col >= map[row].length() ) {
+    return false;
+  }
+  if( map[row][col] == ' ' ) {
+    return false;
+  }
+  return true;
+}
+
 void walker(string map[LINES]) {
   int row = 0, col = 0;
-  int direction = down, possible;
+  int direction = down;
   bool deadend = false;
 
   col = findStart(map[row]);
 
   while( !deadend ) {
-    cout << row << "," << col << endl;
     if( map[row][col] >= 'A' && map[row][col] <= 'Z' ) {
       cout << map[row][col];
     }
-    possible = validdirections(map, row, col, direction);
+
+    // CHANGE DIRECTION
+    if( map[row][col] == '+' ) {
+      if( direction == up || direction == down ) {
+	if( validLR(map, row, col - 1) ) {
+	  direction = left;
+	  col--;
+	  continue;
+	} else {
+	  if( validLR(map, row, col + 1) ) {
+	    direction = right;
+	    col++;
+	    continue;
+	  } else {
+	    deadend = true;
+	    continue;
+	  }
+	}
+      } else {
+	if( validUD(map, row - 1, col) ) {
+	  direction = up;
+	  row--;
+	  continue;
+	} else {
+	  if( validUD(map, row + 1, col) ) {
+	    direction = down;
+	    row++;
+	    continue;
+	  } else {
+	    deadend = true;
+	    continue;
+	  }
+	}
+      }
+    }
+
     switch( direction ) {
     case down:
-      if( possible & down ) {
+      if( validDest(map, row+1, col) ) {
 	row++;
-	continue;
       } else {
-	if( possible & right ) {
-	  col++;
-	  direction = right;
-	  continue;
-	}
-	if( possible & left ) {
-	  col--;
-	  direction = left;
-	  continue;
-	}
 	deadend = true;
       }
       break;
       
     case up:
-      if( possible & up ) {
+      if( validDest(map, row-1, col) ) {
 	row--;
-	continue;
       } else {
-	if( possible & left ) {
-	  col--;
-	  direction = left;
-	  continue;
-	}
-	if( possible & right ) {
-	  col++;
-	  direction = right;
-	  continue;
-	}
+	deadend = true;
       }
-      deadend = true;
       break;
       
     case right:
-      if( possible & right ) {
+      if( validDest(map, row, col+1) ) {
 	col++;
-	continue;
       } else {
-	if( possible & up ) {
-	  row--;
-	  direction = up;
-	  continue;
-	}
-	if( possible & down ) {
-	  row++;
-	  direction = down;
-	  continue;
-	}
+	deadend = true;
       }
-      deadend = true;
       break;
-    
+
     case left:
-      if( possible & left ) {
+      if( validDest(map, row, col-1) ) {
 	col--;
-	continue;
       } else {
-	if( possible & down ) {
-	  row++;
-	  direction = down;
-	  continue;
-	}
-	if( possible & up ) {
-	  row--;
-	  direction = up;
-	  continue;
-	}
+	deadend = true;
       }
-      deadend = true;
       break;
-    
+
     default:
       cout << "How did you get here?" << endl;
       break;
-    }
-    
+    }    
 }
 
   cout << endl;
@@ -219,8 +160,6 @@ int main() {
   }
 
   walker(map);
-
-  cout << "Read " << x << " lines." << endl;
 
   return 0;
 }
