@@ -41,20 +41,22 @@ int validdirections(string map[LINES], int row, int col, int dir) {
     } else {
       ndir |= (up + down);
     }
+  } else {
+    ndir -= dir;
   }
   // Don't turn around.
   switch( dir ) {
   case up:
-    ndir -= down;
+    ndir &= (up+right+left);
     break;
   case down:
-    ndir -= up;
+    ndir &= (down+left+right);
     break;
   case right:
-    ndir -= left;
+    ndir &= (right+up+down);
     break;
   case left:
-    ndir -= right;
+    ndir &= (left+up+down);
     break;
   default:
     break;
@@ -69,19 +71,13 @@ int validdirections(string map[LINES], int row, int col, int dir) {
  */
 bool canDown(string map[LINES], int row, int col) {
   if( (row < LINES - 2) && (map[row+1][col] != ' ' )) {
-    if( map[row][col] == '+' && map[row+1][col] == '+' ) {
-      return false;
-    }
-      return true;
+    return true;
   }
   return false;
 }
 
 bool canUp(string map[LINES], int row, int col) {
   if( (row > 0) && (map[row-1][col] != ' ') ) {
-    if( map[row][col] == '+' && map[row-1][col] == '+' ) {
-      return false;
-    }
     return true;
   }
   return false;
@@ -89,9 +85,6 @@ bool canUp(string map[LINES], int row, int col) {
 
 bool canRight(string map[LINES], int row, int col) {
   if( (col < map[row].length() - 2) && (map[row][col+1] != ' ') ) {
-    if( map[row][col] == '+' && map[row][col+1] == '+' ) {
-      return false;
-    }
     return true;
   }
   return false;
@@ -99,9 +92,6 @@ bool canRight(string map[LINES], int row, int col) {
 
 bool canLeft(string map[LINES], int row, int col) {
   if( (col > 0) && (map[row][col-1] != ' ') ) {
-    if( map[row][col] == '+' && map[row][col-1] == '+' ) {
-      return false;
-    }
     return true;
   }
   return false;
@@ -126,6 +116,7 @@ void walker(string map[LINES]) {
   col = findStart(map[row]);
 
   while( !deadend ) {
+    cout << row << "," << col << endl;
     if( map[row][col] >= 'A' && map[row][col] <= 'Z' ) {
       cout << map[row][col];
     }
