@@ -15,8 +15,38 @@ bool canUp(string[LINES], int, int);
 bool canRight(string[LINES], int, int);
 bool canLeft(string[LINES], int, int);
 int findStart(string);
+int validdirections(string[LINES],int, int, int);
 
-enum dirs { down, up, right, left };
+enum dirs { down = 1, up = 2, right = 4, left = 8 };
+
+int validdirections(string map[LINES], int row, int col, int dir) {
+  int ndir = 0;
+  
+  if( canDown(map, row, col) ) {
+    ndir += down;
+  }
+  if( canUp(map, row, col) ) {
+    ndir += up;
+  }
+  if( canRight(map, row, col) ) {
+    ndir += right;
+  }
+  if( canLeft(map, row, col) ) {
+    ndir += left;
+  }
+
+  if( map[row][col] != '+' ) {
+    if( dir == right || dir == left ) {
+      ndir |= (right+left);
+    } else {
+      ndir |= (up + down);
+    }
+  }
+  // Don't turn around.
+  ndir -= dir;
+
+  return ndir;
+}
 
 /*
  * I am not sure these are correct, right now.  Should test that
@@ -63,7 +93,7 @@ int findStart(string a) {
 
 void walker(string map[LINES]) {
   int row = 0, col = 0;
-  int direction = down;
+  int direction = down, possible;
   bool deadend = false;
 
   col = findStart(map[row]);
@@ -72,96 +102,90 @@ void walker(string map[LINES]) {
     if( map[row][col] >= 'A' && map[row][col] <= 'Z' ) {
       cout << map[row][col];
     }
+    possible = validdirections(map, row, col, direction);
     switch( direction ) {
     case down:
-      if( canDown(map, row, col) ) {
+      if( possible & down ) {
 	row++;
 	continue;
       } else {
-	if( map[row][col] == '+' ) {
-	  if( canRight(map, row, col) ) {
-	    col++;
-	    direction = right;
-	    continue;
-	  }
-	  if( canLeft(map, row, col) ) {
-	    col--;
-	    direction = left;
-	    continue;
-	  }
-	  deadend = true;
+	if( possible & right ) {
+	  col++;
+	  direction = right;
+	  continue;
 	}
+	if( possible & left ) {
+	  col--;
+	  direction = left;
+	  continue;
+	}
+	deadend = true;
       }
       break;
-
+      
     case up:
-      if( canUp(map, row, col) ) {
+      if( possible & up ) {
 	row--;
 	continue;
       } else {
-	if( map[row][col] == '+' ) {
-	  if( canLeft(map, row, col) ) {
-	    col--;
-	    direction = left;
-	    continue;
-	  }
-	  if( canRight(map, row, col) ) {
-	    col++;
-	    direction = right;
-	    continue;
-	  }
-	  deadend = true;
+	if( possible & left ) {
+	  col--;
+	  direction = left;
+	  continue;
+	}
+	if( possible & right ) {
+	  col++;
+	  direction = right;
+	  continue;
 	}
       }
+      deadend = true;
       break;
-
+      
     case right:
-      if( canRight(map, row, col) ) {
+      if( possible & right ) {
 	col++;
 	continue;
       } else {
-	if( map[row][col] == '+' ) {
-	  if( canUp(map, row, col) ) {
-	    row--;
-	    direction = up;
-	    continue;
-	  }
-	  if( canDown(map, row, col) ) {
-	    row++;
-	    direction = down;
-	    continue;
-	  }
-	  deadend = true;
+	if( possible & up ) {
+	  row--;
+	  direction = up;
+	  continue;
+	}
+	if( possible & down ) {
+	  row++;
+	  direction = down;
+	  continue;
 	}
       }
+      deadend = true;
       break;
-
+    
     case left:
-      if( canLeft(map, row, col) ) {
+      if( possible & left ) {
 	col--;
 	continue;
       } else {
-	if( map[row][col] == '+' ) {
-	  if( canDown(map, row, col) ) {
-	    row++;
-	    direction = down;
-	    continue;
-	  }
-	  if( canUp(map, row, col) ) {
-	    row--;
-	    direction = up;
-	    continue;
-	  }
-	  deadend = true;
+	if( possible & down ) {
+	  row++;
+	  direction = down;
+	  continue;
+	}
+	if( possible & up ) {
+	  row--;
+	  direction = up;
+	  continue;
 	}
       }
+      deadend = true;
       break;
-
+    
     default:
       cout << "How did you get here?" << endl;
+      break;
     }
-
-  }
+    
+}
 
   cout << endl;
 }
