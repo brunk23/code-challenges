@@ -3,18 +3,21 @@
 
 #include <iostream>
 #include <string>
+#include "tlist.h"
 
 class Art {
  private:
   const unsigned int size;
   char *pic;
+  TList *t;
 
  public:
-  Art(int);
+  Art(int, TList *);
   ~Art();
 
   int pixels();
   void fill(std::string);
+  unsigned int nextsize();
   std::string box2(int,int);
   std::string box3(int,int);
 

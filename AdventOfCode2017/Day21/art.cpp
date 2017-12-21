@@ -1,9 +1,11 @@
 #include <string>
 #include "art.h"
+#include "tlist.h"
 
-Art::Art(int n) : size(n)
+Art::Art(int n, TList *x) : size(n)
 {
   int i,j;
+  t = x;
   pic = new char[size*size];
   for( i = 0; i < n; i++ ) {
     for( j = 0; j < n; j++ ) {
@@ -14,6 +16,17 @@ Art::Art(int n) : size(n)
 
 Art::~Art() {
   delete pic;
+}
+
+unsigned int Art::nextsize() {
+  if( (size % 2) == 0 ) {
+    return size+size/2;
+  }
+  if( (size % 3) == 0 ) {
+    return size+size/3;
+  }
+  std::cerr << "New size failed." << std::endl;
+  return 2;
 }
 
 void Art::fill(std::string s) {
