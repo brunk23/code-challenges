@@ -38,11 +38,22 @@ void Art::fill(std::string s) {
  * Will make the new object.
  */
 void Art::transform() {
+  int n, i, j;
+  std::string old, trns;
   nsize = nextsize();
   npic = new char[nsize * nsize];
-
-  // call internal fill here
-
+  if( (size % 2) == 0 ) {
+    n = 2;
+  } else {
+    n = 3;
+  }
+  for(i = 0; i < size/n; i++) {
+    for(j = 0; j < size/n; j++) {
+      old = box(n, i, j);
+      trns = t->transform(old);
+      fill(i, j, trns);
+    }
+  }
   delete pic;
   pic = npic;
   size = nsize;

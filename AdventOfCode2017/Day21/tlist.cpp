@@ -72,5 +72,11 @@ void TList::add(std::string s) {
 std::string TList::transform(std::string s) {
   std::string n = "";
 
+  if( s.length() == 4 ) {
+    n = "#...#...#";
+  } else {
+    n = "##...##..#.#..##";
+  }
   return n;
 }
+  

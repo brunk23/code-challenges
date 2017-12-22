@@ -8,11 +8,18 @@ using std::cerr;
 
 int main() {
   TList tr;
-  Art start(4,&tr);
+  Art start(3,&tr);
 
-  start.fill("################");
+  start.fill(".........");
   cout << start << endl;
-
+  start.transform();
+  cout << start << endl;
+  start.transform();
+  cout << start << endl;
+  start.transform();
+  cout << start << endl;
+  start.transform();
+  cout << start << endl;
   cout << start.pixels() << endl;
   
   return 0;
