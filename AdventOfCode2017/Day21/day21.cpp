@@ -8,23 +8,12 @@ using std::cerr;
 
 int main() {
   TList tr;
-  Art start(3,&tr);
-  int i;
-  unsigned int j;
+  Art start(16,&tr);
 
-  start.fill(".#...####");
+  start.fill(3,0,"################");
   cout << start << endl;
 
   cout << start.pixels() << endl;
-
-  Art tmp(3,&tr);
-  j = 3;
-
-  for( i = 0; i < 20; i++ ) {
-    Art tmp(j,&tr);
-    j =  tmp.nextsize();
-    cout << i+2 << ": " << j << "x" << j << "=" << j*j<< endl;
-  }
   
   return 0;
 }

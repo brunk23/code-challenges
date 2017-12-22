@@ -17,6 +17,7 @@ class Art {
 
   int pixels();
   void fill(std::string);
+  void fill(int, int, std::string);
   unsigned int nextsize();
   std::string box2(int,int);
   std::string box3(int,int);

@@ -40,6 +40,35 @@ void Art::fill(std::string s) {
   }
 }
 
+void Art::fill(int x, int y, std::string s) {
+  int fact = -1;
+  unsigned int i, j;
+  if( s.length() == 9 ) {
+    if( (size % 3) == 0 ) {
+      fact = 3;
+    } else {
+      fact = -1;
+    }
+  } else {
+    if( s.length() == 16 ) {
+      if( (size % 4) == 0 ) {
+	fact = 4;
+      } else {
+	fact = -1;
+      }
+    }
+  }
+  if( fact == -1 ) {
+    std::cerr << "BAD FILL LENGTH" << std::endl;
+    return;
+  }
+  for( i = 0 ; i < fact; i++ ) {
+    for( j = 0; j < fact; j++ ) {
+      pic[(x*fact+i)*size + y*fact+j] = s[i*fact + j];
+    }
+  }
+}
+
 int Art::pixels() {
   unsigned int i;
   int count = 0;

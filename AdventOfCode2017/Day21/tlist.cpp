@@ -24,8 +24,8 @@ TList::~TList() {
 }
 
 void TList::add(std::string s) {
-  string inp = "", outp = "";
-  unsigned int i, count, state = 0;
+  std::string inp = "", outp = "";
+  unsigned int i, state = 0;
   transf *tmp = new transf;
 
   for(i = 0; i < s.length(); i++) {
