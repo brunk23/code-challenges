@@ -7,20 +7,22 @@
 
 class Art {
  private:
-  const unsigned int size;
+  unsigned int size;
+  unsigned int nsize;
   char *pic;
+  char *npic;
   TList *t;
+
+  void fill(int, int, std::string);
+  unsigned int nextsize();
+  std::string box(int,int,int);
 
  public:
   Art(int, TList *);
   ~Art();
-
+  void transform();
   int pixels();
   void fill(std::string);
-  void fill(int, int, std::string);
-  unsigned int nextsize();
-  std::string box2(int,int);
-  std::string box3(int,int);
 
   friend std::ostream& operator<<(std::ostream&, const Art&);
 };

@@ -8,9 +8,9 @@ using std::cerr;
 
 int main() {
   TList tr;
-  Art start(16,&tr);
+  Art start(4,&tr);
 
-  start.fill(3,0,"################");
+  start.fill("################");
   cout << start << endl;
 
   cout << start.pixels() << endl;
