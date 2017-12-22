@@ -1,26 +1,33 @@
 #include <iostream>
+#include <string>
 #include "art.h"
 
 using std::cout;
 using std::cin;
 using std::endl;
 using std::cerr;
+using std::string;
+using std::getline;
 
 int main() {
   TList tr;
-  Art start(3,&tr);
+  Art art(3,&tr);
+  int i;
+  string input;
 
-  start.fill(".........");
-  cout << start << endl;
-  start.transform();
-  cout << start << endl;
-  start.transform();
-  cout << start << endl;
-  start.transform();
-  cout << start << endl;
-  start.transform();
-  cout << start << endl;
-  cout << start.pixels() << endl;
-  
+  art.fill(".#...####");
+
+  while( getline(cin, input) ) {
+    tr.add(input);
+  }
+
+  for( i = 0; i < 18; i++ ) {
+    if( i == 5 ) {
+      cout << "5: " << art.pixels() << endl;
+    }
+    art.transform();
+  }
+  cout << "18: " << art.pixels() << endl;
+
   return 0;
 }

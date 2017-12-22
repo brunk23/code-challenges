@@ -97,7 +97,7 @@ void Art::fill(int x, int y, std::string s) {
     }
   }
   if( fact == -1 ) {
-    std::cerr << "BAD FILL LENGTH" << std::endl;
+    std::cerr << "BAD FILL LENGTH: " << s << std::endl;
     return;
   }
   for( i = 0 ; i < fact; i++ ) {

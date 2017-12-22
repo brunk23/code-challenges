@@ -17,6 +17,13 @@ class TList {
   transf *headthree;
   transf *tailthree;
 
+  bool isMatch(std::string, std::string);
+  bool cmpA(char [3][3], char [3][3], int);
+  void flipA(char [3][3], char [3][3], int);
+  void rotA(char [3][3], char [3][3], int);
+  void cpA(char [3][3], char[3][3], int);
+  void printA(char [3][3], int);
+
  public:
   TList();
   ~TList();
