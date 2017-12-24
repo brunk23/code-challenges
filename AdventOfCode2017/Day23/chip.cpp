@@ -212,6 +212,10 @@ int Chip::step() {
   cmd = mem(instPtr) / OPFACT;
   dest = mem(instPtr) % OPFACT;
   arg = mem(instPtr + 1);
+
+  if( instPtr == 42 ) {
+    regs();
+  }
   
   switch( cmd ) {
   case snd:
@@ -331,8 +335,6 @@ int Chip::isub(int r, int v) {
 }
 
 int Chip::imul(int r, int v) {
-  mulcount++;
-  std::cerr << mulcount << std::endl;
   return registers[r] *= v;
 }
 

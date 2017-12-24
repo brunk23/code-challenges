@@ -9,7 +9,7 @@ int main() {
   while( std::getline(std::cin, input) ) {
     a.add(input);
   }
-
+  a.dump();
   while(a.status() == running) {
     a.step();
   }

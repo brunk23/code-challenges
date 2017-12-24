@@ -107,7 +107,7 @@ void loadState() {
 	value = 0;
 	negative = false;
 	for(i = 0; i < input.length(); i++){
-	  if( input[i] = '-' ) {
+	  if( input[i] == '-' ) {
 	    negative = true;
 	    continue;
 	  }
