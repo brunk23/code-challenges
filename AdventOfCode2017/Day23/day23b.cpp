@@ -16,10 +16,17 @@ bool isPrime(int a) {
 }
 
 int main() {
-  int number = 107900;
+  int number = 107900, upper;
   int count = 0;
-  
-  while( number <= 124900 ) {
+
+  std::cout << "What's your input's initial b: ";
+  std::cin >> number;
+
+  number *= 100;
+  number += 100000;
+  upper = number + 17000;
+
+  while( number <= upper ) {
     if( !isPrime(number)) {
       count++;
     }
