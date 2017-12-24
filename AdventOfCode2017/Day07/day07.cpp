@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
 
-#define NUMBER 1089
+// 1089 for normal account
+// 1512 for other account
+#define NUMBER 1512
 
 using std::string;
 using std::cout;
@@ -144,7 +146,8 @@ bool parseLine(string line, Node n[NUMBER], int loc) {
 
 int main() {
   Node n[NUMBER];
-  string line, start = "dgoocsw";
+  // string line, start = "dgoocsw";
+  string line, start = "vvsvez";
   int i = 0, begin;
 
   while( getline(cin, line) ) {
