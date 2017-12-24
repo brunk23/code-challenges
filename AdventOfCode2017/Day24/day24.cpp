@@ -10,28 +10,7 @@ using std::string;
 using std::getline;
 using std::stringstream;
 
-class Bridge {
-public:
-  int len;
-  int str;
-
-  Bridge(int ln, int sr) {
-    len = ln;
-    str = sr;
-  }
-  
-  Bridge &operator=(const Bridge &o) {
-    len = o.len;
-    str = o.str;
-    return *this;
-  }
-  
-  Bridge &operator=(Bridge &o) {
-    len = o.len;
-    str = o.str;
-    return *this;
-  }
-};
+#define PART2
 
 class Used {
 private:
@@ -109,9 +88,14 @@ public:
 };
 
 int makebridge(int y, int n, Port list[], Used u, int len) {
+  static int mlen = 0;
   int x, count = 0, tmp, max;
   Used p(u);
   p.use(n);
+
+  if( len > mlen ) {
+    mlen = len;
+  }
   
   x = list[n].hasNum(y);
   
@@ -129,11 +113,15 @@ int makebridge(int y, int n, Port list[], Used u, int len) {
       }
     }
   }
+  
+#ifdef PART2
   if( count == 0 ) {
-    if( len < 30 ) {
-      return -1000;
+    if( len < mlen ) {
+      return -100;
     }
   }
+#endif
+
   return max;
 }
 
