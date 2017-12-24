@@ -22,6 +22,8 @@ int main() {
   std::cout << "What's your input's initial b: ";
   std::cin >> number;
 
+  std:: cout << "Part a: " << (number-2)*(number-2) << std::endl;
+
   number *= 100;
   number += 100000;
   upper = number + 17000;
@@ -33,7 +35,7 @@ int main() {
     number += 17;
   }
 
-  std::cout << count << std::endl;
+  std::cout << "Part b: " << count << std::endl;
   
   return 0;
 }
