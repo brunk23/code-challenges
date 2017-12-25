@@ -1,7 +1,5 @@
 #include <iostream>
 
-
-
 class Tape {
 private:
   int *tp;
@@ -88,10 +86,8 @@ int main() {
   Tape t;
   int state = a, location = 0, minl =0, maxl =0;
   long count = 0;
-
-  // 12523873
-  
-  while( count < 12523873) {
+ 
+  while( count < 12172063) {
     count++;
     if( location < minl) {
       minl = location;
