@@ -1,5 +1,7 @@
 #include <iostream>
 
+
+
 class Tape {
 private:
   int *tp;
@@ -107,64 +109,64 @@ int main() {
 	location++;
 	state = b;
       } else {
-	t.setVal(location, 1);
+	t.setVal(location, 0);
 	location--;
-	state = e;
+	state = c;
       }
       break;
     case b:
       if(t.getVal(location) == 0 ) {
 	t.setVal(location, 1);
-	location++;
-	state = c;
+	location--;
+	state = a;
       } else {
 	t.setVal(location, 1);
-	location++;
-	state = f;
+	location--;
+	state = d;
       }
       break;
     case c:
       if(t.getVal(location) == 0 ) {
 	t.setVal(location, 1);
-	location--;
+	location++;
 	state = d;
       } else {
 	t.setVal(location, 0);
 	location++;
-	state = b;
+	state = c;
       }
       break;
     case d:
       if(t.getVal(location) == 0 ) {
-	t.setVal(location, 1);
-	location++;
-	state = e;
-      } else {
 	t.setVal(location, 0);
 	location--;
-	state = c;
+	state = b;
+      } else {
+	t.setVal(location, 0);
+	location++;
+	state = e;
       }
       break;
     case e:
       if(t.getVal(location) == 0 ) {
 	t.setVal(location, 1);
-	location--;
-	state = a;
-      } else {
-	t.setVal(location, 0);
 	location++;
-	state = d;
+	state = c;
+      } else {
+	t.setVal(location, 1);
+	location--;
+	state = f;
       }
       break;
     case f:
       if(t.getVal(location) == 0 ) {
 	t.setVal(location, 1);
-	location++;
-	state = a;
+	location--;
+	state = e;
       } else {
 	t.setVal(location, 1);
 	location++;
-	state = c;
+	state = a;
       }
       break;
 
