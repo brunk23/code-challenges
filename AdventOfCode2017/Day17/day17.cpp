@@ -51,7 +51,8 @@ public:
 
 int main() {
   int i;
-  CBuff b(328);
+  // CBuff b(328);
+  CBuff b(355);
   
   for(i = 0; i < 2017; i++ ) {
     cout << i+1 << ": " << b.step() << endl;
