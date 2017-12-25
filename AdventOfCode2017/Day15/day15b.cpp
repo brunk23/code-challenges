@@ -51,8 +51,12 @@ int main() {
   //  Generator b(48271, 8, 8921);
 
   // Given by my specific input
-  Generator a(16807, 4, 783);
-  Generator b(48271, 8, 325);                                                                         
+  // Generator a(16807, 4, 783);
+  // Generator b(48271, 8, 325);
+
+  // Given by my specific input alt account
+  Generator a(16807, 4, 634);
+  Generator b(48271, 8, 301);
 
   for( i = 0; i < 5000000; i++ ) {
     a.next();

@@ -40,8 +40,13 @@ int main() {
   //  Generator b(48271, 8921);
 
   // Given by my specific input
-  Generator a(16807, 783);
-  Generator b(48271, 325);                                                                         
+  // Generator a(16807, 783);
+  // Generator b(48271, 325);
+
+  // Given by my specific input alt account
+  Generator a(16807, 634);
+  Generator b(48271, 301);                                                                         
+
 
   for( i = 0; i < 40000000; i++ ) {
     avalue = a.next();

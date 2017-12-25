@@ -3,9 +3,6 @@
 
 #include "nodep2.h"
 
-// Adding 1 turns right, sub 1 turns left
-enum Directions { up, right, down, left };
-
 class Carrier {
  private:
   int location[2];

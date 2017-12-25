@@ -14,66 +14,67 @@ using std::stringstream;
 
 class Used {
 private:
-  int l[54];
+  int *l;
+  int max;
 
 public:
-  Used() {
+  Used(int n) {
     int i;
-    for( i = 0; i < 54; i++ ) {
+    max = n;
+    l = new int[n];
+    for( i = 0; i < n; i++ ) {
       l[i] = 0;
     }
-  }
+  };
+
+  ~Used() {
+    delete l;
+  };
 
   Used(Used &a) {
     int i;
-    for( i = 0; i < 54; i++ ) {
+    l = new int[a.max];
+    max = a.max;
+    for( i = 0; i < a.max; i++ ) {
       l[i] = a.l[i];
     }
-  }
+  };
 
   bool avail(int i) {
     if( l[i] == 0 ) {
       return true;
     }
     return false;
-  }
+  };
 
   void use(int i) {
     l[i] = 1;
-  }
+  };
+
+  int mx() {
+    return max;
+  };
 };
 
 class Port {
 private:
   int a;
   int b;
-  bool used;
   
 public:
   Port() {
     a = -1;
     b = -1;
-    used = false;
   }
   
   Port(int x, int y) {
     a = x;
     b = y;
-    used = false;
   }
 
   void assign(int x, int y) {
     a = x;
     b = y;
-    used = false;
-  }
-
-  void reset() {
-    used = false;
-  }
-
-  void use() {
-    used = true;
   }
 
   int hasNum(int n) {
@@ -102,7 +103,7 @@ int makebridge(int y, int n, Port list[], Used u, int len) {
   tmp = x + y;
   max = x + y;
   
-  for(int i = 0; i < 54; i++ ) {
+  for(int i = 0; i < u.mx(); i++ ) {
     if( p.avail(i) ) {
       if( list[i].hasNum(x) > -1 ) {
 	count++;
@@ -128,8 +129,7 @@ int makebridge(int y, int n, Port list[], Used u, int len) {
 int main() {
   string input;
   unsigned int i, a, b, n = 0, tmp, total=0;
-  Port list[54];
-  Used u;
+  Port list[100];
   
   while( getline(cin, input) ) {
     for( i = 0; i < input.length(); i++ ) {
@@ -144,6 +144,8 @@ int main() {
     list[n].assign(a,b);
     n++;
   }
+
+  Used u(n);
 
   for( i = 0; i < n; i++ ) {
     if( list[i].hasNum(0) > -1 ) {

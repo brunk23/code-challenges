@@ -36,7 +36,8 @@ public:
 
 int main() {
   int i, c;
-  CBuff b(328);
+  // CBuff b(328);
+  CBuff b(355);
   
   for(i = 1; i < 50000000; i++ ) {
     c = b.step();

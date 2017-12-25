@@ -14,7 +14,7 @@ using std::cerr;
 int main() {
   Particle list[NUMBER];
   string input;
-  int n = 0, change, number;
+  int n = 0, change, number, time = 0;
 
   /*
    * Read in the input file
@@ -40,7 +40,8 @@ int main() {
   
   cout << "Number " << number << " stays closest." << endl;
 
-  while(number > 448) {
+  while(time < 10000) {
+    time++;
     for(n = 0; n < NUMBER; n++ ) {
       list[n].update();
     }
