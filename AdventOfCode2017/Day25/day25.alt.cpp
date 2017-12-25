@@ -20,11 +20,11 @@ public:
   ~Tape() {
     int k;
     // std::cout << *this << std::endl;
+    // std::cout << "The offset was " << offset << std::endl;
+    // std::cout << "Tape length was " << size << std::endl;
     k = chksum();
     std::cout << "Checksum was " << k << std::endl;
     delete tp;
-    std::cout << "The offset was " << offset << std::endl;
-    std::cout << "Tape length was " << size << std::endl;
   };
 
   int chksum() {
@@ -84,20 +84,11 @@ enum States {a,b,c,d,e,f};
 
 int main() {
   Tape t;
-  int state = a, location = 0, minl =0, maxl =0;
+  int state = a, location = 0;
   long count = 0;
  
   while( count < 12172063) {
     count++;
-    if( location < minl) {
-      minl = location;
-    }
-    if( location > maxl) {
-      maxl = location;
-    }
-    //std::cout << static_cast<char>(state+'a') << ": [" << location << "]: "
-    //	      << "{" << t.getVal(location) << "}  " << t << std::endl; 
-    //std::cout << t.chksum() << std::endl;
     switch(state) {
     case a:
       if(t.getVal(location) == 0 ) {
@@ -170,8 +161,6 @@ int main() {
       break;
     }
   }
-
-  std::cout << minl << "-" << maxl << std::endl;
   
   return 0;
 }
