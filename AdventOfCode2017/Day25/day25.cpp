@@ -10,7 +10,7 @@ public:
   Tape() {
     int i;
     size = 100;
-    offset = 0;
+    offset = 15;
     tp = new int[size];
     for( i = 0; i < size; i++ ) {
       tp[i] = 0;
