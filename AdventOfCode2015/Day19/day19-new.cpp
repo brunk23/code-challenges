@@ -9,6 +9,13 @@ using std::endl;
 using std::string;
 using std::getline;
 
+// The basic plan here will be to find all occurences
+// of the current right side of the string, try reducing them
+// and recursively work down the tree until we find a solution
+int reduce() {
+
+}
+
 int main() {
   Rules master;
   string input;
