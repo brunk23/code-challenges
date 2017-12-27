@@ -89,6 +89,10 @@ h--;
 /*
  * Lines 22-40
  *
+ * Inner loop is f += c + 1 - d
+ * c and 1 are constant and d goes
+ * from 1 to b. It's a triangular number
+ *
  * (Finds b*(c+1) - Triangle(b)) mod h
  * O(1) expr: (b * (2 * c - b + 1)) / 2 % h
  */

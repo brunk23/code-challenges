@@ -12,7 +12,7 @@ int main() {
 
   f = (b * (2 * c - b + 1)) / 2 % h;
 
-  std::cout << "A = " << a << ": " << f << std::endl;
+  std::cout << "If A = " << a << ": F = " << f << std::endl;
 
   return 0;
 }
