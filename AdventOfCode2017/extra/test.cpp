@@ -1,7 +1,7 @@
 #include <iostream>
 
 int main() {
-  long a = 0, b = 86, c = b, f = 17, h = 0;
+  long a = 1, b = 86, c = b, f = 17, h = 0;
 
   if( a != 0 ) {
     b *= 10946;
@@ -10,8 +10,9 @@ int main() {
 
   h = (1 << f) - 1;
 
-  // Combined into 1 line
-  std::cout << "A = " << a << ": " << (b * (2 * c - b + 1)) / 2 % h << std::endl;
-  
+  f = (b * (2 * c - b + 1)) / 2 % h;
+
+  std::cout << "A = " << a << ": " << f << std::endl;
+
   return 0;
 }
