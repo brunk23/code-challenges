@@ -1,0 +1,5 @@
+#!/usr/bin/dc
+# This will tell you the first value of b that
+# gives you the same answer when a=1 as when a=0
+
+[l"2l:*l"-1+*2/l>%]s?2s9[l"13*421**l:l7199**s:s"]s;[l917^1-s>]s*89s7[l31+dds3s"s:l?x2l;xl?x!==]s=l*x0s3l=xl3f
