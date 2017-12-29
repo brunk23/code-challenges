@@ -12,8 +12,25 @@ using std::getline;
 // The basic plan here will be to find all occurences
 // of the current right side of the string, try reducing them
 // and recursively work down the tree until we find a solution
-int reduce() {
+int reduce(string s, int steps, Rules m, int min) {
+  Rules r(m);
+  steps++;
+  r.reset();
 
+  /*
+    off = 0; off < length; off++;
+    n = r.location(str, off);
+    if( n >= 0 ) {
+    r.replace(str, n);
+    if( str != "e" ) {
+    reduce(str, steps);
+    }
+    off += n;
+    }
+
+  */
+
+  return 0;
 }
 
 int main() {
@@ -22,7 +39,7 @@ int main() {
   string start;
   unsigned int endleft;
   unsigned int i;
-  
+
   while(getline(cin,input)) {
     endleft = 0;
     start = input;
@@ -36,9 +53,10 @@ int main() {
       }
     }
   }
+  reduce(start, 0, master, -1);
 
   cout << start << endl;
-  
+
   return 0;
 }
 

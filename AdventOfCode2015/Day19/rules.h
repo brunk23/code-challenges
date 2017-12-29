@@ -25,6 +25,7 @@ class Rules {
   void next();
   int location(std::string a, int start);
   void add(std::string lft, std::string rgt);
+  std::string replace(std::string s, int offset);
 
 };
 

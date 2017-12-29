@@ -62,3 +62,22 @@ void Rules::add(std::string lft, std::string rght) {
     tail = tmp;
   }
 }
+
+/*
+ * This will replace len characters, starting at offset,
+ * with string b in string s
+ *
+ * This will be used to remove curr->right and it's len
+ * from the current string, and replace it with curr->left
+ *
+ * replace(str, offset, curr->lenR, curr->left);
+ *
+ * This should be a method in Rules.  And can be called
+ * with only str and offset.
+ */
+inline std::string Rules::replace(std::string s, int offset) {
+  if( curr ) {
+    return s.substr(0,offset) + curr->left + s.substr(offset + curr->lenR);
+  }
+  return s;
+}
