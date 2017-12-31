@@ -8,19 +8,20 @@ using std::string;
 using std::cerr;
 using std::endl;
 
-#define CODESIZE 200
+#define WDSIZE 2
+#define CODESIZE 100 * WDSIZE
 #define REGNUM 27
 #define OPFACT 100
-#define WDSIZE 2
 
 /*
  * Instructions will take 2 words.  The first word will
  * be the command opcode plus the destination register
  * a = 0, b = 1, etc.
  */
-enum commands {snd=1, set, rset, madd, radd, mul, rmul,
-	       mod, rmod, rcv, jgz, rjgz, running, step,
-	       waiting, stopped, sub, rsub, jnz, rjnz};
+enum commands {snd=10, rcv, set, rset,
+	       madd=20, radd, mul, rmul, sub, rsub, mod, rmod,
+	       jgz=30, rjgz, jnz, rjnz,
+	       running=40, step, waiting, stopped};
 
 class Chip {
  private:
