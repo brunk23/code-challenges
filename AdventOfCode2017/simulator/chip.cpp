@@ -38,13 +38,15 @@ Chip::Chip(Chip& other) {
   *this = other;
 }
 
-std::string Chip::regdump() {
+std::string Chip::regstr(int i) {
   std::string ns = "";
-  int i;
-  for( i = 0; i < 26; i++ ) {
-    ns += std::string(1,i+'a') + ": " + std::to_string(registers[i]) + "\n";
-  }
-  ns += "\nInstPtr: " + std::to_string(instPtr / WDSIZE + 1);
+  ns += std::string(1,i+'a') + ": " + std::to_string(registers[i]);
+  return ns;
+}
+
+std::string Chip::iptrstr() {
+  std::string ns = "";
+  ns += "instPtr: " + std::to_string(instPtr / WDSIZE + 1);
   return ns;
 }
 

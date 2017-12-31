@@ -6,11 +6,23 @@
 
 void loop(Chip &a);
 
+void uregwin(WINDOW *win, Chip &a) {
+  int i;
+  werase(win);
+  for( i = 0; i < 26; i++ ) {
+    wmove(win, 1 + i, 1);
+    waddstr(win, a.regstr(i).c_str());
+  }
+  wmove(win, 3 + i, 1);
+  waddstr(win, a.iptrstr().c_str());
+  wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+  wrefresh(win);
+}
+
 void loop(Chip &a) {
   WINDOW *mainwin, *regwin;
   int height, width, key, status = step;
-  std::string regstr;
-  
+
   getmaxyx(stdscr, height, width);
   
   mainwin = newwin(height, width-15, 0, 0);
@@ -39,10 +51,7 @@ void loop(Chip &a) {
       a.step();
       break;
     case 'p':
-      regstr = a.regdump();
-      wmove(regwin, 0, 0);
-      waddstr(regwin, regstr.c_str());
-      wrefresh(regwin);
+      uregwin(regwin,a);
       break;
     default:
       waddch(mainwin, key);

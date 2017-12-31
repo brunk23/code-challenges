@@ -69,7 +69,8 @@ class Chip {
   long nextMessage();
   void pair(Chip &);
   void halt();
-  std::string regdump();
+  std::string iptrstr();
+  std::string regstr(int);
   Chip& operator=(Chip&);
 };
 
