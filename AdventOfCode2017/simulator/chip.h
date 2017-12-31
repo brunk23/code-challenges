@@ -11,6 +11,7 @@ using std::endl;
 #define CODESIZE 200
 #define REGNUM 27
 #define OPFACT 100
+#define WDSIZE 2
 
 /*
  * Instructions will take 2 words.  The first word will
@@ -68,6 +69,7 @@ class Chip {
   long nextMessage();
   void pair(Chip &);
   void halt();
+  std::string regdump();
   Chip& operator=(Chip&);
 };
 

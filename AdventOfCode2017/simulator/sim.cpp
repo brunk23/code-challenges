@@ -4,34 +4,22 @@
 #include <string>
 #include "chip.h"
 
-int main(int argc, char *argv[]) {
-  WINDOW *win;
-  std::ifstream fp;
-  Chip a;
+void loop(Chip &a);
+
+void loop(Chip &a) {
+  WINDOW *mainwin, *regwin;
   int height, width, key, status = step;
-  std::string input;
-
-  if( argc < 2 ) {
-    std::cerr << "You need an input file." << std::endl;
-    return 1;
-  }
-
-  fp.open(argv[1]);
+  std::string regstr;
   
-  while( std::getline(fp, input) ) {
-    a.add(input);
-  }
-  fp.close();
-  
-  initscr();
   getmaxyx(stdscr, height, width);
   
-  win = newwin(height, width, 0, 0);
+  mainwin = newwin(height, width-15, 0, 0);
+  regwin = newwin(height, 15, 0, width-15);
   nodelay(stdscr, TRUE);
   noecho();
-  wrefresh(win);
+  wrefresh(mainwin);
+  wrefresh(regwin);
 
-  addstr("This is a test.\n");
   while( a.status() == running ) {
     key = getch();
     if( status == running ) {
@@ -50,12 +38,43 @@ int main(int argc, char *argv[]) {
       status = step;
       a.step();
       break;
+    case 'p':
+      regstr = a.regdump();
+      wmove(regwin, 0, 0);
+      waddstr(regwin, regstr.c_str());
+      wrefresh(regwin);
+      break;
     default:
-      waddch(win, key);
-      wrefresh(win);
+      waddch(mainwin, key);
+      wrefresh(mainwin);
+      wrefresh(regwin);
       break;
     }
   }
+
+}
+
+int main(int argc, char *argv[]) {
+  std::ifstream fp;
+  Chip a;
+  std::string input;
+
+  if( argc < 2 ) {
+    std::cerr << "You need an input file." << std::endl;
+    return 1;
+  }
+
+  fp.open(argv[1]);
+
+  while( std::getline(fp, input) ) {
+    a.add(input);
+  }
+  fp.close();
+
+  initscr();
+
+  loop(a);
+
   endwin();
   return 0;
 }

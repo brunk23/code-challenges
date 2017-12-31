@@ -38,6 +38,16 @@ Chip::Chip(Chip& other) {
   *this = other;
 }
 
+std::string Chip::regdump() {
+  std::string ns = "";
+  int i;
+  for( i = 0; i < 26; i++ ) {
+    ns += std::string(1,i+'a') + ": " + std::to_string(registers[i]) + "\n";
+  }
+  ns += "\nInstPtr: " + std::to_string(instPtr / WDSIZE + 1);
+  return ns;
+}
+
 void Chip::halt() {
   stat = stopped;
 }
@@ -273,13 +283,13 @@ int Chip::step() {
     return -1;
   }
 
-  instPtr += 2;
+  instPtr += WDSIZE;
   return 0;
 }
 
 void Chip::regs() {
   int i;
-  cerr << "iPtr: " << instPtr/2+1 << endl;
+  cerr << "iPtr: " << instPtr/WDSIZE+1 << endl;
   cerr << "Nonzero Registers:" << endl;
   for( i = 0; i < REGNUM; i++ ) {
     if( registers[i] != 0 ) {
@@ -348,18 +358,18 @@ int Chip::imod(int r, int v) {
 
 int Chip::ijgz(int r, int v) {
   if(registers[r] > 0 ) {
-    instPtr += 2 * v;
+    instPtr += WDSIZE * v;
   } else {
-    instPtr += 2;
+    instPtr += WDSIZE;
   }
   return 0;
 }
 
 int Chip::ijnz(int r, int v) {
   if(registers[r] != 0 ) {
-    instPtr += 2 * v;
+    instPtr += WDSIZE * v;
   } else {
-    instPtr += 2;
+    instPtr += WDSIZE;
   }
   return 0;
 }
@@ -375,7 +385,7 @@ int Chip::ircv(int r) {
     } else {
       stat = waiting;
     }
-    instPtr -= 2;
+    instPtr -= WDSIZE;
   }
   return 0;
 }
