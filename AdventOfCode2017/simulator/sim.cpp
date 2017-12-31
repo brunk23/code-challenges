@@ -24,14 +24,17 @@ void loop(Chip &a) {
   int height, width, key, status = step;
 
   getmaxyx(stdscr, height, width);
-  
+  nodelay(stdscr, TRUE);
   mainwin = newwin(height, width-15, 0, 0);
   regwin = newwin(height, 15, 0, width-15);
-  nodelay(stdscr, TRUE);
   noecho();
+  key=getch();
+  wmove(mainwin, 1, 1);
+  waddstr(mainwin,"r=run, p=print, s=step, q=quit");
+  wborder(mainwin, 0, 0, 0, 0, 0, 0, 0, 0);
   wrefresh(mainwin);
-  wrefresh(regwin);
 
+  uregwin(regwin,a);
   while( a.status() == running ) {
     key = getch();
     if( status == running ) {
