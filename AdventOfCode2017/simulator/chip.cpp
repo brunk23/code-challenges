@@ -38,16 +38,12 @@ Chip::Chip(Chip& other) {
   *this = other;
 }
 
-std::string Chip::regstr(int i) {
-  std::string ns = "";
-  ns += std::string(1,i+'a') + ": " + std::to_string(registers[i]);
-  return ns;
+long Chip::regVal(int i) {
+  return registers[i];
 }
 
-std::string Chip::iptrstr() {
-  std::string ns = "";
-  ns += "instPtr: " + std::to_string(instPtr / WDSIZE + 1);
-  return ns;
+int Chip::iptr() {
+  return instPtr / WDSIZE + 1;
 }
 
 void Chip::halt() {

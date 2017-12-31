@@ -10,11 +10,9 @@ void uregwin(WINDOW *win, Chip &a) {
   int i;
   werase(win);
   for( i = 0; i < 26; i++ ) {
-    wmove(win, 1 + i, 1);
-    waddstr(win, a.regstr(i).c_str());
+    mvwprintw(win, 1 + i, 1, "%c: %08i", i+'a', a.regVal(i));
   }
-  wmove(win, 3 + i, 1);
-  waddstr(win, a.iptrstr().c_str());
+  mvwprintw(win, 3 + i, 1, "instPtr: %i", a.iptr());
   wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
   wrefresh(win);
 }
@@ -52,9 +50,10 @@ void loop(Chip &a) {
     case 's':
       status = step;
       a.step();
+      uregwin(regwin, a);
       break;
     case 'p':
-      uregwin(regwin,a);
+      uregwin(regwin, a);
       break;
     default:
       waddch(mainwin, key);
