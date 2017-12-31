@@ -56,7 +56,6 @@ void loop(Chip &a) {
     default:
       waddch(mainwin, key);
       wrefresh(mainwin);
-      wrefresh(regwin);
       break;
     }
   }
