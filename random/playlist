@@ -1,16 +1,21 @@
 #!/bin/sh
-/usr/bin/osascript -e 'set volume 4'
 
+SILENTMODE="/Users/brunellek/Desktop/music=no"
 LOGPATH="/Users/brunellek/song.log"
 TMPLOG="/tmp/song.log"
 key="$1"
-FILE="/Users/brunellek/classsongs/${1}.mp3"
+FILE="/Users/brunellek/class_songs/${1}.mp3"
 TIME=""
 
 /usr/bin/tail -n 10 ${LOGPATH} > ${TMPLOG}
 /bin/mv ${TMPLOG} ${LOGPATH}
 
-case $key in
+if [ ! -e ${SILENTMODE} ]
+then
+	/usr/bin/osascript -e 'set volume 4'
+fi
+
+case ${key} in
 	lunch)
 		/usr/bin/osascript -e 'set volume 8'
 	;;
@@ -20,17 +25,30 @@ case $key in
 	socialstudies)
 		TIME="-t 32"
 	;;
+	welcome)
+		/usr/bin/osascript -e 'set volume 8'
+		TIME="-t 11"
+	;;
+	howfar)
+		/usr/bin/osascript -e 'set volume 8'
+	;;
 	*)
 	;;
 esac
 
 if [ -e ${FILE} ]
 then
+    if [ -e ${SILENTMODE} ]
+    then
+	/bin/echo -n "NOT PLAYING ${key} :: ${SILENTMODE} exists @ " >> ${LOGPATH}
+	/bin/date >> ${LOGPATH}
+    else
 	# LOG THE ACTION
 	/bin/echo -n "Run ${key} song: " >> ${LOGPATH}
 	/bin/date >> ${LOGPATH}
 	# PLAY THE SONG
 	/usr/bin/afplay ${TIME} ${FILE}
+    fi
 else
 	# LOG THE FAILURE
 	/bin/echo -n "Run ${key} song: FAILED {DOES NOT EXIST} " >> ${LOGPATH}
