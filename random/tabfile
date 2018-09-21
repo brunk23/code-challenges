@@ -1,0 +1,14 @@
+# This is the setup file for the songs played in the room.
+57 08 * * 1-5 /Users/brunellek/bin/playlist morning
+38 09 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+43 09 * * 1-5 /Users/brunellek/bin/playlist kinghenry
+53 10 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+58 10 * * 1-5 /Users/brunellek/bin/playlist franklinstower
+14 11 * * 1-5 /Users/brunellek/bin/playlist say "Dylan go to the nurse."
+20 11 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+25 11 * * 1-5 /Users/brunellek/bin/playlist walk
+30 12 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+35 12 * * 1-5 /Users/brunellek/bin/playlist kinghenry
+51 13 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+56 13 * * 1-5 /Users/brunellek/bin/playlist walk
+20 15 * * 1-5 /Users/brunellek/bin/playlist endofday
