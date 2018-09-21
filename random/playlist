@@ -6,6 +6,7 @@ TMPLOG="/tmp/song.log"
 key="$1"
 FILE="/Users/brunellek/class_songs/${1}.mp3"
 TIME=""
+SAY="/usr/bin/say"
 
 /usr/bin/tail -n 10 ${LOGPATH} > ${TMPLOG}
 /bin/mv ${TMPLOG} ${LOGPATH}
@@ -16,11 +17,8 @@ then
 fi
 
 case ${key} in
-    5minutes)
-	FILE="/Users/brunellek/class_songs/${1}.mp4"
-	;;
-    dylan)
-	FILE="/Users/brunellek/class_songs/${1}.mp4"
+    say)
+	FILE=${SAY}
 	/usr/bin/osascript -e 'set volume 8'
 	;;
     lunch)
@@ -50,11 +48,19 @@ then
 	/bin/echo -n "NOT PLAYING ${key} :: ${SILENTMODE} exists @ " >> ${LOGPATH}
 	/bin/date >> ${LOGPATH}
     else
+ 	if [ "say" = ${key} ]
+	then
 	# LOG THE ACTION
-	/bin/echo -n "Run ${key} song: " >> ${LOGPATH}
-	/bin/date >> ${LOGPATH}
+	    /bin/echo -n "${SAY} ${2}: " >> ${LOGPATH}
+	    /bin/date >> ${LOGPATH}
+	    ${SAY} "${2}"
+	else
+	# LOG THE ACTION
+	    /bin/echo -n "Run ${key} song: " >> ${LOGPATH}
+	    /bin/date >> ${LOGPATH}
 	# PLAY THE SONG
-	/usr/bin/afplay ${TIME} ${FILE}
+	    /usr/bin/afplay ${TIME} ${FILE}
+	fi
     fi
 else
 	# LOG THE FAILURE
