@@ -16,23 +16,30 @@ then
 fi
 
 case ${key} in
-	lunch)
-		/usr/bin/osascript -e 'set volume 8'
+    5minutes)
+	FILE="/Users/brunellek/class_songs/${1}.mp4"
 	;;
-	math)
-		TIME="-t 40"
+    dylan)
+	FILE="/Users/brunellek/class_songs/${1}.mp4"
+	/usr/bin/osascript -e 'set volume 8'
 	;;
-	socialstudies)
-		TIME="-t 32"
+    lunch)
+	/usr/bin/osascript -e 'set volume 8'
 	;;
-	welcome)
-		/usr/bin/osascript -e 'set volume 8'
-		TIME="-t 11"
+    math)
+	TIME="-t 40"
 	;;
-	howfar)
-		/usr/bin/osascript -e 'set volume 8'
+    socialstudies)
+	TIME="-t 32"
 	;;
-	*)
+    welcome)
+	/usr/bin/osascript -e 'set volume 8'
+	TIME="-t 11"
+	;;
+    howfar)
+	/usr/bin/osascript -e 'set volume 8'
+	;;
+    *)
 	;;
 esac
 
