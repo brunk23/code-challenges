@@ -1,10 +1,10 @@
 #!/bin/sh
 
-SILENTMODE="/Users/brunellek/Desktop/music=no"
-LOGPATH="/Users/brunellek/song.log"
+SILENTMODE="/Users/${USER}/Desktop/music=no"
+LOGPATH="/Users/${USER}/song.log"
 TMPLOG="/tmp/song.log"
 key="$1"
-FILE="/Users/brunellek/class_songs/${1}.mp3"
+FILE="/Users/${USER}/class_songs/${1}.mp3"
 TIME=""
 SAY="/usr/bin/say"
 
