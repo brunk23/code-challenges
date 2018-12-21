@@ -12,11 +12,11 @@
 13 11 * * 1-5 /Users/brunellek/bin/playlist franklinstower
 
 # Remind Dylan to get his meds before lunch
-55 11 * * 1-5 /Users/brunellek/bin/playlist say "Dylan go to the nurse."
+57 11 * * 1-5 /Users/brunellek/bin/playlist say "Go to the nurse."
 
 # Mon-Thu We have intervention groups
-50 11 * * 1-4 /Users/brunellek/bin/playlist say "Five minutes"
-55 11 * * 1-4 /Users/brunellek/bin/playlist welcome
+54 11 * * 1-4 /Users/brunellek/bin/playlist say "Five minutes"
+59 11 * * 1-4 /Users/brunellek/bin/playlist welcome
 
 # Lunch time 
 05 12 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
@@ -31,4 +31,4 @@
 36 14 * * 1-5 /Users/brunellek/bin/playlist endofday
 
 # If we have car-rider duty, leave now.
-15 15 * * 1-5 /Users/brunellek/bin/playlist howfar
+28 15 * * 1-5 /Users/brunellek/bin/playlist howfar

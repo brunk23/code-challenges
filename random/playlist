@@ -11,10 +11,15 @@ SAY="/usr/bin/say"
 /usr/bin/tail -n 10 ${LOGPATH} > ${TMPLOG}
 /bin/mv ${TMPLOG} ${LOGPATH}
 
-if [ ! -e ${SILENTMODE} ]
+# Get an early abort if the song shouldn't play
+if [ -e ${SILENTMODE} ]
 then
-	/usr/bin/osascript -e 'set volume 4'
+	/bin/echo -n "NOT PLAYING ${key} :: ${SILENTMODE} exists @ " >> ${LOGPATH}
+	/bin/date >> ${LOGPATH}
+	exit
 fi
+
+/usr/bin/osascript -e 'set volume 4'
 
 case ${key} in
     say)
@@ -43,29 +48,23 @@ esac
 
 if [ -e ${FILE} ]
 then
-    if [ -e ${SILENTMODE} ]
+    if [ "say" = ${key} ]
     then
-	/bin/echo -n "NOT PLAYING ${key} :: ${SILENTMODE} exists @ " >> ${LOGPATH}
+	# LOG THE ACTION
+	/bin/echo -n "${SAY} ${2}: " >> ${LOGPATH}
 	/bin/date >> ${LOGPATH}
+	${SAY} "${2}"
     else
- 	if [ "say" = ${key} ]
-	then
 	# LOG THE ACTION
-	    /bin/echo -n "${SAY} ${2}: " >> ${LOGPATH}
-	    /bin/date >> ${LOGPATH}
-	    ${SAY} "${2}"
-	else
-	# LOG THE ACTION
-	    /bin/echo -n "Run ${key} song: " >> ${LOGPATH}
-	    /bin/date >> ${LOGPATH}
+	/bin/echo -n "Run ${key} song: " >> ${LOGPATH}
+	/bin/date >> ${LOGPATH}
 	# PLAY THE SONG
-	    /usr/bin/afplay ${TIME} ${FILE}
-	fi
+	/usr/bin/afplay ${TIME} ${FILE}
     fi
 else
-	# LOG THE FAILURE
-	/bin/echo -n "Run ${key} song: FAILED {DOES NOT EXIST} " >> ${LOGPATH}
-	/bin/date >> ${LOGPATH}
+    # LOG THE FAILURE
+    /bin/echo -n "Run ${key} song: FAILED {DOES NOT EXIST} " >> ${LOGPATH}
+    /bin/date >> ${LOGPATH}
 fi
 
 # TURN OFF SLEEPING FOR 3 HOURS
