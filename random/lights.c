@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define LIGHTSDEFAULT 1000
+#define LIGHTSDEFAULT 20
 #define OFF '-'
 #define ON 'O'
 

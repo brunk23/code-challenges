@@ -1,0 +1,34 @@
+# This is the setup file for the songs played in the room.
+
+# Welcome song for the morning
+57 08 * * 1-5 /Users/brunellek/bin/playlist morning
+
+# Switch to science with the first group
+23 10 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+28 10 * * 1-5 /Users/brunellek/bin/playlist math
+
+# We need to switch classes and start the next science block
+08 11 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+13 11 * * 1-5 /Users/brunellek/bin/playlist franklinstower
+
+# Remind Dylan to get his meds before lunch
+57 11 * * 1-5 /Users/brunellek/bin/playlist say "Go to the nurse."
+
+# Mon-Thu We have intervention groups
+54 11 * * 1-4 /Users/brunellek/bin/playlist say "Five minutes"
+59 11 * * 1-4 /Users/brunellek/bin/playlist welcome
+
+# Lunch time 
+05 12 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+10 12 * * 1-5 /Users/brunellek/bin/playlist happy
+
+# This kids should be back from recess and starting math block
+10 13 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+15 13 * * 1-5 /Users/brunellek/bin/playlist math
+
+# It is time to clean up and get ready for special area
+31 14 * * 1-5 /Users/brunellek/bin/playlist say "Five minutes"
+36 14 * * 1-5 /Users/brunellek/bin/playlist endofday
+
+# If we have car-rider duty, leave now.
+28 15 * * 1-5 /Users/brunellek/bin/playlist howfar
