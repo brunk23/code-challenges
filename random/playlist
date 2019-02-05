@@ -11,6 +11,10 @@ SAY="/usr/bin/say"
 /usr/bin/tail -n 10 ${LOGPATH} > ${TMPLOG}
 /bin/mv ${TMPLOG} ${LOGPATH}
 
+# TURN OFF SLEEPING FOR 3 HOURS
+# -s is no sleep, default is -i (do not idle sleep)
+/usr/bin/caffeinate -u -t 10800 &
+
 # Get an early abort if the song shouldn't play
 if [ -e ${SILENTMODE} ]
 then
@@ -66,7 +70,3 @@ else
     /bin/echo -n "Run ${key} song: FAILED {DOES NOT EXIST} " >> ${LOGPATH}
     /bin/date >> ${LOGPATH}
 fi
-
-# TURN OFF SLEEPING FOR 3 HOURS
-# -s is no sleep, default is -i (do not idle sleep)
-/usr/bin/caffeinate -u -t 10800 &
