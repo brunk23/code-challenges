@@ -4,6 +4,24 @@
 
 #include "assembler.h"
 
+/*
+ * We are going to rewrite the code to be a much better assembler.
+ * This is step 1.
+ */
+struct TOKEN {
+  int line;
+  int type;
+  int value;
+  int location;
+  char *word;
+};
+
+struct LINE {
+  int number;
+  char *str;
+  LINE *next;
+};
+
 int main(int argc, char *argv[]) {
   int retcode = 0, source = 0, dest = 0;
   struct symstack *sptr = 0, *usptr = 0;

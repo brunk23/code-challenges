@@ -5,6 +5,9 @@
  * Synacor Machine Description
  */
 
+typedef struct TOKEN TOKEN;
+typedef struct LINE LINE;
+
 /* 15 bit addressable, 16 bit values. Values limited from
  * 0-32768, 8 registers, an unbounded stack. These are globals
  * because I am both too lazy to pass them around, but it is
