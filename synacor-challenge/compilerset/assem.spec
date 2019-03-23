@@ -4,11 +4,11 @@ Assembly files will have the following format:
 
 .origin 00000           # will give an address where the next code goes
 
-:label                  # all labels and variable names start with :
+label:                  # all labels and variable names end with :
 
     jmp label          # example (label needs to be resolved if unknown)
 
-    out :o1            : o1 is a label at this spot!
+    out o1:            : o1 is a label at this spot!
 	
     add r1, 234, r0     # numbers are written directly into memory
 
