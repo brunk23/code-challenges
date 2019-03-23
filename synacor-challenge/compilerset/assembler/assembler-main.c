@@ -28,9 +28,13 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  tokencount = 0;
+  linecount = 0;
+  symbolcount = 0;
+
   init_machine();
 
-  if( process_input(argv[source]) ) {
+  if( !(tokens = process_input(argv[source]) )) {
     return 1;
   }
 
@@ -41,12 +45,13 @@ int main(int argc, char *argv[]) {
    * Free all the structures created by process_input
    */
   delete_sym_tree();
-  syms = NULL;
-  delete_line_tree(filelines);
-  filelines = NULL;
-  delete_token_tree(tokens);
-  tokens = NULL;
+  delete_line_tree();
+  delete_token_tree();
 
+  /* Used for finding memory leaks.
+  printf("tokens: %i\nlines: %i\nsymbols: %i\n",
+	 tokencount,linecount,symbolcount);
+  */
   if( dest ) {
     process_output(argv[dest]);
   } else {
@@ -82,27 +87,33 @@ int process_output(const char *filename) {
   return 0;
 }
 
-int process_input(const char *filename) {
+TOKEN *process_input(const char *filename) {
   FILE *fp;
   int lineno = 0, strind = 0, len = 0;
   char inbuffer[BUFFSIZE];
-  LINE *curr_line = filelines, *line_tmp;
-  TOKEN *curr_token = NULL, *tmp_token = NULL;
+  LINE *curr_line = filelines, *line_tmp = NULL;
+  TOKEN *head_token = NULL, *curr_token = NULL, *tmp_token = NULL;
 
   if( !(fp = fopen(filename,"r"))) {
     fprintf(stderr,"Couldn't open file: %s\n",filename);
-    return 1;
+    return NULL;
   }
 
   if( !(line_tmp = malloc( sizeof(LINE) ))) {
     fprintf(stderr, "Failed to get memory for line buffer\n");
-    return 1;
+    return NULL;
   }
+  linecount++;
   line_tmp->next = NULL;
   line_tmp->str = NULL;
 
   if( !(curr_line) ) {
     filelines = line_tmp;
+  } else {
+    while( curr_line->next ) {
+      curr_line = curr_line->next;
+    }
+    curr_line->next = line_tmp;
   }
   curr_line = line_tmp;
 
@@ -112,7 +123,7 @@ int process_input(const char *filename) {
     len = strlen(inbuffer);
     if( !(curr_line->str = malloc(sizeof(char)* len + 1)) ) {
       fprintf(stderr, "Failed to get memory for line buffer\n");
-      return 1;
+      return NULL;
     }
     strncpy(curr_line->str, inbuffer, strlen(inbuffer));
     while ( strind <= len ) {
@@ -125,9 +136,9 @@ int process_input(const char *filename) {
 	fprintf(stderr, "Line #%i: %s", lineno, curr_line->str);
 	break;
       }
-      if( tokens == (TOKEN *)NULL ) {
-	tokens = tmp_token;
-	curr_token = tokens;
+      if( head_token == (TOKEN *)NULL ) {
+	head_token = tmp_token;
+	curr_token = head_token;
       } else {
 	curr_token->next = tmp_token;
 	curr_token = curr_token->next;
@@ -139,15 +150,16 @@ int process_input(const char *filename) {
     }
     if( !(curr_line->next = malloc( sizeof(LINE) ))) {
       fprintf(stderr, "Failed to get memory for line buffer\n");
-      return 1;
+      return NULL;
     }
+    linecount++;
     curr_line = curr_line->next;
     curr_line->next = (LINE *)NULL;
     curr_line->str = NULL;
   }
 
   fclose(fp);
-  return 0;
+  return head_token;
 }
 
 void delete_sym_tree() {
@@ -156,6 +168,7 @@ void delete_sym_tree() {
   while(curr) {
     next = curr->next;
     free(curr);
+    symbolcount--;
     curr = next;
   }
   syms = (SYMBOL *)NULL;
@@ -163,33 +176,37 @@ void delete_sym_tree() {
 /*
  * Will delete the tree of the file lines
  */
-void delete_line_tree(LINE *s) {
+void delete_line_tree() {
   LINE *curr, *next;
-  curr = s;
+  curr = filelines;
   while( curr ) {
     next = curr->next;
     if( curr->str ) {
       free( curr->str );
     }
     free( curr );
+    linecount--;
     curr = next;
   }
+  filelines = NULL;
 }
 
 /*
  * Will delete all the tokens
  */
-void delete_token_tree(TOKEN *t) {
+void delete_token_tree() {
   TOKEN *curr, *next;
-  curr = t;
+  curr = tokens;
   while( curr ) {
     if( curr->word ) {
       free(curr->word);
     }
     next = curr->next;
     free(curr);
+    tokencount--;
     curr = next;
   }
+  tokens = NULL;
 }
   
 

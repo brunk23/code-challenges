@@ -65,66 +65,7 @@ overvalue1:
 endprogram:
 	halt
 
-pstr:
-	push	r0
-	push	r1
-	push	r7
-p001:
-	rmem	r0	r1
-	eq	r7	r0	0
-	jt	r7	p002
-	out	r0
-	add	r1	r1	1
-	jmp	p001
-p002:
-	pop	r7
-	pop	r1
-	pop	r0
-	ret
-
-# This will print the number in r1
-pnumber:
-	# Preserve all the changed registers for code reuse
-	push	r1
-	push	r2
-	push	r3
-	push	r5
-	push	r7
-
-	set	r5	0		# pushed digits
-pn01:
-	mod	r2	r1	10	# take remainder of r6 mod 10
-	push	r2			# save it
-	add	r5	r5	1
-	mult	r2	r2	32767	# multiply by neg 1
-	add	r1	r1	r2	# subtract it
-	eq	r7	r1	0
-	jt	r7	pn03
-	set	r3	0		# set r3 = 0
-
-pn02:
-	add	r3	r3	1	
-	mult	r2	r3	10	# multiply it by 10
-	eq	r7	r2	r1	# 
-	jf	r7	pn02
-	set	r1	r3
-	jmp	pn01
-pn03:
-	pop	r1
-	add	r1	r1	48	# push ascii for last digit
-	out	r1
-	add	r5	r5	32767	# count digit pushed -1
-	eq	r7	r5	0
-	jf	r7	pn03
-
-	# Restore all the registers before returning
-	pop	r7
-	pop	r5
-	pop	r3
-	pop	r2
-	pop	r1
-	ret
-
+.include	"funcs.s"
 
 vals:
 	data	0 0  0  0  0

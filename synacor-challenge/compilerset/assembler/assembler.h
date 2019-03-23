@@ -11,6 +11,10 @@
 #define true 1
 #define false 0
 
+int linecount;
+int symbolcount;
+int tokencount;
+
 /*
  * Synacor Machine Description
  */
@@ -69,7 +73,7 @@ enum REGISTERS {
 enum INSTSET {
   halt = 0, set, push, pop, eq, gt, jmp, jt, jf, add, mult,
   mod, and, or, not, rmem, wmem, call, ret, out, in, nop,
-  dread, dwrite, ORIGIN, DATA
+  dread, dwrite, ORIGIN, DATA, INCLUDE
 };
 
 enum STATES {
@@ -81,24 +85,25 @@ enum STATES {
  */
 int help_menu( const char * );
 int init_machine();
-int process_input( const char * );
+TOKEN *process_input( const char * );
 int process_output( const char * );
 int process_data_line();
-int pass1(TOKEN *, LINE *);
-int pass2(TOKEN *, LINE *);
+int pass1();
+int pass2();
 SWORD isregister(char *);
 SWORD reserved(char *);
 SWORD token_value(TOKEN *);
 SYMBOL *find_symbol(char *);
 TOKEN *token(char *, int);
-TOKEN *origin_handler(TOKEN *, LINE *, int *);
-TOKEN *data_handler(TOKEN *, LINE *, int *);
-TOKEN *one_ops_handler(TOKEN *, LINE *, int *);
-TOKEN *two_ops_handler(TOKEN *, LINE *, int *);
-TOKEN *three_ops_handler(TOKEN *, LINE *, int *);
-void error_missing_word(TOKEN *, LINE *);
-void delete_token_tree(TOKEN *);
-void delete_line_tree(LINE *);
+TOKEN *origin_handler(TOKEN *, int *);
+TOKEN *data_handler(TOKEN *, int *);
+TOKEN *one_ops_handler(TOKEN *, int *);
+TOKEN *two_ops_handler(TOKEN *, int *);
+TOKEN *three_ops_handler(TOKEN *, int *);
+TOKEN *include_handler(TOKEN *, int *);
+void error_missing_word(TOKEN *);
+void delete_token_tree();
+void delete_line_tree();
 void delete_sym_tree();
 void add_symbol(char *, int, int);
 void print_token(TOKEN *);

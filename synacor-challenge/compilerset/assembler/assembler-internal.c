@@ -16,6 +16,7 @@ TOKEN *token(char *s, int start) {
     fprintf(stderr,"Failed to get memory in token(): ");
     return (TOKEN *)FAIL;
   }
+  tokencount++;
   curr->line = 0;
   curr->type = 0;
   curr->value = 0;
@@ -30,6 +31,7 @@ TOKEN *token(char *s, int start) {
     i++;
     if( i == size ) {
       free(curr);
+      tokencount--;
       return (TOKEN *)SUCCESS;
     }
   }
@@ -50,6 +52,7 @@ TOKEN *token(char *s, int start) {
       if( j == 0 ) {
 	fprintf(stderr, "No label found: ");
 	free(curr);
+	tokencount--;
 	return (TOKEN *)FAIL;
       }
       curr->type = LABEL;
@@ -83,6 +86,7 @@ TOKEN *token(char *s, int start) {
     if( isspace(s[i]) || s[i] == '#' ) {
       if( j == 0 ) {
 	free(curr);
+	tokencount--;
 	return (TOKEN *)SUCCESS;
       }
       break;
@@ -94,6 +98,7 @@ TOKEN *token(char *s, int start) {
   if( !(curr->word = malloc( sizeof(char) * j + 1)) ) {
     fprintf(stderr, "Could not save string: ");
     free(curr);
+    tokencount--;
     return (TOKEN *)FAIL;
   }
   strncpy(curr->word,tmp,j);
@@ -112,7 +117,7 @@ void print_token(TOKEN *t) {
   printf("Word: \"%s\"\n\n",t->word);
 }
 
-int pass1(TOKEN *tokens, LINE *source) {
+int pass1() {
   TOKEN *curr = tokens;
   SWORD inst;
   SYMBOL *tmp;
@@ -145,7 +150,11 @@ int pass1(TOKEN *tokens, LINE *source) {
 	switch (inst) {
 	case ORIGIN:
 	  curr->location = pc;
-	  curr = origin_handler(curr, source, &error);
+	  curr = origin_handler(curr, &error);
+	  break;
+	case INCLUDE:
+	  curr->location = pc;
+	  curr = include_handler(curr, &error);
 	  break;
 	case eq:
 	case gt:
@@ -154,7 +163,7 @@ int pass1(TOKEN *tokens, LINE *source) {
 	case mod:
 	case and:
 	case or:
-	  curr = three_ops_handler(curr, source, &error);
+	  curr = three_ops_handler(curr, &error);
 	  break;
 	case set:
 	case jt:
@@ -162,7 +171,7 @@ int pass1(TOKEN *tokens, LINE *source) {
 	case not:
 	case rmem:
 	case wmem:
-	  curr = two_ops_handler(curr, source, &error);
+	  curr = two_ops_handler(curr, &error);
 	  break;
 	case in:
 	case out:
@@ -170,7 +179,7 @@ int pass1(TOKEN *tokens, LINE *source) {
 	case pop:
 	case jmp:
 	case call:
-	  curr = one_ops_handler(curr, source, &error);
+	  curr = one_ops_handler(curr, &error);
 	  break;
 	case nop:
 	case halt:
@@ -181,7 +190,7 @@ int pass1(TOKEN *tokens, LINE *source) {
 	  curr = curr->next;
 	  break;
 	case DATA:
-	  curr = data_handler(curr,source, &error);
+	  curr = data_handler(curr, &error);
 	  break;
 	default:
 	  fprintf(stderr,"WARNING: Unrecognized instruction \"%s\" [Line %i]\n",
@@ -196,7 +205,8 @@ int pass1(TOKEN *tokens, LINE *source) {
   return error;
 }
 
-int pass2(TOKEN *c, LINE *source) {
+int pass2() {
+  TOKEN *c = tokens;
   int error = false;
   SYMBOL *s;
 
@@ -226,20 +236,20 @@ int pass2(TOKEN *c, LINE *source) {
   return error;
 }
 
-void error_missing_word(TOKEN *curr, LINE *source) {
+void error_missing_word(TOKEN *curr) {
   fprintf(stderr,"ERROR: Unexpected end of tokens. [Line %i]\n",
 	  curr->line);
   fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
 }
 
-TOKEN *one_ops_handler(TOKEN *curr, LINE *source, int *error) {
+TOKEN *one_ops_handler(TOKEN *curr, int *error) {
   char *inst = curr->word;
   int val = curr->value;
   curr->location = pc;
   memory[pc] = curr->value;
   pc++;
   if( !curr->next ) {
-    error_missing_word(curr,source);
+    error_missing_word(curr);
     *error = true;
     return curr->next;
   }
@@ -255,14 +265,14 @@ TOKEN *one_ops_handler(TOKEN *curr, LINE *source, int *error) {
   return curr->next;
 }
 
-TOKEN *two_ops_handler(TOKEN *curr, LINE *source, int *error) {
+TOKEN *two_ops_handler(TOKEN *curr, int *error) {
   char *inst = curr->word;
   int val = curr->value;
   curr->location = pc;
   memory[pc] = curr->value;
   pc++;
   if( !curr->next ) {
-    error_missing_word(curr,source);
+    error_missing_word(curr);
     *error = true;
     return curr->next;
   }
@@ -284,7 +294,7 @@ TOKEN *two_ops_handler(TOKEN *curr, LINE *source, int *error) {
   memory[pc] = curr->value;
   pc++;
   if( !curr->next ) {
-    error_missing_word(curr,source);
+    error_missing_word(curr);
     *error = true;
     return curr->next;
   }
@@ -295,13 +305,13 @@ TOKEN *two_ops_handler(TOKEN *curr, LINE *source, int *error) {
   return curr->next;
 }
 
-TOKEN *three_ops_handler(TOKEN *curr, LINE *source, int *error) {
+TOKEN *three_ops_handler(TOKEN *curr, int *error) {
   char *inst = curr->word;
   curr->location = pc;
   memory[pc] = curr->value;
   pc++;
   if( !curr->next ) {
-    error_missing_word(curr,source);
+    error_missing_word(curr);
     *error = true;
     return curr->next;
   }
@@ -315,7 +325,7 @@ TOKEN *three_ops_handler(TOKEN *curr, LINE *source, int *error) {
   memory[pc] = curr->value;
   pc++;
   if( !curr->next ) {
-    error_missing_word(curr,source);
+    error_missing_word(curr);
     *error = true;
     return curr->next;
   }
@@ -324,7 +334,7 @@ TOKEN *three_ops_handler(TOKEN *curr, LINE *source, int *error) {
   memory[pc] = token_value(curr);
   pc++;
   if( !curr->next ) {
-    error_missing_word(curr,source);
+    error_missing_word(curr);
     *error = true;
     return curr->next;
   }
@@ -368,7 +378,7 @@ SWORD token_value(TOKEN *curr) {
 /*
  * This needs to be modified to also take strings.
  */
-TOKEN *data_handler(TOKEN *curr, LINE *source, int *error) {
+TOKEN *data_handler(TOKEN *curr, int *error) {
   int line = curr->line, i = 0;
   if( !curr->next ) {
     *error = true;
@@ -397,9 +407,9 @@ TOKEN *data_handler(TOKEN *curr, LINE *source, int *error) {
   return curr;
 }
 
-TOKEN *origin_handler(TOKEN *curr, LINE *source, int *error) {
+TOKEN *origin_handler(TOKEN *curr, int *error) {
   if( !curr->next ) {
-    error_missing_word(curr, source);
+    error_missing_word(curr);
     *error = true;
     return (TOKEN *)NULL;
   }
@@ -413,6 +423,36 @@ TOKEN *origin_handler(TOKEN *curr, LINE *source, int *error) {
   }
   pc = curr->value;
   return curr->next;
+}
+
+TOKEN *include_handler(TOKEN *curr, int *error) {
+  TOKEN *after_file = NULL, *file_token = NULL, *head_token = NULL;
+  if( !curr->next ) {
+    error_missing_word(curr);
+    *error = true;
+    return NULL;
+  }
+  file_token = curr->next;
+  after_file = file_token->next;
+  if( file_token->type != STRING ) {
+    fprintf(stderr,"ERROR: .include must be a filename. [Line %i]\n",
+	    curr->line);
+    fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
+    *error = true;
+  } else {
+    if( !(head_token = process_input( file_token->word ))) {
+      fprintf(stderr,"WARNING: .include \"%s\" did not produce any tokens. Line [%i]\n",
+	      file_token->word, file_token->line);
+      return after_file;
+    }
+  }
+  file_token->next = head_token;
+  file_token = head_token;
+  while(file_token->next) {
+    file_token = file_token->next;
+  }
+  file_token->next = after_file;
+  return head_token;
 }
 
 /*
@@ -525,6 +565,9 @@ SWORD reserved(char *str) {
   if( !(strcmp(str,"origin")) ) {
     return ORIGIN;
   }
+  if( !(strcmp(str,"include")) ) {
+    return INCLUDE;
+  }
   if( !(strcmp(str,"data")) ) {
     return DATA;
   }
@@ -536,6 +579,7 @@ void add_symbol(char *s, int r, int val) {
   if( !(tmp = malloc( sizeof(SYMBOL) )) ) {
     fprintf(stderr,"Unable to create symbol for %s.\n",s);
   }
+  symbolcount++;
   tmp->str = s;
   tmp->resolved = r;
   tmp->value = val;
