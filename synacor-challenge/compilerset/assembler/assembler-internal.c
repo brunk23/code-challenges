@@ -389,7 +389,7 @@ TOKEN *data_handler(TOKEN *curr, LINE *source, int *error) {
   } else {
     while( curr && (curr->line == line) ) {
       curr->location = pc;
-      memory[pc] = curr->value;
+      memory[pc] = token_value(curr);
       pc++;
       curr = curr->next;
     }
