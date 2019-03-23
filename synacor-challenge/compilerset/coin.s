@@ -78,7 +78,10 @@ tryagain:
 	call	pstr
 	jmp	inp
 
-.include	"funcs.s"
+	.include	"readnum.s"
+	.include	"divide.s"
+	.include	"pstr.s"
+	.include	"pnumber.s"
 
 vals:	data	0 0  0  0  0
 lastv:	data    0
