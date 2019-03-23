@@ -27,7 +27,8 @@ FILE *devices[MAXDEV];
 
 enum REGISTERS {
   r0 = 32768, r1, r2, r3, r4, r5, r6, r7,
-  INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP, PC, LOAD
+  INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP, PC,
+  LOAD,STACK, QUIT
 };
 
 enum INSTSET {
@@ -92,6 +93,11 @@ int op_in();
 int op_nop();
 int op_dread();
 int op_dwrite();
+void print_mem_range(SWORD, SWORD);
+void debug_set(char *, int *);
+void debug_jump(char *, int *);
+void debug_break(char *, int *);
+void catch_int(int);
 
 /* There are 22 opcodes and we just call them
  * from here. +2 extensions */

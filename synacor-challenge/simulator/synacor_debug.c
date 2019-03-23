@@ -25,6 +25,18 @@ void process_debug_str(char *s) {
   case SAVE:
     save_state();
     break;
+  case JUMP:
+    debug_jump( s, &i );
+    break;
+  case SET:
+    debug_set( s, &i );
+    break;
+  case BREAK:
+    debug_break(s, &i );
+    break;
+  case QUIT:
+    exit(1);
+    break;
   case STEP:
     if( stepmode == 0 ) {
       stepmode = 1;
@@ -35,6 +47,40 @@ void process_debug_str(char *s) {
   default:
     printf("Invalid debug command %s\n",s);
     break;
+  }
+}
+
+void debug_break(char *s, int *i) {
+  SWORD arg1 = INVALID;
+  arg1 = next_word(s, i);
+  if( arg1 < r0 ) {
+    breakpoint = arg1;
+  }
+}
+
+void debug_jump(char *s, int *i) {
+  SWORD arg1 = INVALID;
+  arg1 = next_word(s, i);
+  if( arg1 < r0 ) {
+    pc = arg1;
+  }
+}
+
+void debug_set(char *s, int *i) {
+  SWORD arg1 = INVALID, arg2 = INVALID;
+  arg1 = next_word(s, i);
+  arg2 = next_word(s, i);
+
+  if( arg1 >= INVALID || arg2 >= INVALID ) {
+    fprintf(stderr,"Unable to set bad address\n");
+    return;
+  }
+  fprintf(stderr,"Set address [%i] <- %i\n",arg1, arg2);
+  if( arg1 >= r0 ) {
+    arg1 -= r0;
+    reg[arg1] = arg2;
+  } else {
+    memory[arg1] = arg2;
   }
 }
 
@@ -61,10 +107,26 @@ void debug_print(char *s, int *i) {
   case PC:
     printf("PC: %i\n", pc);
     break;
+  case STACK:
+    printstack();
+    break;
   default:
-    printf("Invalid print\n");
+    arg2 = next_word(s, i);
+    if( arg2 == INVALID ) {
+      arg2 = arg1;
+    }
+    print_mem_range(arg1, arg2);
     break;
   }
+}
+
+void print_mem_range(SWORD x, SWORD y) {
+  int i = 0;
+  fprintf(stderr,"MEMORY: %i to %i\n",x,y);
+  for( i = x; i <= y; ++i ) {
+    fprintf(stderr,"%05i\t",memory[i]);
+  }
+  fprintf(stderr,"\n");
 }
 
 SWORD next_word(char *s, int *i) {
@@ -116,29 +178,35 @@ SWORD isdebugcommand( char *s ) {
   if( !(strcmp( s, "step" )) || !(strcmp( s, "st")) ) {
     return STEP;
   }
+  if( !(strcmp( s, "quit")) || !(strcmp( s, "q")) ) {
+    return QUIT;
+  }
+  if( !(strcmp( s, "stack")) || !(strcmp( s, "s")) ) {
+    return STACK;
+  }
   if( !(strcmp( s, "r0" )) ) {
     return r0;
   }
   if( !(strcmp( s, "r1" )) ) {
-    return r0;
+    return r1;
   }
   if( !(strcmp( s, "r2" )) ) {
-    return r0;
+    return r2;
   }
   if( !(strcmp( s, "r3" )) ) {
-    return r0;
+    return r3;
   }
   if( !(strcmp( s, "r4" )) ) {
-    return r0;
+    return r4;
   }
   if( !(strcmp( s, "r5" )) ) {
-    return r0;
+    return r5;
   }
   if( !(strcmp( s, "r6" )) ) {
-    return r0;
+    return r6;
   }
   if( !(strcmp( s, "r7" )) ) {
-    return r0;
+    return r7;
   }
   if( !(strcmp( s, "pc" )) ) {
     return PC;
@@ -147,33 +215,7 @@ SWORD isdebugcommand( char *s ) {
 }
 
 
-/*
-int enter_debug_mode() {
-  int x = 0, y = 0, i=0, index = 0;
-  struct STACKOBJ *sptr;
-
-  case 'j':
-    while( (inbuffer[inbuffindex] >= 'a' &&
-	    inbuffer[inbuffindex] <= 'z') ||
-	   (inbuffer[inbuffindex] >= '0' &&
-	    inbuffer[inbuffindex] <= '9') ) {
-      inbuffindex++;
-    }
-    y = strtol(&inbuffer[inbuffindex],0,10);
-    pc = y;
-    break;
-
-  case 'b':
-    while( (inbuffer[inbuffindex] >= 'a' &&
-	    inbuffer[inbuffindex] <= 'z') ||
-	   (inbuffer[inbuffindex] >= '0' &&
-	    inbuffer[inbuffindex] <= '9') ) {
-      inbuffindex++;
-    }
-    y = strtol(&inbuffer[inbuffindex],0,10);
-    breakpoint = y;
-    break;
-    
+/*** Remove the ability to call
   case 'c':
     while( (inbuffer[inbuffindex] >= 'a' &&
 	    inbuffer[inbuffindex] <= 'z') ||
@@ -190,68 +232,6 @@ int enter_debug_mode() {
     stack = sptr;
     pc = y;
     break;
-
-    /* This has to be print 
-  case 'p':
-    if( inbuffer[inbuffindex] == 's' ) {
-      printstack();
-      break;
-    }
-    x = strtol(&inbuffer[inbuffindex],0,10);
-    while( (inbuffer[inbuffindex] >= 'a' &&
-	    inbuffer[inbuffindex] <= 'z') ||
-	   (inbuffer[inbuffindex] >= '0' &&
-	    inbuffer[inbuffindex] <= '9') ) {
-      inbuffindex++;
-    }
-    y = strtol(&inbuffer[inbuffindex],0,10);
-    if( !y ) {
-      y = x;
-    }
-    if( (x < 0 || x > 32767) || (y < 0 || y > 32767 )) {
-      fprintf(stderr,"Invalid memory location\n");
-    }
-    fprintf(stderr,"MEMORY: %i to %i\n",x,y);
-    for( i = x; i <= y; ++i ) {
-      fprintf(stderr,"%05i\t",memory[i]);
-    }
-    fprintf(stderr,"\n");
-    break;
-
-  case 's':
-    if( inbuffer[inbuffindex+1] == 'e' ) {
-      while(inbuffer[inbuffindex] >= 'a' &&
-	    inbuffer[inbuffindex] <= 'z') {
-	inbuffindex++;
-      }
-      while(inbuffer[inbuffindex] == ' ') {
-	inbuffindex++;
-      }
-      if(inbuffer[inbuffindex] == 'r') {
-	inbuffindex++;
-	index = inbuffer[inbuffindex] - '0';
-	inbuffindex++;
-	x = strtol(&inbuffer[inbuffindex],0,10);
-	reg[index] = x;
-      }
-      if( inbuffer[inbuffindex] >= '0' && inbuffer[inbuffindex] <= '9' ) {
-	x = strtol(&inbuffer[inbuffindex],0,10);
-	while( (inbuffer[inbuffindex] >= '0' &&
-		inbuffer[inbuffindex] <= '9') ) {
-	  inbuffindex++;
-	}
-	y = strtol(&inbuffer[inbuffindex],0,10);
-	fprintf(stderr,"Setting [%05i] to %05i\n",x,y);
-	memory[x] = y;
-      }
-      break;
-    }
-  }
-  while( inbuffer[inbuffindex] != 0 ) {
-    inbuffindex++;
-  }
-  return 0;
-}
 */
 
 int printstack() {

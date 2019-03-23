@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <signal.h>
 
 #include "synacor.h"
 
@@ -15,6 +16,8 @@ int main(int argc, char *argv[]) {
   int retval = 0;
   int source = 0;
   int bufflen = 0;
+
+  signal(SIGINT, catch_int);
 
   fprintf(stderr,"Initializing Machine...\n");
   init_machine();
@@ -104,6 +107,10 @@ int main(int argc, char *argv[]) {
   }
   
   return 0;
+}
+
+void catch_int(int none) {
+  stepmode = 1;
 }
 
 /*
