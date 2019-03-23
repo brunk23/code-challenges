@@ -19,6 +19,19 @@ void process_debug_str(char *s) {
   case PRINT:
     debug_print( s, &i );
     break;
+  case LOAD:
+    load_state();
+    break;
+  case SAVE:
+    save_state();
+    break;
+  case STEP:
+    if( stepmode == 0 ) {
+      stepmode = 1;
+    } else {
+      stepmode = 0;
+    }
+    break;
   default:
     printf("Invalid debug command %s\n",s);
     break;
@@ -96,6 +109,9 @@ SWORD isdebugcommand( char *s ) {
   }
   if( !(strcmp( s, "save" )) || !(strcmp( s, "sa")) ) {
     return SAVE;
+  }
+  if( !(strcmp( s, "load" )) || !(strcmp( s, "l")) ) {
+    return LOAD;
   }
   if( !(strcmp( s, "step" )) || !(strcmp( s, "st")) ) {
     return STEP;
