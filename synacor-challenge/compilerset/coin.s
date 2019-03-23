@@ -77,14 +77,12 @@ tryagain:
 	set	r1	emsg
 	call	pstr
 	jmp	inp
+
 .include	"funcs.s"
 
-vals:
-	data	0 0  0  0  0
-lastv:
-	data    0
-coins:
-	data	1 5 10 25 50 100
+vals:	data	0 0  0  0  0
+lastv:	data    0
+coins:	data	1 5 10 25 50 100
 disp:	data	"How much cents? "
 emsg:	data	"Pick a different number: "
 strgs:	data	penny nickel dime quarter half-dollar dollar
@@ -94,5 +92,3 @@ dime:	data	"Dimes: "
 quarter:data	"Quarters: "
 half-dollar:	data	"Halfs: "
 dollar:	data	"Dollars: "
-
-#.include	"foo.s"
