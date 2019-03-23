@@ -34,6 +34,19 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  pass1(tokens, filelines);
+  pass2(tokens, filelines);
+
+  /*
+   * Free all the structures created by process_input
+   */
+  delete_sym_tree();
+  syms = NULL;
+  delete_line_tree(filelines);
+  filelines = NULL;
+  delete_token_tree(tokens);
+  tokens = NULL;
+
   if( dest ) {
     process_output(argv[dest]);
   } else {
@@ -73,75 +86,67 @@ int process_input(const char *filename) {
   FILE *fp;
   int lineno = 0, strind = 0, len = 0;
   char inbuffer[BUFFSIZE];
-  LINE *start = NULL, *curr = NULL;
-  TOKEN *tokens = NULL, *curr_token = NULL, *tmp = NULL;
+  LINE *curr_line = filelines, *line_tmp;
+  TOKEN *curr_token = NULL, *tmp_token = NULL;
 
   if( !(fp = fopen(filename,"r"))) {
     fprintf(stderr,"Couldn't open file: %s\n",filename);
     return 1;
   }
 
-  if( !(start = malloc( sizeof(LINE) ))) {
+  if( !(line_tmp = malloc( sizeof(LINE) ))) {
     fprintf(stderr, "Failed to get memory for line buffer\n");
     return 1;
   }
-  start->number = 0;
-  start->next = NULL;
-  start->str = NULL;
-  curr = start;
+  line_tmp->next = NULL;
+  line_tmp->str = NULL;
+
+  if( !(curr_line) ) {
+    filelines = line_tmp;
+  }
+  curr_line = line_tmp;
 
   while( fgets(inbuffer,BUFFSIZE,fp) ) {
     strind = 0;
     lineno += 1;
     len = strlen(inbuffer);
-    if( !(curr->str = malloc(sizeof(char)* len + 1)) ) {
+    if( !(curr_line->str = malloc(sizeof(char)* len + 1)) ) {
       fprintf(stderr, "Failed to get memory for line buffer\n");
       return 1;
     }
-    strncpy(curr->str, inbuffer, strlen(inbuffer));
-    curr->number = lineno;
+    strncpy(curr_line->str, inbuffer, strlen(inbuffer));
     while ( strind <= len ) {
-      if( !(tmp = token(inbuffer, strind)) ) {
+      if( !(tmp_token = token(inbuffer, strind)) ) {
 	/* We didn't get a token and are done with this line */
 	break;
       }
-      if( tmp == (TOKEN *)FAIL ) {
+      if( tmp_token == (TOKEN *)FAIL ) {
 	/* Error on this line */
-	fprintf(stderr, "Line #%i: %s", lineno, curr->str);
+	fprintf(stderr, "Line #%i: %s", lineno, curr_line->str);
 	break;
       }
       if( tokens == (TOKEN *)NULL ) {
-	tokens = tmp;
+	tokens = tmp_token;
 	curr_token = tokens;
       } else {
-	curr_token->next = tmp;
+	curr_token->next = tmp_token;
 	curr_token = curr_token->next;
       }
       curr_token->line = lineno;
+      curr_token->file_name = filename;
+      curr_token->source_line = curr_line->str;
       strind = curr_token->length;
     }
-    if( !(curr->next = malloc( sizeof(LINE) ))) {
+    if( !(curr_line->next = malloc( sizeof(LINE) ))) {
       fprintf(stderr, "Failed to get memory for line buffer\n");
       return 1;
     }
-    curr = curr->next;
-    curr->next = (LINE *)NULL;
-    curr->str = NULL;
+    curr_line = curr_line->next;
+    curr_line->next = (LINE *)NULL;
+    curr_line->str = NULL;
   }
 
   fclose(fp);
-
-  pass1(tokens, start);
-  pass2(tokens, start);
-
-  delete_sym_tree();
-  syms = NULL;
-  delete_line_tree(start);
-  start = NULL;
-  curr = NULL;
-  delete_token_tree(tokens);
-  tokens = NULL;
-  curr_token = NULL;
   return 0;
 }
 
@@ -197,6 +202,8 @@ int init_machine() {
   }
 
   syms = (SYMBOL *)NULL;
+  tokens = (TOKEN *)NULL;
+  filelines = (LINE *)NULL;
   pc = 0;
 
   return 0;

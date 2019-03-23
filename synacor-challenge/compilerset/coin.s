@@ -140,3 +140,5 @@ dime:	data	"Dimes: "
 quarter:data	"Quarters: "
 half-dollar:	data	"Halfs: "
 dollar:	data	"Dollars: "
+
+#.include	"foo.s"

@@ -30,11 +30,12 @@ struct TOKEN {
   SWORD location;
   int length;
   char *word;
+  const char *file_name;
+  const char *source_line;
   TOKEN *next;
 };
 
 struct LINE {
-  int number;
   char *str;
   LINE *next;
 };
@@ -58,6 +59,8 @@ struct SYMBOL {
 SWORD memory[32768];
 SWORD pc;
 SYMBOL *syms;
+TOKEN *tokens;
+LINE *filelines;
 
 enum REGISTERS {
   r0 = 32768, r1, r2, r3, r4, r5, r6, r7
@@ -76,7 +79,6 @@ enum STATES {
 /*
  * Function prototypes
  */
-char *source_line(LINE *, int);
 int help_menu( const char * );
 int init_machine();
 int process_input( const char * );

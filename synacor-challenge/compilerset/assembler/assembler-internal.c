@@ -58,6 +58,7 @@ TOKEN *token(char *s, int start) {
     }
     if( s[i] == '\"' ) {
       if( j == 0 ) {
+	i++;
 	curr->type = STRING;
 	tmp[j] = s[i];
 	j++;
@@ -74,9 +75,8 @@ TOKEN *token(char *s, int start) {
 	    j++;
 	  }
 	}
-	tmp[j] = '\"';
+	tmp[j] = '\0';
 	j++;
-	tmp[j] = 0;
 	i++;
       }
     }
@@ -136,7 +136,7 @@ int pass1(TOKEN *tokens, LINE *source) {
 	/* Not a reserved word */
 	fprintf(stderr,"WARNING: Unexpected word \"%s\" where command should be. [Line %i]\n",
 		curr->word,curr->line);
-        fprintf(stderr,"%s",source_line(source,curr->line));
+        fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
 	fprintf(stderr,"Ignoring unexpected word.\n");
 	curr = curr->next;
       } else {
@@ -186,7 +186,7 @@ int pass1(TOKEN *tokens, LINE *source) {
 	default:
 	  fprintf(stderr,"WARNING: Unrecognized instruction \"%s\" [Line %i]\n",
 		  curr->word,curr->line);
-	  fprintf(stderr,"%s",source_line(source,curr->line));
+	  fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
 	  curr = curr->next;
 	  break;
 	}
@@ -205,7 +205,7 @@ int pass2(TOKEN *c, LINE *source) {
       if( !(s = find_symbol(c->word)) || s->resolved == UNRESOLVED ) {
 	fprintf(stderr,"ERROR: Unresolved symbol \"%s\" [Line %i]\n",
 		c->word, c->line);
-	fprintf(stderr,"%s",source_line(source,c->line));
+        fprintf(stderr,"%s: %s",c->file_name,c->source_line);
 	error = true;
 	return error;
       }
@@ -229,7 +229,7 @@ int pass2(TOKEN *c, LINE *source) {
 void error_missing_word(TOKEN *curr, LINE *source) {
   fprintf(stderr,"ERROR: Unexpected end of tokens. [Line %i]\n",
 	  curr->line);
-  fprintf(stderr,"%s",source_line(source,curr->line));
+  fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
 }
 
 TOKEN *one_ops_handler(TOKEN *curr, LINE *source, int *error) {
@@ -247,7 +247,7 @@ TOKEN *one_ops_handler(TOKEN *curr, LINE *source, int *error) {
   curr->value = token_value(curr);
   if( val == pop && (curr->value < r0 || curr->value > r7 )) {
     fprintf(stderr,"WARNING: 1st argument to %s should be a register.\n",inst);
-    fprintf(stderr,"%s",source_line(source,curr->line));
+    fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
   }
   curr->location = pc;
   memory[pc] = curr->value;
@@ -274,7 +274,7 @@ TOKEN *two_ops_handler(TOKEN *curr, LINE *source, int *error) {
   case rmem:
     if( curr->value < r0 || curr->value > r7 ) {
       fprintf(stderr,"WARNING: 1st argument to %s should be a register.\n",inst);
-      fprintf(stderr,"%s",source_line(source,curr->line));
+      fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
     }
     break;
   default:
@@ -309,7 +309,7 @@ TOKEN *three_ops_handler(TOKEN *curr, LINE *source, int *error) {
   curr->value = token_value(curr);
   if( curr->value < r0 || curr->value > r7 ) {
     fprintf(stderr,"WARNING: 1st argument to %s should be a register.\n",inst);
-    fprintf(stderr,"%s",source_line(source,curr->line));
+    fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
   }
   curr->location = pc;
   memory[pc] = curr->value;
@@ -369,7 +369,7 @@ SWORD token_value(TOKEN *curr) {
  * This needs to be modified to also take strings.
  */
 TOKEN *data_handler(TOKEN *curr, LINE *source, int *error) {
-  int line = curr->line, i = 1;
+  int line = curr->line, i = 0;
   if( !curr->next ) {
     *error = true;
     return curr->next;
@@ -378,7 +378,7 @@ TOKEN *data_handler(TOKEN *curr, LINE *source, int *error) {
   curr = curr->next;
   if( curr->type == STRING ) {
     curr->location = pc;
-    while( curr->word[i] != '"' && curr->word[i] != '\0' ) {
+    while( curr->word[i] != '\0' ) {
       memory[pc] = curr->word[i];
       pc++;
       i++;
@@ -407,7 +407,7 @@ TOKEN *origin_handler(TOKEN *curr, LINE *source, int *error) {
   if(curr->type != NUMBER) {
     fprintf(stderr,"ERROR: .origin must be a number. [Line %i]\n",
 	    curr->line);
-    fprintf(stderr,"%s",source_line(source,curr->line));
+    fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
     *error = true;
     return curr->next;
   }
@@ -529,16 +529,6 @@ SWORD reserved(char *str) {
     return DATA;
   }
   return USERWORD;
-}
-
-char *source_line(LINE *lp, int i) {
-  while( lp ) {
-    if( i == lp->number ) {
-      return lp->str;
-    }
-    lp = lp->next;
-  }
-  return (char *)NULL;
 }
 
 void add_symbol(char *s, int r, int val) {

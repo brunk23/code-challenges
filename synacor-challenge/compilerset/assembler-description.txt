@@ -1,0 +1,54 @@
+Assembly files will have the following format:
+----------------------------------------------
+# comments are everything after a #
+
+Labels should be at the start of the line and end with a colon. I would
+like to support labels as arguments to a command, so the code can be
+self-modifying with wmem, but it's not in place at the moment.  When referenced
+you would not use the colon.
+
+label: nop              # all labels and variable names end with
+       jmp label
+       out foo:		# this does not work but is desired.
+
+Origin is used to set the program counter for code placement purposes.
+.origin 00000           # will give an address where the next code goes
+
+Include is not supported, yet, but would read the file one the line into
+the token tree at the place it is read.  If included files have .include
+directives, they are not checked to ensure they don't overwrite other code.
+.include  "funcs.s"
+
+data:                 # <- is label "data" not a data statement, you should
+		      # not do this! But, it would work.
+
+Data commands put the numbers or string directly after them into memory.
+    data 0 0 4533 234 99  # everything after a data statement is written directly
+    data "Hello"          # will write ascii for "Hello" followed by a 0.
+
+    # registers start with r
+-- OPCODES and number of args --
+add a b c
+and a b c
+call a
+eq a b c
+gt a b c
+halt
+in a
+jf a b
+jmp a
+jt a b
+mod a b c
+mult a b c
+nop
+not a b
+or a b c
+out a
+pop a
+push a
+ret
+rmem a b
+set a b
+wmem a b
+dread a b c d e
+dwrite a b c d e
