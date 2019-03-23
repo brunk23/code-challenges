@@ -27,7 +27,7 @@ FILE *devices[MAXDEV];
 
 enum REGISTERS {
   r0 = 32768, r1, r2, r3, r4, r5, r6, r7,
-  INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP
+  INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP, PC
 };
 
 enum INSTSET {
@@ -63,7 +63,7 @@ SWORD isdebugcommand(char *);
 SWORD next_word(char *, int *);
 int scan_inbuff();
 void process_debug_str(char *);
-
+void debug_print(char *, int *);
 /*
  * See the arch-spec sheet for detailed instructions on
  * opcodes

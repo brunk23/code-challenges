@@ -10,22 +10,46 @@
  */
 
 void process_debug_str(char *s) {
-  int i = 0, x = 0;
-  SWORD command_word = INVALID, arg1 = INVALID, arg2 = INVALID;
+  int i = 0;
+  SWORD command_word = INVALID;
 
   command_word = next_word(s, &i);
 
   switch( command_word ) {
   case PRINT:
-    arg1 = next_word(s, &i);
+    debug_print( s, &i );
+    break;
+  default:
+    printf("Invalid debug command %s\n",s);
+    break;
+  }
+}
+
+void debug_print(char *s, int *i) {
+  SWORD arg1 = INVALID, arg2 = INVALID;
+  int x = 0;
+
+  arg1 = next_word(s, i);
+  switch( arg1 ) {
+  case r0:
+  case r1:
+  case r2:
+  case r3:
+  case r4:
+  case r5:
+  case r6:
+  case r7:
     if( arg1 >= r0 && arg1 <= r7 ) {
       for( x = 0; x < 8; ++x ) {
 	printf("r%i: %i\n", x, reg[x]);
       }
     }
     break;
+  case PC:
+    printf("PC: %i\n", pc);
+    break;
   default:
-    printf("Invalid command %s\n",s);
+    printf("Invalid print\n");
     break;
   }
 }
@@ -100,30 +124,20 @@ SWORD isdebugcommand( char *s ) {
   if( !(strcmp( s, "r7" )) ) {
     return r0;
   }
+  if( !(strcmp( s, "pc" )) ) {
+    return PC;
+  }
   return INVALID;
 }
 
 
+/*
 int enter_debug_mode() {
   int x = 0, y = 0, i=0, index = 0;
   struct STACKOBJ *sptr;
   
-  inbuffindex++;
-  switch ( inbuffer[inbuffindex] ) {
-    /* Return at the end of the string */
-  case 0:
-    return 0;
-    break;
 
-    /* Ignore whitespace and # */
-  case ' ':
-  case '\t':
-  case '\n':
-  case '#':
-    inbuffindex++;
-    break;
-
-    /* This has to be load state */
+    /* This has to be load state 
   case 'l':
     while( inbuffer[inbuffindex] >= 'a' &&
 	   inbuffer[inbuffindex] <= 'z') {
@@ -171,7 +185,7 @@ int enter_debug_mode() {
     pc = y;
     break;
 
-    /* This has to be print */
+    /* This has to be print 
   case 'p':
     while( inbuffer[inbuffindex] >= 'a' &&
 	   inbuffer[inbuffindex] <= 'z') {
@@ -181,7 +195,7 @@ int enter_debug_mode() {
       inbuffindex++;
     }
     if( inbuffer[inbuffindex] == 'p' ) {
-      /* print pc */
+      /* print pc 
       printf("PC: %i\n", pc);
       break;
     }
@@ -262,6 +276,7 @@ int enter_debug_mode() {
   }
   return 0;
 }
+*/
 
 int printstack() {
   struct STACKOBJ *sptr = 0;
