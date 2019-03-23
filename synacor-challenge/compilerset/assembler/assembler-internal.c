@@ -10,7 +10,7 @@
 TOKEN *token(char *s, int start) {
   TOKEN *curr = NULL;
   char tmp[BUFFSIZE];
-  int i = 0, j = 0;
+  int i = 0, j = 0, size = 0;
 
   if( !(curr = malloc( sizeof(TOKEN) ))) {
     fprintf(stderr,"Failed to get memory in token(): ");
@@ -24,15 +24,16 @@ TOKEN *token(char *s, int start) {
   curr->word = NULL;
   curr->next = NULL;
 
+  size = strlen(s);
   i = start;
   while( isspace(s[i])) {
     i++;
-    if( i == strlen(s) ) {
+    if( i == size ) {
       free(curr);
       return (TOKEN *)SUCCESS;
     }
   }
-  for( ; i < strlen(s) ; i++ ) {
+  for( ; i < size ; i++ ) {
     if( j == 0 ) {
       if( s[i] == '.' ) {
 	curr->type = DIRECTIVE;
@@ -54,6 +55,30 @@ TOKEN *token(char *s, int start) {
       curr->type = LABEL;
       i++;
       break;
+    }
+    if( s[i] == '\"' ) {
+      if( j == 0 ) {
+	curr->type = STRING;
+	tmp[j] = s[i];
+	j++;
+	i++;
+	while( s[i] != '\"' && i < size ) {
+	  if( s[i] != '\\' ) {
+	    tmp[j] = s[i];
+	    j++;
+	    i++;
+	  } else {
+	    i++;
+	    tmp[j] = s[i];
+	    i++;
+	    j++;
+	  }
+	}
+	tmp[j] = '\"';
+	j++;
+	tmp[j] = 0;
+	i++;
+      }
     }
     if( isspace(s[i]) || s[i] == '#' ) {
       if( j == 0 ) {
@@ -344,18 +369,30 @@ SWORD token_value(TOKEN *curr) {
  * This needs to be modified to also take strings.
  */
 TOKEN *data_handler(TOKEN *curr, LINE *source, int *error) {
-  int line = curr->line;
+  int line = curr->line, i = 1;
   if( !curr->next ) {
     *error = true;
     return curr->next;
   }
   curr->location = pc;
   curr = curr->next;
-  while( curr && (curr->line == line) ) {
+  if( curr->type == STRING ) {
     curr->location = pc;
-    memory[pc] = curr->value;
+    while( curr->word[i] != '"' && curr->word[i] != '\0' ) {
+      memory[pc] = curr->word[i];
+      pc++;
+      i++;
+    }
+    memory[pc] = 0;
     pc++;
     curr = curr->next;
+  } else {
+    while( curr && (curr->line == line) ) {
+      curr->location = pc;
+      memory[pc] = curr->value;
+      pc++;
+      curr = curr->next;
+    }
   }
   return curr;
 }
@@ -378,7 +415,9 @@ TOKEN *origin_handler(TOKEN *curr, LINE *source, int *error) {
   return curr->next;
 }
 
-
+/*
+ * This function will return the register value, or it will return 0.
+ */
 SWORD isregister(char *str) {
   if( !(strcmp(str,"r0")) ) {
     return r0;
