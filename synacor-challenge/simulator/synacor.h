@@ -26,7 +26,8 @@ SWORD stepmode;
 FILE *devices[MAXDEV];
 
 enum REGISTERS {
-  r0 = 32768, r1, r2, r3, r4, r5, r6, r7
+  r0 = 32768, r1, r2, r3, r4, r5, r6, r7,
+  INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP
 };
 
 enum INSTSET {
@@ -42,6 +43,7 @@ struct STACKOBJ {
 
 struct STACKOBJ *stack;
 char inbuffer[BUFFSIZE];
+char debugbuffer[BUFFSIZE];
 int inbuffindex;
 int breakpoint;
 
@@ -57,6 +59,10 @@ SWORD get_add( SWORD );
 const char *regname( SWORD );
 SWORD print_instruction( SWORD );
 int print_addr(SWORD, const char *);
+SWORD isdebugcommand(char *);
+SWORD next_word(char *, int *);
+int scan_inbuff();
+void process_debug_str(char *);
 
 /*
  * See the arch-spec sheet for detailed instructions on

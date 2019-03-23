@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "synacor.h"
 
@@ -13,6 +14,7 @@ int main(int argc, char *argv[]) {
   char *test;
   int retval = 0;
   int source = 0;
+  int bufflen = 0;
 
   fprintf(stderr,"Initializing Machine...\n");
   init_machine();
@@ -53,22 +55,29 @@ int main(int argc, char *argv[]) {
     if( pc == breakpoint ) {
       stepmode = 1;
     }
-    
-    if((memory[pc] == in && inbuffindex >= strlen(inbuffer)) ||
-       (stepmode)) {
-      if(stepmode) {
-	print_instruction( pc );
-      }
+
+    /*
+     * This is where we need to change the code.
+     */
+    if((memory[pc] == in && inbuffindex >= bufflen)) {
       test = fgets(inbuffer, BUFFSIZE, stdin);
       if( !test || feof(stdin) || ferror(stdin) ) {
 	fprintf(stderr,"Input error!");
 	return 1;
       }
       inbuffindex = 0;
-      if( inbuffer[inbuffindex] == '#' ) {
-	enter_debug_mode();
+      if( !(bufflen = scan_inbuff()) ) {
 	continue;
       }
+    }
+    if(stepmode) {
+      print_instruction( pc );
+      test = fgets(debugbuffer, BUFFSIZE, stdin);
+      if( !test || feof(stdin) || ferror(stdin) ) {
+	fprintf(stderr,"Input error!");
+	return 1;
+      }
+      process_debug_str(debugbuffer);
     }
 
     /* Only halt returns 1 */
@@ -94,6 +103,26 @@ int main(int argc, char *argv[]) {
   }
   
   return 0;
+}
+
+/*
+ * This will clear the inbuff of debug strings
+ */
+int scan_inbuff() {
+  int count = 0, i = 0;
+  while( isspace(inbuffer[i])) {
+    i++;
+  }
+  while ( inbuffer[i] != 0 ) {
+    if( inbuffer[i] == '#' ) {
+      inbuffer[i] = 0;
+      process_debug_str(&inbuffer[i+1]);
+    } else {
+      i++;
+      count++;
+    }
+  }
+  return count;
 }
 
 int init_machine() {

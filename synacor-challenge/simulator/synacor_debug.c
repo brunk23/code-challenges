@@ -1,12 +1,108 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "synacor.h"
 
 /*
  * The debug commands
  */
+
+void process_debug_str(char *s) {
+  int i = 0, x = 0;
+  SWORD command_word = INVALID, arg1 = INVALID, arg2 = INVALID;
+
+  command_word = next_word(s, &i);
+
+  switch( command_word ) {
+  case PRINT:
+    arg1 = next_word(s, &i);
+    if( arg1 >= r0 && arg1 <= r7 ) {
+      for( x = 0; x < 8; ++x ) {
+	printf("r%i: %i\n", x, reg[x]);
+      }
+    }
+    break;
+  default:
+    printf("Invalid command %s\n",s);
+    break;
+  }
+}
+
+SWORD next_word(char *s, int *i) {
+  SWORD value = INVALID;
+  int start = 0, end = 0;
+  char oldchar = 0;
+
+  while( isspace(s[*i]) ) {
+    (*i)++;
+  }
+  start = *i;
+  while( isalnum(s[*i]) ) {
+    (*i)++;
+  }
+  end = *i;
+  oldchar = s[end];
+  s[end] = 0;
+
+  value = isdebugcommand( &s[start] );
+  if( value == INVALID ) {
+    value = strtol( &s[start], 0, 10 );
+  }
+  s[end] = oldchar;
+  return value;
+}
+
+SWORD isdebugcommand( char *s ) {
+  if( !(strcmp( s, "set" )) ) {
+    return SET;
+  }
+  if( !(strcmp( s, "jump" )) || !(strcmp( s, "j")) ) {
+    return JUMP;
+  }
+  if( !(strcmp( s, "break" )) || !(strcmp( s, "b")) ) {
+    return BREAK;
+  }
+  if( !(strcmp( s, "clear" )) || !(strcmp( s, "c")) ) {
+    return CLEAR;
+  }
+  if( !(strcmp( s, "print" )) || !(strcmp( s, "p")) ) {
+    return PRINT;
+  }
+  if( !(strcmp( s, "save" )) || !(strcmp( s, "sa")) ) {
+    return SAVE;
+  }
+  if( !(strcmp( s, "step" )) || !(strcmp( s, "st")) ) {
+    return STEP;
+  }
+  if( !(strcmp( s, "r0" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r1" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r2" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r3" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r4" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r5" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r6" )) ) {
+    return r0;
+  }
+  if( !(strcmp( s, "r7" )) ) {
+    return r0;
+  }
+  return INVALID;
+}
+
 
 int enter_debug_mode() {
   int x = 0, y = 0, i=0, index = 0;
