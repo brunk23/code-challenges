@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
     }
     if(stepmode) {
       print_instruction( pc );
+      fprintf(stderr,"  SYNDB> ");
       test = fgets(debugbuffer, BUFFSIZE, stdin);
       if( !test || feof(stdin) || ferror(stdin) ) {
 	fprintf(stderr,"Input error!");

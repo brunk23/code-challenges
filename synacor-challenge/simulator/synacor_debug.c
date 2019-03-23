@@ -151,16 +151,6 @@ SWORD isdebugcommand( char *s ) {
 int enter_debug_mode() {
   int x = 0, y = 0, i=0, index = 0;
   struct STACKOBJ *sptr;
-  
-
-    /* This has to be load state 
-  case 'l':
-    while( inbuffer[inbuffindex] >= 'a' &&
-	   inbuffer[inbuffindex] <= 'z') {
-      inbuffindex++;
-    }
-    load_state();
-    break;
 
   case 'j':
     while( (inbuffer[inbuffindex] >= 'a' &&
@@ -203,24 +193,6 @@ int enter_debug_mode() {
 
     /* This has to be print 
   case 'p':
-    while( inbuffer[inbuffindex] >= 'a' &&
-	   inbuffer[inbuffindex] <= 'z') {
-      inbuffindex++;
-    }
-    while( inbuffer[inbuffindex] == ' ' ) {
-      inbuffindex++;
-    }
-    if( inbuffer[inbuffindex] == 'p' ) {
-      /* print pc 
-      printf("PC: %i\n", pc);
-      break;
-    }
-    if( inbuffer[inbuffindex] == 'r' ) {
-      for( x = 0; x < 8; ++x ) {
-	printf("r%i: %i\n", x, reg[x]);
-      }
-      break;
-    }
     if( inbuffer[inbuffindex] == 's' ) {
       printstack();
       break;
@@ -247,18 +219,6 @@ int enter_debug_mode() {
     break;
 
   case 's':
-    if( inbuffer[inbuffindex+1] == 'a' ) {
-      save_state();
-      break;
-    }
-    if( inbuffer[inbuffindex+1] == 't' ) {
-      if( stepmode ) {
-	stepmode = 0;
-      } else {
-	stepmode = 1;
-      }
-      break;
-    }
     if( inbuffer[inbuffindex+1] == 'e' ) {
       while(inbuffer[inbuffindex] >= 'a' &&
 	    inbuffer[inbuffindex] <= 'z') {
