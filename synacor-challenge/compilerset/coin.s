@@ -29,6 +29,7 @@ addvalues1:
 hitvalue:
 	add	r6	r6	1
 	set	r4	strgs
+	set	r5	coins
 	set	r3	vals
 	set	r1	r6
 	call	pnumber
@@ -37,10 +38,13 @@ hitvalue1:
  	rmem	r1	r4
 	call	pstr
 	rmem	r1	r3
+	rmem	r2	r5
+	call	divide
 	call	pnumber
 	out	9
 	add	r3	r3	1
 	add	r4	r4	1
+	add	r5	r5	1
 	eq	r7	r3	coins
 	jf	r7	hitvalue1
 	out	10
