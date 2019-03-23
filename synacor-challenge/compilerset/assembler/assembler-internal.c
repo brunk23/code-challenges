@@ -448,10 +448,14 @@ TOKEN *include_handler(TOKEN *curr, int *error) {
   }
   file_token->next = head_token;
   file_token = head_token;
-  while(file_token->next) {
-    file_token = file_token->next;
+  if( file_token ) {
+    while(file_token->next) {
+      file_token = file_token->next;
+    }
+    file_token->next = after_file;
+  } else {
+    return after_file;
   }
-  file_token->next = after_file;
   return head_token;
 }
 
