@@ -1,8 +1,12 @@
 .origin 00000
-	set	r0	62		# initial amount of coins
 	set	r1	disp
 	call	pstr
 	out	10
+inp:	call	readnum
+	jf	r1	tryagain
+	gt	r0	r1	499
+	jt	r0	tryagain
+	set	r0	r1
 
 # This is our adding loop
 addvalues:
@@ -69,6 +73,10 @@ overvalue1:
 endprogram:
 	halt
 
+tryagain:
+	set	r1	emsg
+	call	pstr
+	jmp	inp
 .include	"funcs.s"
 
 vals:
@@ -77,7 +85,8 @@ lastv:
 	data    0
 coins:
 	data	1 5 10 25 50 100
-disp:	data	"				How Many Ways To Make Change!"
+disp:	data	"How much cents? "
+emsg:	data	"Pick a different number: "
 strgs:	data	penny nickel dime quarter half-dollar dollar
 penny:	data	"Pennies: "
 nickel:	data	"Nickels: "
