@@ -45,7 +45,7 @@ void process_debug_str(char *s) {
     }
     break;
   default:
-    printf("Invalid debug command %s\n",s);
+    fprintf(stderr,"Invalid debug command %s\n",s);
     break;
   }
 }
@@ -100,7 +100,7 @@ void debug_print(char *s, int *i) {
   case r7:
     if( arg1 >= r0 && arg1 <= r7 ) {
       for( x = 0; x < 8; ++x ) {
-	printf("r%i: %i\n", x, reg[x]);
+	fprintf(stderr,"r%i: %i\n", x, reg[x]);
       }
     }
     break;
