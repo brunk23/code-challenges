@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  read_in_file( devices[0], 0, 0, REGOFFSET );
+
   while( 1 ) {
 
     /* Make sure pc loops down correctly */
@@ -174,14 +176,6 @@ int init_machine() {
   for( x = 0; x < REGOFFSET; ++x ) {
     memory[x] = 0;
   }
-
-  /* This initial memory state will cause the contents
-   * of the first segment of the first file to be loaded
-   * to memory and start executing at location 0
-   */
-  memory[0] = jmp;
-  memory[1] = 32762;
-  memory[32762] = dread;
 
   /* Reset Registers */
   for( x = 0; x < 8; ++x ) {
