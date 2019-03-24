@@ -2,29 +2,32 @@ Assembly files will have the following format:
 ----------------------------------------------
 # comments are everything after a #
 
-Labels should be at the start of the line and end with a colon. I would
-like to support labels as arguments to a command, so the code can be
-self-modifying with wmem, but it's not in place at the moment.  When referenced
-you would not use the colon.
+Labels should be at the start of the line and end with a colon. I support
+labels as arguments to a command, so the code can be self-modifying with wmem.
+When labels are referenced you would not use the colon.
 
-label: nop              # all labels and variable names end with
-       jmp label
-       out foo:		# this does not work but is desired.
+label:  nop                # all labels and variable names end with
+        jmp   label
+        wmem  foo     r1
+        jt    foo:    0	
 
 Origin is used to set the program counter for code placement purposes.
 .origin 00000           # will give an address where the next code goes
 
 Include reads the contents of the file specified on  the line into
-the token tree at the place it is read.  If included files have .include
+the token tree at the place it is read.  If included files have .origin
 directives, they are not checked to ensure they don't overwrite other code.
-.include  "funcs.s"
+It is probably smart to not use .origin in files you intend on including
 
-data:                 # <- is label "data" not a data statement, you should
-		      # not do this! But, it would work.
+	.include  "funcs.s"
+
+data:			# <- is label "data" not a data statement, you should
+jmp:	jmp	jmp	# not do this! But, it would work. There are no "reserved"
+			# words that can't also be labels
 
 Data commands put the numbers or string directly after them into memory.
-    data 0 0 4533 234 99  # everything after a data statement is written directly
-    data "Hello"          # will write ascii for "Hello" followed by a 0.
+	data	0 0 4533 234 99  
+	dat	"Hello"		# will write ascii for "Hello" followed by a 0.
 
     # registers start with r
 -- OPCODES and number of args --

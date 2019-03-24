@@ -23,10 +23,7 @@ typedef unsigned short int SWORD;
 typedef struct TOKEN TOKEN;
 typedef struct LINE LINE;
 typedef struct SYMBOL SYMBOL;
-/*
- * We are going to rewrite the code to be a much better assembler.
- * This is step 1.
- */
+
 struct TOKEN {
   int line;
   int type;
@@ -90,6 +87,7 @@ int process_output( const char * );
 int process_data_line();
 int pass1();
 int pass2();
+int compile_token(TOKEN *);
 SWORD isregister(char *);
 SWORD reserved(char *);
 SWORD token_value(TOKEN *);

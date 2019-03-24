@@ -38,8 +38,10 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  pass1(tokens, filelines);
-  pass2(tokens, filelines);
+  retcode = pass1(tokens, filelines);
+  if( retcode == false ) {
+    retcode = pass2(tokens, filelines);
+  }
 
   /*
    * Free all the structures created by process_input
@@ -52,13 +54,15 @@ int main(int argc, char *argv[]) {
   printf("tokens: %i\nlines: %i\nsymbols: %i\n",
 	 tokencount,linecount,symbolcount);
   */
-  if( dest ) {
-    process_output(argv[dest]);
-  } else {
-    process_output("syn-asm.bin");
+  if( !retcode ) {
+    if( dest ) {
+      process_output(argv[dest]);
+    } else {
+      process_output("syn-asm.bin");
+    }
   }
 
-  return 0;
+  return retcode;
 }
 
 int process_output(const char *filename) {
