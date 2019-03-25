@@ -32,9 +32,27 @@ addvalues1:
 	
 hitvalue:
 	add	r6	r6	1
+	eq	r7	r6	10000
+	jt	r7	upcount
+hitvalue2:
 	set	r4	strgs
 	set	r5	coins
 	set	r3	vals
+	jf	count:	hitvalue0
+	rmem	r1	count
+	call	pnumber
+	gt	r7	r6	9
+	jf	r7	three0s
+	gt	r7	r6	99
+	jf	r7	two0s
+	gt	r7	r6	999
+	jf	r7	one0
+	jmp	hitvalue0
+three0s:
+	out	48
+two0s:	out	48
+one0:	out	48
+hitvalue0:
 	set	r1	r6
 	call	pnumber
 	out	9
@@ -77,6 +95,13 @@ tryagain:
 	set	r1	emsg
 	call	pstr
 	jmp	inp
+
+upcount:
+	rmem	r1	count
+	add	r1	r1	1
+	wmem	count	r1
+	set	r6	0
+	jmp	hitvalue2
 
 	.include	"readnum.s"
 	.include	"divide.s"
