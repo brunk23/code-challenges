@@ -32,6 +32,15 @@ addvalues1:
 	
 hitvalue:
 	add	r6	r6	1
+	eq	r7	r6	1000
+	jt	r7	fixcount
+hitvalue0:
+	rmem	r7	count
+	gt	r7	r7	0
+	jf	r7	onedigit
+	rmem	r1	count
+	call	pnumber
+onedigit:	
 	set	r4	strgs
 	set	r5	coins
 	set	r3	vals
@@ -78,6 +87,13 @@ tryagain:
 	call	pstr
 	jmp	inp
 
+fixcount:
+	rmem	r6	count
+	add	r6	r6	1
+	wmem	count	r6
+	set	r6	0
+	jmp	hitvalue0
+
 	.include	"readnum.s"
 	.include	"divide.s"
 	.include	"pstr.s"
@@ -86,6 +102,7 @@ tryagain:
 vals:	data	0 0  0  0  0
 lastv:	data    0
 coins:	data	1 5 10 25 50 100
+count:	data	0
 disp:	data	"How much cents? "
 emsg:	data	"Pick a different number: "
 strgs:	data	penny nickel dime quarter half-dollar dollar
