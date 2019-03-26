@@ -4,7 +4,7 @@
 	out	10
 inp:	call	readnum
 	jf	r1	tryagain
-	gt	r0	r1	499
+	gt	r0	r1	499	# We don't have $5 bills, so limit to under $5
 	jt	r0	tryagain
 	set	r0	r1
 
