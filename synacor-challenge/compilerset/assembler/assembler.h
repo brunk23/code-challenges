@@ -1,19 +1,14 @@
 #ifndef SYNACOR_H
 #define SYNACOR_H
 
-#define BUFFSIZE 160
-#define REGOFFSET 32768
-#define FAIL -1
-#define SUCCESS 0
-#define USERWORD 32776
-#define RESOLVED 32555
-#define UNRESOLVED 39999
-#define true 1
-#define false 0
-
 int linecount;
 int symbolcount;
 int tokencount;
+
+enum CONSTANTS {
+  FAIL = -1, SUCCESS = 0, BUFFSIZE = 160, REGOFFSET = 32768, USERWORD = 32776,
+  RESOLVED, UNRESOLVED, TRUE, FALSE
+};
 
 /*
  * Synacor Machine Description

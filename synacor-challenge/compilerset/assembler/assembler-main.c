@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   }
 
   retcode = pass1(tokens, filelines);
-  if( retcode == false ) {
+  if( retcode == FALSE ) {
     retcode = pass2(tokens, filelines);
   }
 

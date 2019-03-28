@@ -166,7 +166,7 @@ int compile_token(TOKEN *curr) {
 int pass1() {
   TOKEN *curr = tokens;
   SWORD inst;
-  int error = false;
+  int error = FALSE;
 
   pc = 0;
 
@@ -284,7 +284,7 @@ int pass1() {
  */
 int pass2() {
   TOKEN *c = tokens;
-  int error = false;
+  int error = FALSE;
   SYMBOL *s;
 
   while( c ) {
@@ -294,7 +294,7 @@ int pass2() {
 	fprintf(stderr,"ERROR: Unresolved symbol \"%s\" [Line %i]\n",
 		c->word, c->line);
         fprintf(stderr,"%s: %s",c->file_name,c->source_line);
-	error = true;
+	error = TRUE;
 	return error;
       }
 
@@ -339,7 +339,7 @@ TOKEN *one_ops_handler(TOKEN *curr, int *error) {
   /* First Argument */
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -364,7 +364,7 @@ TOKEN *two_ops_handler(TOKEN *curr, int *error) {
   /* First Argument */
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -386,7 +386,7 @@ TOKEN *two_ops_handler(TOKEN *curr, int *error) {
   /* Second Argument */
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -401,7 +401,7 @@ TOKEN *three_ops_handler(TOKEN *curr, int *error) {
   /* First Argument */
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -415,7 +415,7 @@ TOKEN *three_ops_handler(TOKEN *curr, int *error) {
   /* Second Argument */
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -424,7 +424,7 @@ TOKEN *three_ops_handler(TOKEN *curr, int *error) {
   /* Third Argument */
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -475,7 +475,7 @@ TOKEN *data_handler(TOKEN *curr, int *error) {
 
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
   curr = curr->next;
@@ -507,7 +507,7 @@ TOKEN *origin_handler(TOKEN *curr, int *error) {
 
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return (TOKEN *)NULL;
   }
   curr = curr->next;
@@ -516,7 +516,7 @@ TOKEN *origin_handler(TOKEN *curr, int *error) {
     fprintf(stderr,"ERROR: .origin must be a number. [Line %i]\n",
 	    curr->line);
     fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
-    *error = true;
+    *error = TRUE;
     return curr->next;
   }
 
@@ -534,7 +534,7 @@ TOKEN *include_handler(TOKEN *curr, int *error) {
 
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = true;
+    *error = TRUE;
     return NULL;
   }
 
@@ -547,7 +547,7 @@ TOKEN *include_handler(TOKEN *curr, int *error) {
     fprintf(stderr,"ERROR: .include must be a filename. [Line %i]\n",
 	    curr->line);
     fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
-    *error = true;
+    *error = TRUE;
   } else {
     if( !(head_token = process_input( file_token->word ))) {
       fprintf(stderr,"WARNING: .include \"%s\" did not produce any tokens. Line [%i]\n",
