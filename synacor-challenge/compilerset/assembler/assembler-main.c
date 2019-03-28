@@ -93,10 +93,10 @@ int process_output(const char *filename) {
 
 TOKEN *process_input(const char *filename) {
   FILE *fp;
-  int lineno = 0, strind = 0, len = 0;
-  char inbuffer[BUFFSIZE];
   LINE *curr_line = filelines, *line_tmp = NULL;
   TOKEN *head_token = NULL, *curr_token = NULL, *tmp_token = NULL;
+  int lineno = 0, strind = 0, len = 0;
+  char inbuffer[BUFFSIZE];
 
   if( !(fp = fopen(filename,"r"))) {
     fprintf(stderr,"Couldn't open file: %s\n",filename);
@@ -168,13 +168,16 @@ TOKEN *process_input(const char *filename) {
 
 void delete_sym_tree() {
   SYMBOL *curr, *next;
+
   curr = syms;
+
   while(curr) {
     next = curr->next;
     free(curr);
     symbolcount--;
     curr = next;
   }
+
   syms = (SYMBOL *)NULL;
 }
 /*
@@ -182,7 +185,9 @@ void delete_sym_tree() {
  */
 void delete_line_tree() {
   LINE *curr, *next;
+
   curr = filelines;
+
   while( curr ) {
     next = curr->next;
     if( curr->str ) {
@@ -192,6 +197,7 @@ void delete_line_tree() {
     linecount--;
     curr = next;
   }
+
   filelines = NULL;
 }
 
@@ -200,7 +206,9 @@ void delete_line_tree() {
  */
 void delete_token_tree() {
   TOKEN *curr, *next;
+
   curr = tokens;
+
   while( curr ) {
     if( curr->word ) {
       free(curr->word);
@@ -210,6 +218,7 @@ void delete_token_tree() {
     tokencount--;
     curr = next;
   }
+
   tokens = NULL;
 }
   
@@ -231,6 +240,8 @@ int init_machine() {
 }
 
 int help_menu(const char *progname) {
+
   fprintf(stderr,"Usage: %s {source} [-o destination]\n",progname);
+
   return 0;
 }

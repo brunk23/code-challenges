@@ -9,8 +9,8 @@
  */
 TOKEN *token(char *s, int start) {
   TOKEN *curr = NULL;
-  char tmp[BUFFSIZE];
   int i = 0, j = 0, size = 0;
+  char tmp[BUFFSIZE];
 
   if( !(curr = malloc( sizeof(TOKEN) ))) {
     fprintf(stderr,"Failed to get memory in token(): ");
@@ -165,8 +165,8 @@ int compile_token(TOKEN *curr) {
  */
 int pass1() {
   TOKEN *curr = tokens;
-  SWORD inst;
   int error = FALSE;
+  SWORD inst;
 
   pc = 0;
 
@@ -284,8 +284,8 @@ int pass1() {
  */
 int pass2() {
   TOKEN *c = tokens;
-  int error = FALSE;
   SYMBOL *s;
+  int error = FALSE;
 
   while( c ) {
     if( c->value == UNRESOLVED ) {
