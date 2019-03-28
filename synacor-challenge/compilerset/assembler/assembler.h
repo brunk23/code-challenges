@@ -25,10 +25,10 @@ typedef struct LINE LINE;
 typedef struct SYMBOL SYMBOL;
 
 struct TOKEN {
-  int line;
-  int type;
   SWORD value;
   SWORD location;
+  int line;
+  int type;
   int length;
   char *word;
   const char *file_name;
@@ -42,9 +42,9 @@ struct LINE {
 };
 
 struct SYMBOL {
-  int count;
   SWORD resolved;
   SWORD value;
+  int count;
   char *str;
   SYMBOL *next;
 };
