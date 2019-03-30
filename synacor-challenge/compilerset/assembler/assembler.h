@@ -44,7 +44,6 @@ struct SYMBOL {
   SYMBOL *next;
 };
 
-
 /* 15 bit addressable, 16 bit values. Values limited from
  * 0-32768, 8 registers, an unbounded stack. These are globals
  * because I am both too lazy to pass them around, but it is
