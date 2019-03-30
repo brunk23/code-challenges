@@ -345,10 +345,12 @@ int verify_next_token(TOKEN *curr) {
     error_missing_word(curr);
     return BAD;
   }
+
   if( !(line == curr->next->line) ) {
     error_end_of_line(curr);
     return BAD;
   }
+
   return GOOD;
 }
 
@@ -475,11 +477,8 @@ SWORD token_value(TOKEN *curr) {
     add_symbol(curr->word, UNRESOLVED, UNRESOLVED);
     curr->value = UNRESOLVED;
   } else {
-    if( csym->resolved == RESOLVED ) {
-      curr->value = csym->value;
-    } else {
-      curr->value = UNRESOLVED;
-    }
+    /* Will return the value or UNRESOLVED depending on contents */
+    curr->value = csym->value;
   }
 
   return curr->value;
@@ -491,8 +490,8 @@ SWORD token_value(TOKEN *curr) {
 TOKEN *data_handler(TOKEN *curr, int *compile_status) {
   int line = curr->line, i = 0;
 
-  if( !curr->next ) {
-    error_missing_word(curr);
+  /* We need at least one valid token on the line */
+  if( verify_next_token(curr) == BAD ) {
     *compile_status = BAD;
     return curr->next;
   }
@@ -523,10 +522,9 @@ TOKEN *data_handler(TOKEN *curr, int *compile_status) {
  */
 TOKEN *origin_handler(TOKEN *curr, int *compile_status) {
 
-  if( !curr->next ) {
-    error_missing_word(curr);
+  if( verify_next_token(curr) == BAD ) {
     *compile_status = BAD;
-    return (TOKEN *)NULL;
+    return curr->next;
   }
   curr = curr->next;
 
@@ -550,10 +548,9 @@ TOKEN *origin_handler(TOKEN *curr, int *compile_status) {
 TOKEN *include_handler(TOKEN *curr, int *compile_status) {
   TOKEN *after_file = NULL, *file_token = NULL, *head_token = NULL;
 
-  if( !curr->next ) {
-    error_missing_word(curr);
+  if( verify_next_token(curr) == BAD ) {
     *compile_status = BAD;
-    return NULL;
+    return curr->next;
   }
 
   /* We need to save the token after the filename to connect this
