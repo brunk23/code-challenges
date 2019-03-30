@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   printf("tokens: %i\nlines: %i\nsymbols: %i\n",
 	 tokencount,linecount,symbolcount);
   */
-  if( !retcode ) {
+  if( retcode == FALSE ) {
     if( dest ) {
       process_output(argv[dest]);
     } else {

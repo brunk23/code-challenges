@@ -578,30 +578,17 @@ TOKEN *include_handler(TOKEN *curr, int *error) {
  * This function will return the register value, or it will return 0.
  */
 SWORD isregister(char *str) {
-  if( !(strcmp(str,"r0")) ) {
-    return r0;
+  const char *words[] = { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 0 };
+  const SWORD values[] = { r0, r1, r2, r3, r4, r5, r6, r7 };
+  int i = 0;
+
+  while( words[i] != 0 ) {
+    if( !(strcmp(str,words[i])) ) {
+      return values[i];
+    }
+    i++;
   }
-  if( !(strcmp(str,"r1")) ) {
-    return r1;
-  }
-  if( !(strcmp(str,"r2")) ) {
-    return r2;
-  }
-  if( !(strcmp(str,"r3")) ) {
-    return r3;
-  }
-  if( !(strcmp(str,"r4")) ) {
-    return r4;
-  }
-  if( !(strcmp(str,"r5")) ) {
-    return r5;
-  }
-  if( !(strcmp(str,"r6")) ) {
-    return r6;
-  }
-  if( !(strcmp(str,"r7")) ) {
-    return r7;
-  }
+
   return 0;
 }
 
@@ -609,87 +596,25 @@ SWORD isregister(char *str) {
  * This will return the value of the reserved words.
  */
 SWORD reserved(char *str) {
-  if( !(strcmp(str,"halt")) ) {
-    return halt;
+  const char *words[] = { "halt", "set", "push", "pop", "eq", "gt", "jmp",
+			  "jt", "jf", "add", "mult", "mod", "and", "or",
+			  "not", "rmem", "wmem", "call", "ret", "out", "in",
+			  "nop", "dread", "dwrite", "origin", "include",
+			  "data", 0 };
+  const SWORD values[] = { halt, set, push, pop, eq, gt, jmp,
+			   jt, jf, add, mult, mod, and, or,
+			   not, rmem, wmem, call, ret, out, in,
+			   nop, dread, dwrite, ORIGIN, INCLUDE,
+			   DATA, USERWORD };
+  int i = 0;
+
+  while( words[i] != 0 ) {
+    if( !(strcmp(str,words[i])) ) {
+      return values[i];
+    }
+    i++;
   }
-  if( !(strcmp(str,"set")) ) {
-    return set;
-  }
-  if( !(strcmp(str,"push")) ) {
-    return push;
-  }
-  if( !(strcmp(str,"pop")) ) {
-    return pop;
-  }
-  if( !(strcmp(str,"eq")) ) {
-    return eq;
-  }
-  if( !(strcmp(str,"gt")) ) {
-    return gt;
-  }
-  if( !(strcmp(str,"jmp")) ) {
-    return jmp;
-  }
-  if( !(strcmp(str,"jt")) ) {
-    return jt;
-  }
-  if( !(strcmp(str,"jf")) ) {
-    return jf;
-  }
-  if( !(strcmp(str,"add")) ) {
-    return add;
-  }
-  if( !(strcmp(str,"mult")) ) {
-    return mult;
-  }
-  if( !(strcmp(str,"mod")) ) {
-    return mod;
-  }
-  if( !(strcmp(str,"and")) ) {
-    return and;
-  }
-  if( !(strcmp(str,"or")) ) {
-    return or;
-  }
-  if( !(strcmp(str,"not")) ) {
-    return not;
-  }
-  if( !(strcmp(str,"rmem")) ) {
-    return rmem;
-  }
-  if( !(strcmp(str,"wmem")) ) {
-    return wmem;
-  }
-  if( !(strcmp(str,"call")) ) {
-    return call;
-  }
-  if( !(strcmp(str,"ret")) ) {
-    return ret;
-  }
-  if( !(strcmp(str,"out")) ) {
-    return out;
-  }
-  if( !(strcmp(str,"in")) ) {
-    return in;
-  }
-  if( !(strcmp(str,"nop")) ) {
-    return nop;
-  }
-  if( !(strcmp(str,"dread")) ) {
-    return dread;
-  }
-  if( !(strcmp(str,"dwrite")) ) {
-    return dwrite;
-  }
-  if( !(strcmp(str,"origin")) ) {
-    return ORIGIN;
-  }
-  if( !(strcmp(str,"include")) ) {
-    return INCLUDE;
-  }
-  if( !(strcmp(str,"data")) ) {
-    return DATA;
-  }
+
   return USERWORD;
 }
 
