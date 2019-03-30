@@ -165,7 +165,7 @@ int compile_token(TOKEN *curr) {
  */
 int pass1() {
   TOKEN *curr = tokens;
-  int error = FALSE;
+  int compile_status = GOOD;
   SWORD inst;
 
   pc = 0;
@@ -201,16 +201,16 @@ int pass1() {
 
 	  case ORIGIN:
 	    curr->location = pc;
-	    curr = origin_handler(curr, &error);
+	    curr = origin_handler(curr, &compile_status);
 	    break;
 
 	  case INCLUDE:
 	    curr->location = pc;
-	    curr = include_handler(curr, &error);
+	    curr = include_handler(curr, &compile_status);
 	    break;
 
 	  case DATA:
-	    curr = data_handler(curr, &error);
+	    curr = data_handler(curr, &compile_status);
 	    break;
 
 	  default:   /* This should be unreachable */
@@ -233,7 +233,7 @@ int pass1() {
 	  case mod:
 	  case and:
 	  case or:
-	    curr = three_ops_handler(curr, &error);
+	    curr = three_ops_handler(curr, &compile_status);
 	    break;
 
 	  case set:
@@ -242,7 +242,7 @@ int pass1() {
 	  case not:
 	  case rmem:
 	  case wmem:
-	    curr = two_ops_handler(curr, &error);
+	    curr = two_ops_handler(curr, &compile_status);
 	    break;
 
 	  case in:
@@ -251,7 +251,7 @@ int pass1() {
 	  case pop:
 	  case jmp:
 	  case call:
-	    curr = one_ops_handler(curr, &error);
+	    curr = one_ops_handler(curr, &compile_status);
 	    break;
 
 	  case nop:
@@ -271,7 +271,7 @@ int pass1() {
       }
     }
   }
-  return error;
+  return compile_status;
 }
 
 /*
@@ -285,7 +285,7 @@ int pass1() {
 int pass2() {
   TOKEN *c = tokens;
   SYMBOL *s;
-  int error = FALSE;
+  int compile_status = GOOD;
 
   while( c ) {
     if( c->value == UNRESOLVED ) {
@@ -294,8 +294,8 @@ int pass2() {
 	fprintf(stderr,"ERROR: Unresolved symbol \"%s\" [Line %i]\n",
 		c->word, c->line);
         fprintf(stderr,"%s: %s",c->file_name,c->source_line);
-	error = TRUE;
-	return error;
+	compile_status = BAD;
+	return compile_status;
       }
 
       c->value = s->value;
@@ -315,7 +315,7 @@ int pass2() {
     s = s->next;
   }
 
-  return error;
+  return compile_status;
 }
 
 /*
@@ -329,17 +329,40 @@ void error_missing_word(TOKEN *curr) {
 }
 
 /*
+ * We expected a token from the same line, but the next token
+ * isn't from this line of the source file.
+ */
+void error_end_of_line(TOKEN *curr) {
+  fprintf(stderr,"ERROR: Unexpected end of line. [Line %i]\n",
+	  curr->line);
+  fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
+}
+
+int verify_next_token(TOKEN *curr) {
+  int line = curr->line;
+
+  if( !curr->next ) {
+    error_missing_word(curr);
+    return BAD;
+  }
+  if( !(line == curr->next->line) ) {
+    error_end_of_line(curr);
+    return BAD;
+  }
+  return GOOD;
+}
+
+/*
  * This will compile one token into memory. It will warn if the
  * instruction expects a register and didn't get one.
  */
-TOKEN *one_ops_handler(TOKEN *curr, int *error) {
+TOKEN *one_ops_handler(TOKEN *curr, int *compile_status) {
   char *inst = curr->word;
   int val = curr->value;
 
   /* First Argument */
-  if( !curr->next ) {
-    error_missing_word(curr);
-    *error = TRUE;
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
@@ -357,14 +380,13 @@ TOKEN *one_ops_handler(TOKEN *curr, int *error) {
  * This will compile two tokens into memory. It will warn if the first one
  * is expected to be a register and didn't get one.
  */
-TOKEN *two_ops_handler(TOKEN *curr, int *error) {
+TOKEN *two_ops_handler(TOKEN *curr, int *compile_status) {
   char *inst = curr->word;
   int val = curr->value;
 
   /* First Argument */
-  if( !curr->next ) {
-    error_missing_word(curr);
-    *error = TRUE;
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
@@ -384,9 +406,8 @@ TOKEN *two_ops_handler(TOKEN *curr, int *error) {
   }
 
   /* Second Argument */
-  if( !curr->next ) {
-    error_missing_word(curr);
-    *error = TRUE;
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
@@ -395,13 +416,12 @@ TOKEN *two_ops_handler(TOKEN *curr, int *error) {
   return curr->next;
 }
 
-TOKEN *three_ops_handler(TOKEN *curr, int *error) {
+TOKEN *three_ops_handler(TOKEN *curr, int *compile_status) {
   char *inst = curr->word;
 
   /* First Argument */
-  if( !curr->next ) {
-    error_missing_word(curr);
-    *error = TRUE;
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
@@ -413,18 +433,16 @@ TOKEN *three_ops_handler(TOKEN *curr, int *error) {
   }
 
   /* Second Argument */
-  if( !curr->next ) {
-    error_missing_word(curr);
-    *error = TRUE;
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
   compile_token(curr);
 
   /* Third Argument */
-  if( !curr->next ) {
-    error_missing_word(curr);
-    *error = TRUE;
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
@@ -470,12 +488,12 @@ SWORD token_value(TOKEN *curr) {
 /*
  * This stuffs all the information on the line into memory.
  */
-TOKEN *data_handler(TOKEN *curr, int *error) {
+TOKEN *data_handler(TOKEN *curr, int *compile_status) {
   int line = curr->line, i = 0;
 
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = TRUE;
+    *compile_status = BAD;
     return curr->next;
   }
   curr = curr->next;
@@ -503,11 +521,11 @@ TOKEN *data_handler(TOKEN *curr, int *error) {
 /*
  * This changes where pc is pointing during pass1
  */
-TOKEN *origin_handler(TOKEN *curr, int *error) {
+TOKEN *origin_handler(TOKEN *curr, int *compile_status) {
 
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = TRUE;
+    *compile_status = BAD;
     return (TOKEN *)NULL;
   }
   curr = curr->next;
@@ -516,7 +534,7 @@ TOKEN *origin_handler(TOKEN *curr, int *error) {
     fprintf(stderr,"ERROR: .origin must be a number. [Line %i]\n",
 	    curr->line);
     fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
-    *error = TRUE;
+    *compile_status = BAD;
     return curr->next;
   }
 
@@ -529,12 +547,12 @@ TOKEN *origin_handler(TOKEN *curr, int *error) {
  * This will read a new file into the token tree at the location
  * we are at. It should handle includes in includes seamlessly.
  */
-TOKEN *include_handler(TOKEN *curr, int *error) {
+TOKEN *include_handler(TOKEN *curr, int *compile_status) {
   TOKEN *after_file = NULL, *file_token = NULL, *head_token = NULL;
 
   if( !curr->next ) {
     error_missing_word(curr);
-    *error = TRUE;
+    *compile_status = BAD;
     return NULL;
   }
 
@@ -547,7 +565,7 @@ TOKEN *include_handler(TOKEN *curr, int *error) {
     fprintf(stderr,"ERROR: .include must be a filename. [Line %i]\n",
 	    curr->line);
     fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
-    *error = TRUE;
+    *compile_status = BAD;
   } else {
     if( !(head_token = process_input( file_token->word ))) {
       fprintf(stderr,"WARNING: .include \"%s\" did not produce any tokens. Line [%i]\n",

@@ -5,16 +5,16 @@
 #include "assembler.h"
 
 int main(int argc, char *argv[]) {
-  int retcode = 0, source = 0, dest = 0;
+  int compile_status = 0, source = 0, dest = 0;
 
   /* COMMAND LINE ARGUMENTS */
-  for( retcode = 1; retcode < argc; retcode++) {
-    if( strcmp(argv[retcode],"-o" ) == 0 ) {
-      dest = retcode + 1;
-      retcode++;
+  for( compile_status = 1; compile_status < argc; compile_status++) {
+    if( strcmp(argv[compile_status],"-o" ) == 0 ) {
+      dest = compile_status + 1;
+      compile_status++;
     } else {
       if( !source ) {
-        source = retcode;
+        source = compile_status;
       } else {
         source = 0;
         break;
@@ -38,9 +38,9 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  retcode = pass1(tokens, filelines);
-  if( retcode == FALSE ) {
-    retcode = pass2(tokens, filelines);
+  compile_status = pass1(tokens, filelines);
+  if( compile_status == GOOD ) {
+    compile_status = pass2(tokens, filelines);
   }
 
   /*
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   printf("tokens: %i\nlines: %i\nsymbols: %i\n",
 	 tokencount,linecount,symbolcount);
   */
-  if( retcode == FALSE ) {
+  if( compile_status == GOOD ) {
     if( dest ) {
       process_output(argv[dest]);
     } else {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  return retcode;
+  return compile_status;
 }
 
 int process_output(const char *filename) {

@@ -1,18 +1,21 @@
 #ifndef SYNACOR_H
 #define SYNACOR_H
 
-int linecount;
-int symbolcount;
-int tokencount;
-
 enum CONSTANTS {
   FAIL = -1, SUCCESS = 0, BUFFSIZE = 160, REGOFFSET = 32768, USERWORD = 32776,
-  RESOLVED, UNRESOLVED, TRUE, FALSE
+  RESOLVED, UNRESOLVED, BAD, GOOD, DIRECTIVE, LABEL, WORD, NUMBER, STRING,
+  ORIGIN, DATA, INCLUDE
 };
 
-/*
- * Synacor Machine Description
- */
+enum REGISTERS {
+  r0 = 32768, r1, r2, r3, r4, r5, r6, r7
+};
+
+enum INSTSET {
+  halt = 0, set, push, pop, eq, gt, jmp, jt, jf, add, mult,
+  mod, and, or, not, rmem, wmem, call, ret, out, in, nop,
+  dread, dwrite
+};
 
 typedef unsigned short int SWORD;
 typedef struct TOKEN TOKEN;
@@ -44,60 +47,55 @@ struct SYMBOL {
   SYMBOL *next;
 };
 
-/* 15 bit addressable, 16 bit values. Values limited from
- * 0-32768, 8 registers, an unbounded stack. These are globals
- * because I am both too lazy to pass them around, but it is
- * also a reasonable expectation that all parts of the chip can
- * access registers, memory, and the stack. pc is the program
- * counter
+/*
+ * GLOBAL VARIABLES
+ * 15 bit addressable, 16 bit values. Values limited from
+ * 0-32768, 8 registers, an unbounded stack.
+ * Variables to track malloc'd structures to check for leaks
+ * And our global structure pointers
  */
 SWORD memory[32768];
 SWORD pc;
+int linecount;
+int symbolcount;
+int tokencount;
 SYMBOL *syms;
 TOKEN *tokens;
 LINE *filelines;
-
-enum REGISTERS {
-  r0 = 32768, r1, r2, r3, r4, r5, r6, r7
-};
-
-enum INSTSET {
-  halt = 0, set, push, pop, eq, gt, jmp, jt, jf, add, mult,
-  mod, and, or, not, rmem, wmem, call, ret, out, in, nop,
-  dread, dwrite, ORIGIN, DATA, INCLUDE
-};
-
-enum STATES {
-  DIRECTIVE, LABEL, WORD, NUMBER, STRING
-};
 
 /*
  * Function prototypes
  */
 int help_menu( const char * );
 int init_machine();
-TOKEN *process_input( const char * );
 int process_output( const char * );
-int process_data_line();
+void print_token( TOKEN * );
+
+TOKEN *process_input( const char * );
+TOKEN *token( char *, int );
 int pass1();
 int pass2();
-int compile_token(TOKEN *);
-SWORD isregister(char *);
-SWORD reserved(char *);
-SWORD token_value(TOKEN *);
-SYMBOL *find_symbol(char *);
-TOKEN *token(char *, int);
-TOKEN *origin_handler(TOKEN *, int *);
-TOKEN *data_handler(TOKEN *, int *);
-TOKEN *one_ops_handler(TOKEN *, int *);
-TOKEN *two_ops_handler(TOKEN *, int *);
-TOKEN *three_ops_handler(TOKEN *, int *);
-TOKEN *include_handler(TOKEN *, int *);
-void error_missing_word(TOKEN *);
+
+/* Functions that check for valid tokens and syntax */
+int verify_next_token( TOKEN * );
+void error_missing_word( TOKEN * );
+void error_end_of_line( TOKEN * );
+
+int compile_token( TOKEN * );
+SWORD isregister( char * );
+SWORD reserved( char * );
+SWORD token_value( TOKEN * );
+SYMBOL *find_symbol( char * );
+void add_symbol( char *, int, int );
+TOKEN *origin_handler( TOKEN *, int * );
+TOKEN *data_handler( TOKEN *, int * );
+TOKEN *one_ops_handler( TOKEN *, int * );
+TOKEN *two_ops_handler( TOKEN *, int * );
+TOKEN *three_ops_handler( TOKEN *, int * );
+TOKEN *include_handler( TOKEN *, int * );
+
 void delete_token_tree();
 void delete_line_tree();
 void delete_sym_tree();
-void add_symbol(char *, int, int);
-void print_token(TOKEN *);
 
 #endif
