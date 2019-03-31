@@ -137,38 +137,42 @@ int scan_inbuff() {
 
 int init_machine() {
   int x;
-  inst_tble[0] = op_halt;
-  inst_tble[1] = op_set;
-  inst_tble[2] = op_push;
-  inst_tble[3] = op_pop;
-  inst_tble[4] = op_eq;
-  inst_tble[5] = op_gt;
-  inst_tble[6] = op_jmp;
-  inst_tble[7] = op_jt;
-  inst_tble[8] = op_jf;
-  inst_tble[9] = op_add;
-  inst_tble[10] = op_mult;
-  inst_tble[11] = op_mod;
-  inst_tble[12] = op_and;
-  inst_tble[13] = op_or;
-  inst_tble[14] = op_not;
-  inst_tble[15] = op_rmem;
-  inst_tble[16] = op_wmem;
-  inst_tble[17] = op_call;
-  inst_tble[18] = op_ret;
-  inst_tble[19] = op_out;
-  inst_tble[20] = op_in;
-  inst_tble[21] = op_nop;
-  inst_tble[22] = op_dread;
-  inst_tble[23] = op_dwrite;
-  stack = 0;
+  inst_tble[halt] = op_halt;
+  inst_tble[set] = op_set;
+  inst_tble[push] = op_push;
+  inst_tble[pop] = op_pop;
+  inst_tble[eq] = op_eq;
+  inst_tble[gt] = op_gt;
+  inst_tble[jmp] = op_jmp;
+  inst_tble[jt] = op_jt;
+  inst_tble[jf] = op_jf;
+  inst_tble[add] = op_add;
+  inst_tble[mult] = op_mult;
+  inst_tble[mod] = op_mod;
+  inst_tble[and] = op_and;
+  inst_tble[or] = op_or;
+  inst_tble[not] = op_not;
+  inst_tble[rmem] = op_rmem;
+  inst_tble[wmem] = op_wmem;
+  inst_tble[call] = op_call;
+  inst_tble[ret] = op_ret;
+  inst_tble[out] = op_out;
+  inst_tble[in] = op_in;
+  inst_tble[nop] = op_nop;
+  inst_tble[dread] = op_dread;
+  inst_tble[dwrite] = op_dwrite;
+  stack = NULL;
+
   pc = 0;
+
   stepmode = 0;
+
   breakpoint = REGOFFSET;
   
   /* Reset Input Buffer */
   for( x = 0; x < BUFFSIZE; ++x ) {
     inbuffer[x] = 0;
+    debugbuffer[x] = 0;
   }
   inbuffindex = 0;
 
