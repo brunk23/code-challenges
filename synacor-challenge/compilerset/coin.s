@@ -104,7 +104,7 @@ upcount:
 	jmp	hitvalue2
 
 	.include	"readnum.s"
-	.include	"divide.s"
+	.include	"fastdivide.s"
 	.include	"pstr.s"
 	.include	"pnumber.s"
 
