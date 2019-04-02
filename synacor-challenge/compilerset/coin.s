@@ -1,9 +1,9 @@
-; This will count and print all the ways to make a certain amount of cents
-; with coins. It starts penny first.  The method will work if you don't use
-; the coins in order, but it is less efficient.
-;
-; Some effort was put into making this the most efficient program possible.
-; But, there is likely more improvements that could be done.
+;; This will count and print all the ways to make a certain amount of cents
+;; with coins. It starts penny first.  The method will work if you don't use
+;; the coins in order, but it is less efficient.
+;;
+;; Some effort was put into making this the most efficient program possible.
+;; But, there is likely more improvements that could be done.
 	.origin	00000
 	set	r1	disp
 	call	pstr
@@ -14,7 +14,9 @@ inp:	call	readnum
 	jt	r0	tryagain
 	set	r0	r1
 
-	; This is our adding loop
+	;; This is our adding loop. We start by adding all the values and
+	;; then we continue to add only the first coin until we hit the value
+	;; we are looking for or we are over it.
 addvalues:
 	set	r1	vals		; point r1 to vals
 	rmem	r2	r1		; get the first number
@@ -24,86 +26,98 @@ addvalues1:
 	add	r2	r2	r3	; add next value
 	eq	r7	lastv	r1	; if r1 != 6
 	jf	r7	addvalues1	; loop again
-	rmem	r3	vals
-	rmem	r4	coins
+	set	r3	0		; We should have none of the first coin
+	rmem	r4	coins		; Get the value of the first coin
 addvalues2:
 	eq	r7	r0	r2	; if r0 == r2
-	jt	r7	hitvalue
+	jt	r7	hitvalue	;   we count a hit
 	gt	r7	r2	r0	; if r2 > r0
-	jt	r7	overvalue
-	add	r3	r3	1
-	add	r2	r2	r4
+	jt	r7	overvalue	;   we went over
+	add	r3	r3	r4	; Increase amount of first coin
+	add	r2	r2	r4	; Increase the current sum
 	jmp	addvalues2	; We save time by avoiding recalculating whole sum
 
+	;; When we find a match, we need to increase the counter and then
+	;; print a line showing how the match was made.
 hitvalue:
-	wmem	vals	r3
-	add	r6	r6	1
-	eq	r7	r6	10000
-	jt	r7	upcount
+	wmem	vals	r3		; We save the value of the first coin
+	add	r6	r6	1	; r6 is out counter for hits, increase it
+	eq	r7	r6	10000	; if we hit 10k, we need a second word
+	jt	r7	upcount		; so we jump there to handle that
 hitvalue2:
-	set	r4	strgs
-	set	r5	coins
-	set	r3	vals
-	jf	count:	hitvalue0
+	set	r4	strgs		; r4 = strgs[0] j
+	set	r5	coins		; r5 = coins[0] k
+	set	r3	vals		; r3 = vals[0]  i
+	jf	count:	hitvalue0	; count=# of 10k groups, skip forward if 0
 	rmem	r1	count
-	call	pnumber
-	gt	r7	r6	9
+	call	pnumber		  	; print the number of 10k groups we have
+	gt	r7	r6	9 	; 9 or lower needs 000 padding
 	jf	r7	three0s
-	gt	r7	r6	99
+	gt	r7	r6	99 	; 10-99 needs 00 padding
 	jf	r7	two0s
-	gt	r7	r6	999
+	gt	r7	r6	999 	; 100-999 neext 0 padding
 	jf	r7	one0
-	jmp	hitvalue0
+	jmp	hitvalue0		; don't pad any digits
 three0s:
-	out	48
-two0s:	out	48
+	out	48			; Print 1-3 0s based on where we jump in
+two0s:	out	48			; to this block from above
 one0:	out	48
 hitvalue0:
-	set	r1	r6
-	call	pnumber
-	out	9
+	set	r1	r6		; put counter in r1 for printing
+	call	pnumber			; print the number
+	out	9			; print a tab
 hitvalue1:
-	rmem	r1	r4
-	call	pstr
-	rmem	r1	r3
-	rmem	r2	r5
-	call	divide
-	call	pnumber
-	out	9
-	add	r3	r3	1
-	add	r4	r4	1
-	add	r5	r5	1
-	eq	r7	r3	coins
-	jf	r7	hitvalue1
-	out	10
-	rmem	r3	vals
+	rmem	r1	r4		; r1 = strgs[j]
+	call	pstr			; print strgs[j]
+	rmem	r1	r3		; r1 = vals[i]
+	rmem	r2	r5		; r2 = coins[k]
+	call	divide			; r1 = r1 / r2
+	call	pnumber			; print r1
+	out	9			; print a tab
+	add	r3	r3	1	; i++
+	add	r4	r4	1	; j++
+	add	r5	r5	1	; k++
+	eq	r7	r3	coins	; if &vals[i] != &coins[0]
+	jf	r7	hitvalue1	;   print the next pair of string/number
+	out	10			; print a newline
+	rmem	r3	vals		; r3 must be vals[0] because we fall through
+
+	;; We intentionally fallthrough from the above code into this
+	;; block. This block will add one of the next highest coin and
+	;; zero out all the blocks below it.
 overvalue:
-	wmem	vals	r3
-	set	r5	vals
-	set	r3	coins
+	wmem	vals	r3		; vals[0] = r3
+	set	r5	vals		; r5 = vals[0]
+	set	r3	coins		; r3 = coins[0]
 overvalue1:
-	rmem	r2	r5
-	add	r5	r5	1
-	add	r3	r3	1
-	eq	r7	r5	coins	; we are out of coins
+	rmem	r2	r5	  	; r2 = vals[i]
+	add	r5	r5	1 	; i++
+	add	r3	r3	1 	; j++
+	eq	r7	r5	coins	; &vals[i] == &coins[0] we are out of coins
 	jt	r7	endprogram
-	eq	r7	0	r2	; if r2 == 0
+	eq	r7	0	r2	; if vals[i] == 0
 	jt	r7	overvalue1	; go to next value
-	rmem	r2	r5		; r2 = m[1]
-	rmem	r3	r3		; r3 = m[r3]
-	add	r2	r3	r2	; r2 = r3 + r2
-	wmem	r5	r2		; m[r1] = r2
-	add	r5	r5	32767	; r1 = r1 - 1
-	wmem	r5	0
+	rmem	r2	r5		; r2 = vals[i]
+	rmem	r3	r3		; r3 = coins[j]
+	add	r2	r3	r2	; r2 += r3
+	wmem	r5	r2		; vals[i] = r2
+	add	r5	r5	32767	; i--
+	wmem	r5	0		; vals[i] = 0
 	jmp	addvalues
+
+	;; We are done with the program.
 endprogram:
 	halt
 
+	;; This is a helper for the input. It makes sure we get a valid
+	;; number for the program.
 tryagain:
 	set	r1	emsg
 	call	pstr
 	jmp	inp
 
+	;; This is a helper that lets us have more than 32767 combinations
+	;; and print them correctly.
 upcount:
 	rmem	r1	count
 	add	r1	r1	1
@@ -116,9 +130,9 @@ upcount:
 	.include	"pstr.s"
 	.include	"pnumber.s"
 
-vals:	data	0 0  0  0  0
+vals:	data	0	0	0	0	0
 lastv:	data    0
-coins:	data	1 5 10 25 50 100
+coins:	data	1	5	10	25	50	100
 disp:	data	"How much cents? "
 emsg:	data	"Pick a different number: "
 strgs:	data	penny nickel dime quarter half-dollar dollar
