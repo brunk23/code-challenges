@@ -85,7 +85,7 @@ TOKEN *token(char *s, int start) {
 	i++;
       }
     }
-    if( isspace(s[i]) || s[i] == '#' ) {
+    if( isspace(s[i]) || s[i] == ';' ) {
       if( j == 0 ) {
 	free(curr);
 	tokencount--;

@@ -37,12 +37,6 @@ enum INSTSET {
   dread, dwrite
 };
 
-struct STACKOBJ {
-  struct STACKOBJ *next;
-  SWORD value;
-};
-
-struct STACKOBJ *stack;
 char inbuffer[BUFFSIZE];
 char debugbuffer[BUFFSIZE];
 int inbuffindex;

@@ -1,5 +1,5 @@
-	# This is a faster divide function, but it could probably still
-	# be improved to increase the performance even more.
+; This is a faster divide function, but it could probably still
+; be improved to increase the performance even more.
 divide:
 	push	r3
 	push	r4

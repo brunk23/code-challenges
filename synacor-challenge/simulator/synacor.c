@@ -5,6 +5,7 @@
 #include <signal.h>
 
 #include "synacor.h"
+#include "synacor_stack.h"
 
 /*
  * Synacor Emulator

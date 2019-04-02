@@ -1,36 +1,42 @@
+; This will count and print all the ways to make a certain amount of cents
+; with coins. It starts penny first.  The method will work if you don't use
+; the coins in order, but it is less efficient.
+;
+; Some effort was put into making this the most efficient program possible.
+; But, there is likely more improvements that could be done.
 	.origin	00000
 	set	r1	disp
 	call	pstr
 	out	10
 inp:	call	readnum
 	jf	r1	tryagain
-	gt	r0	r1	499	# We don't have $5 bills, so limit to under $5
+	gt	r0	r1	499 ; We don't have $5 bills, so limit to under $5
 	jt	r0	tryagain
 	set	r0	r1
 
-	# This is our adding loop
+	; This is our adding loop
 addvalues:
-	set	r1	vals		# point r1 to vals
-	rmem	r2	r1		# get the first number
+	set	r1	vals		; point r1 to vals
+	rmem	r2	r1		; get the first number
 addvalues1:
-	add	r1	r1	1	# increase r1
-	rmem	r3	r1		# get the val
-	add	r2	r2	r3	# add next value
-	eq	r7	lastv	r1	# if r1 != 6
-	jf	r7	addvalues1	# loop again
-
-	eq	r7	r0	r2	# if r0 == r2
-	jt	r7	hitvalue
-	gt	r7	r2	r0	# if r2 > r0
-	jt	r7	overvalue
-
+	add	r1	r1	1	; increase r1
+	rmem	r3	r1		; get the val
+	add	r2	r2	r3	; add next value
+	eq	r7	lastv	r1	; if r1 != 6
+	jf	r7	addvalues1	; loop again
 	rmem	r3	vals
-	rmem	r2	coins
-	add	r3	r3	r2
-	wmem	vals	r3
-	jmp	addvalues
+	rmem	r4	coins
+addvalues2:
+	eq	r7	r0	r2	; if r0 == r2
+	jt	r7	hitvalue
+	gt	r7	r2	r0	; if r2 > r0
+	jt	r7	overvalue
+	add	r3	r3	1
+	add	r2	r2	r4
+	jmp	addvalues2	; We save time by avoiding recalculating whole sum
 
 hitvalue:
+	wmem	vals	r3
 	add	r6	r6	1
 	eq	r7	r6	10000
 	jt	r7	upcount
@@ -70,22 +76,24 @@ hitvalue1:
 	eq	r7	r3	coins
 	jf	r7	hitvalue1
 	out	10
+	rmem	r3	vals
 overvalue:
+	wmem	vals	r3
 	set	r5	vals
 	set	r3	coins
 overvalue1:
 	rmem	r2	r5
 	add	r5	r5	1
 	add	r3	r3	1
-	eq	r7	r5	coins	# we are out of coins
+	eq	r7	r5	coins	; we are out of coins
 	jt	r7	endprogram
-	eq	r7	0	r2	# if r2 == 0
-	jt	r7	overvalue1	# go to next value
-	rmem	r2	r5		# r2 = m[1]
-	rmem	r3	r3		# r3 = m[r3]
-	add	r2	r3	r2	# r2 = r3 + r2
-	wmem	r5	r2		# m[r1] = r2
-	add	r5	r5	32767	# r1 = r1 - 1
+	eq	r7	0	r2	; if r2 == 0
+	jt	r7	overvalue1	; go to next value
+	rmem	r2	r5		; r2 = m[1]
+	rmem	r3	r3		; r3 = m[r3]
+	add	r2	r3	r2	; r2 = r3 + r2
+	wmem	r5	r2		; m[r1] = r2
+	add	r5	r5	32767	; r1 = r1 - 1
 	wmem	r5	0
 	jmp	addvalues
 endprogram:

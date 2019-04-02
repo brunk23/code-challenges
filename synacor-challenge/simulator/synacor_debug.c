@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "synacor.h"
+#include "synacor_stack.h"
 
 /*
  * The debug commands
@@ -236,11 +237,14 @@ SWORD isdebugcommand( char *s ) {
 
 int printstack() {
   struct STACKOBJ *sptr = 0;
+  int i = 0;
 
   sptr = stack;
 
   while(sptr) {
-    printf("%i\n",sptr->value);
+    for( i = sptr->stack_size; i > 0; i-- ) {
+      printf("%i\n", sptr->values[ i - 1 ] );
+    }
     sptr = sptr->next;
   }
   return 0;
@@ -250,7 +254,7 @@ int save_state() {
   FILE *source;
   int words_written = 0, x = 0, y = 0;
   struct STACKOBJ *sptr;
-  unsigned short int *temp;
+  SWORD *temp;
   
   if( !( source = fopen("synacor.dump", "w"))) {
     fprintf(stderr,"Could not open file for writing.\n");
@@ -258,17 +262,17 @@ int save_state() {
   }
 
   words_written= fwrite(memory,
-			sizeof(unsigned short int),
+			sizeof(SWORD),
 			REGOFFSET,
 			source);
   fprintf(stderr,"CORE MEM: %i words\n",words_written);
   words_written= fwrite(reg,
-			sizeof(unsigned short int),
+			sizeof(SWORD),
 			8,
 			source);
   fprintf(stderr,"REGISTERS: %i words\n",words_written);
   words_written= fwrite(&pc,
-			sizeof(unsigned short int),
+			sizeof(SWORD),
 			1,
 			source);
   fprintf(stderr,"PROGRAM COUNTER: %i words\n",words_written);
@@ -280,21 +284,21 @@ int save_state() {
   }
 
   words_written= fwrite(&x,
-			sizeof(unsigned short int),
+			sizeof(SWORD),
 			1,
 			source);
   fprintf(stderr,"STACK SIZE: %i words\n",words_written);
   if( x ) {
-    if( !(temp = malloc( x*sizeof(unsigned short int)) ) ) {
+    if( !(temp = malloc( x*STACKMAX*sizeof(SWORD)) ) ) {
       fprintf(stderr,"Couldn't save stack.\n");
     }
     sptr = stack;
     for( y = 1; y <= x; ++y ) {
-      temp[x-y] = sptr->value;
+      temp[x-y] = sptr->values[y];  // XXX BROKEN
       sptr = sptr->next;
     }
     words_written= fwrite(temp,
-			  sizeof(unsigned short int),
+			  sizeof(SWORD),
 			  x,
 			  source);
     fprintf(stderr,"STACK CONTENTS: %i words\n",words_written);
@@ -317,7 +321,7 @@ int load_state() {
     stack = sptr;
   }
 
-  stack = 0;
+  stack = NULL;
   
   if( !( source = fopen("synacor.dump", "r"))) {
     fprintf(stderr,"Could not open file for reading.\n");
@@ -325,23 +329,23 @@ int load_state() {
   }
 
   words_read = fread(memory,
-		     sizeof(unsigned short int),
+		     sizeof(SWORD),
 		     REGOFFSET,
 		     source);
   fprintf(stderr,"CORE MEM: %i words\n",words_read);
   words_read = fread(reg,
-		     sizeof(unsigned short int),
+		     sizeof(SWORD),
 		     8,
 		     source);
   fprintf(stderr,"REGISTERS: %i words\n",words_read);
   words_read = fread(&pc,
-		     sizeof(unsigned short int),
+		     sizeof(SWORD),
 		     1,
 		     source);
   fprintf(stderr,"PROGRAM COUNTER: %i words\n",words_read);
 
   words_read = fread(&x,
-		     sizeof(unsigned short int),
+		     sizeof(SWORD),
 		     1,
 		     source);
   fprintf(stderr,"STACK SIZE: %i words\n",words_read);
@@ -354,10 +358,10 @@ int load_state() {
     stack = sptr;
     
     words_read= fread(&y,
-		      sizeof(unsigned short int),
+		      sizeof(SWORD),
 		      1,
 		      source);
-    stack->value = y;
+    stack->values[0] = y;  // BROKEN
     --x;
   }
   x = 0;

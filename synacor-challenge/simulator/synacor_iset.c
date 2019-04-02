@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "synacor.h"
+#include "synacor_stack.h"
 
 /*
  * Implement the actual instruction set
@@ -20,30 +21,21 @@ int op_set() {
 }
 
 int op_push() {
-  struct STACKOBJ *nbottom;
-  if( !(nbottom = malloc(sizeof(struct STACKOBJ)))) {
-    fprintf(stderr,"Could not allocate room on stack\n");
-    return 1;
-  }
-  nbottom->next = stack;
-  stack = nbottom;
-  stack->value = get_add(pc + 1);
   pc += 2;
-  return 0;
+
+  return push_word( get_add(pc - 1) );
 }
 
 int op_pop() {
-  struct STACKOBJ *obottom;
-  if(stack) {
-    set_add(pc+1, stack->value);
-    obottom = stack;
-    stack = stack->next;
-    free(obottom);
-  } else {
-    fprintf(stderr,"Pop from empty stack.\n");
+  SWORD value = pop_word();
+
+  if( value == REGOFFSET ) {
     return 1;
   }
+
+  set_add(pc + 1, value);
   pc += 2;
+
   return 0;
 }
 
@@ -167,29 +159,21 @@ int op_wmem() {
 }
 
 int op_call() {
-  struct STACKOBJ *nbottom;
-  if( !(nbottom = malloc(sizeof(struct STACKOBJ)))) {
-    fprintf(stderr,"Could not allocate room on stack\n");
+  if( push_word( pc + 2 ) ) {
     return 1;
   }
-  nbottom->next = stack;
-  stack = nbottom;
-  stack->value = pc + 2;
-  pc = get_add(pc+1);
+  pc = get_add(pc + 1);
   return 0;
 }
 
 int op_ret() {
-  struct STACKOBJ *obottom;
-  if(stack) {
-    pc = stack->value;
-    obottom = stack;
-    stack = stack->next;
-    free(obottom);
-  } else {
-    fprintf(stderr,"Pop from empty stack.\n");
+  SWORD addr = pop_word();
+
+  if( addr == REGOFFSET ) {
     return 1;
   }
+
+  pc = addr;
   return 0;
 }
 
