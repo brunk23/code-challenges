@@ -61,9 +61,6 @@ int main(int argc, char *argv[]) {
       stepmode = 1;
     }
 
-    /*
-     * This is where we need to change the code.
-     */
     if((memory[pc] == in && inbuffindex >= bufflen)) {
       test = fgets(inbuffer, BUFFSIZE, stdin);
       if( !test || feof(stdin) || ferror(stdin) ) {

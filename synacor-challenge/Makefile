@@ -6,7 +6,8 @@ DISASS = $(SRCDIR)/synacor_disassem.c
 DEST = bin
 
 bin/synacor: $(CFILES) $(HFILES)
-	gcc -Wall -g -o $(DEST)/synacor $(CFILES)
+	gcc -Wall -O2 -o $(DEST)/synacor $(CFILES)
+#	gcc -Wall -g -o $(DEST)/synacor $(CFILES)
 
 bin/disass: $(SRCDIR)/$(DISASS) $(SRCDIR)/$(HFILES)
 	gcc -Wall -g -o $(DEST)/disass $(DISASS)

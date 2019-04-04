@@ -10,6 +10,32 @@
  * The debug commands
  */
 
+const char *debug_commands[] = {
+  "set", "jump", "j", "break", "b", "clear", "c", "print", "p",
+  "save", "sa", "load", "l", "step", "st", "quit", "q", "stack",
+  "s", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "pc",
+  "call", 0
+};
+
+const SWORD debug_command_values[] = {
+  SET, JUMP, JUMP, BREAK, BREAK, CLEAR, CLEAR, PRINT, PRINT,
+  SAVE, SAVE, LOAD, LOAD, STEP, STEP, QUIT, QUIT, STACK,
+  STACK, r0, r1, r2, r3, r4, r5, r6, r7, PC,
+  CALL
+};
+
+SWORD isdebugcommand( char *s ) {
+  int i = 0;
+
+  while( debug_commands[i] ) {
+    if( !(strcmp( s, debug_commands[i])) ) {
+      return debug_command_values[i];
+    }
+    i++;
+  }
+  return INVALID;
+}
+
 void process_debug_str(char *s) {
   int i = 0;
   SWORD command_word = INVALID;
@@ -36,8 +62,10 @@ void process_debug_str(char *s) {
     print_stack();
     break;
   case BREAK:
-    debug_break(s, &i );
+    debug_break( s, &i );
     break;
+  case CALL:
+    debug_call( s, &i );
   case QUIT:
     exit(1);
     break;
@@ -124,6 +152,11 @@ void debug_print(char *s, int *i) {
   }
 }
 
+void debug_call(char *s, int *i) {
+  push_word(pc);
+  pc = next_word(s, i);
+}
+
 /*
  * Will print a range of memory in columns of 10 words each
  */
@@ -171,90 +204,6 @@ SWORD next_word(char *s, int *i) {
   s[end] = oldchar;
   return value;
 }
-
-/*
- * We should use a constant character pointer array here to simplify this function
- */
-SWORD isdebugcommand( char *s ) {
-  if( !(strcmp( s, "set" )) ) {
-    return SET;
-  }
-  if( !(strcmp( s, "jump" )) || !(strcmp( s, "j")) ) {
-    return JUMP;
-  }
-  if( !(strcmp( s, "break" )) || !(strcmp( s, "b")) ) {
-    return BREAK;
-  }
-  if( !(strcmp( s, "clear" )) || !(strcmp( s, "c")) ) {
-    return CLEAR;
-  }
-  if( !(strcmp( s, "print" )) || !(strcmp( s, "p")) ) {
-    return PRINT;
-  }
-  if( !(strcmp( s, "save" )) || !(strcmp( s, "sa")) ) {
-    return SAVE;
-  }
-  if( !(strcmp( s, "load" )) || !(strcmp( s, "l")) ) {
-    return LOAD;
-  }
-  if( !(strcmp( s, "step" )) || !(strcmp( s, "st")) ) {
-    return STEP;
-  }
-  if( !(strcmp( s, "quit")) || !(strcmp( s, "q")) ) {
-    return QUIT;
-  }
-  if( !(strcmp( s, "stack")) || !(strcmp( s, "s")) ) {
-    return STACK;
-  }
-  if( !(strcmp( s, "r0" )) ) {
-    return r0;
-  }
-  if( !(strcmp( s, "r1" )) ) {
-    return r1;
-  }
-  if( !(strcmp( s, "r2" )) ) {
-    return r2;
-  }
-  if( !(strcmp( s, "r3" )) ) {
-    return r3;
-  }
-  if( !(strcmp( s, "r4" )) ) {
-    return r4;
-  }
-  if( !(strcmp( s, "r5" )) ) {
-    return r5;
-  }
-  if( !(strcmp( s, "r6" )) ) {
-    return r6;
-  }
-  if( !(strcmp( s, "r7" )) ) {
-    return r7;
-  }
-  if( !(strcmp( s, "pc" )) ) {
-    return PC;
-  }
-  return INVALID;
-}
-
-
-/*** Remove the ability to call
-  case 'c':
-    while( (inbuffer[inbuffindex] >= 'a' &&
-	    inbuffer[inbuffindex] <= 'z') ||
-	   (inbuffer[inbuffindex] >= '0' &&
-	    inbuffer[inbuffindex] <= '9') ) {
-      inbuffindex++;
-    }
-    y = strtol(&inbuffer[inbuffindex],0,10);
-    if( !(sptr = malloc(sizeof(struct STACKOBJ)))) {
-      fprintf(stderr,"Error saving pc\n");
-    }
-    sptr->next = stack;
-    sptr->value = pc;
-    stack = sptr;
-    pc = y;
-    break;
-*/
 
 int print_stack() {
   const SWORD *stack = stack_buffer();

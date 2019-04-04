@@ -28,7 +28,7 @@ FILE *devices[MAXDEV];
 enum REGISTERS {
   r0 = REGOFFSET, r1, r2, r3, r4, r5, r6, r7,
   INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP, PC,
-  LOAD,STACK, QUIT
+  LOAD,STACK, QUIT, CALL
 };
 
 enum INSTSET {
@@ -42,26 +42,45 @@ char debugbuffer[BUFFSIZE];
 int inbuffindex;
 int breakpoint;
 
+/*
+ * In synacor.c
+ */
 int read_in_file(FILE *, SWORD, long, size_t);
 int write_out_file(FILE *, SWORD, long, size_t);
 int init_machine();
-int enter_debug_mode();
-int print_stack();
-int save_state();
-int load_state();
 SWORD get_add( SWORD );
 SWORD set_add( SWORD, SWORD );
+int scan_inbuff();
+void catch_int(int);
+
+/*
+ * In synacor_step.c
+ */
 const char *regname( SWORD );
 SWORD print_instruction( SWORD );
 int print_addr(SWORD, const char *);
+
+
+/*
+ * In synacor_debug.c
+ */
 SWORD isdebugcommand(char *);
 SWORD next_word(char *, int *);
-int scan_inbuff();
 void process_debug_str(char *);
 void debug_print(char *, int *);
+void debug_call(char *s, int *i);
+void debug_set(char *s, int *i);
+void debug_jump(char *s, int *i);
+void debug_break(char *s, int *i);
+void print_mem_range(SWORD, SWORD);
+int print_stack();
+int save_state();
+int load_state();
+
 /*
  * See the arch-spec sheet for detailed instructions on
  * opcodes
+ * In synacor_iset.c
  */
 int op_halt();
 int op_set();
@@ -87,11 +106,6 @@ int op_in();
 int op_nop();
 int op_dread();
 int op_dwrite();
-void print_mem_range(SWORD, SWORD);
-void debug_set(char *, int *);
-void debug_jump(char *, int *);
-void debug_break(char *, int *);
-void catch_int(int);
 
 /* There are 22 opcodes and we just call them
  * from here. +2 extensions */
