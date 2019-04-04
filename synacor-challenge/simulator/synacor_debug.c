@@ -66,6 +66,7 @@ void process_debug_str(char *s) {
     break;
   case CALL:
     debug_call( s, &i );
+    break;
   case QUIT:
     exit(1);
     break;
@@ -153,7 +154,7 @@ void debug_print(char *s, int *i) {
 }
 
 void debug_call(char *s, int *i) {
-  push_word(pc);
+  push_word( pc );
   pc = next_word(s, i);
 }
 
