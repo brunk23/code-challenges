@@ -94,7 +94,7 @@ overvalue1:
 	add	r3	r3	1 	; j++
 	eq	r7	r5	coins	; &vals[i] == &coins[0] we are out of coins
 	jt	r7	endprogram
-	jf	r2	overvalue1	; go to next value
+	jf	r2	overvalue1	; if counts[i] == 0 go to next value
 	rmem	r2	r5		; r2 = vals[i]
 	rmem	r3	r3		; r3 = coins[j]
 	add	r2	r3	r2	; r2 += r3
