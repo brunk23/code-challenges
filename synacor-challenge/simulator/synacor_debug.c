@@ -112,7 +112,7 @@ void debug_print(char *s, int *i) {
     printf("PC: %i\n", pc);
     break;
   case STACK:
-    printstack();
+    print_stack();
     break;
   default:
     arg2 = next_word(s, i);
