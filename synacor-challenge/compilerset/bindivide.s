@@ -1,10 +1,12 @@
 	;; This will use binary to divide
+	;; Invoke: call divide
 	;; Inputs:  r1 <- dividend, r2 <- divisor
 	;; Outputs:  r1 <- quotient, r2 <- remainder
 divide:
 
 	;; We start off by finding early return conditions. We can return
-	;; right away if we are dividing a 0, or by 1.
+	;; right away if we are dividing a 0, or by 1. This saves a marginal
+	;; amount of time
 	jt	r1	divide.notzero
 	set	r2	0
 	ret
@@ -25,13 +27,13 @@ divide.start:
 	;; We store possible factors on the stack
 	push	0			; push 0 on the stack for when we are done
 	set	r4	r2		; We first push r2 on the stack
-	set	r5	1
+	set	r5	1		; This is the power of 2
 divide.findfactor:
 	set	r3	r4		; save the old factor to see when we go over
 	push	r5			; push the power of 2 we multiplied by
 	push	r4			; push the next factor on the stack
-	mult	r4	r4	2	; double the factor
-	mult	r5	r5	2	; double the power of 2
+	add	r4	r4	r4	; double the factor
+	add	r5	r5	r5	; double the power of 2
 	gt	r7	r4	r1 	; is r4 > dividend
 	gt	r3	r3	r4	; is the old number > the new number?
 	or	r3	r3	r7	; Either one is a done situation
@@ -39,14 +41,13 @@ divide.findfactor:
 
 	set	r6	0		; keep quotient in r6
 divide.loop:
-	pop	r4		   	; pop the test divisor
-	jf	r4	divide.end	; We read a zero
-	pop	r5			; pop the power of 2 we add
-	mod	r3	r1	r4	; r3 = r1 mod r4
-	eq	r7	r3	r1	; Is the remainder the same as the start?
-	jt	r7	divide.loop	; if so, don't add anything and loop
-	add	r6	r6	r5	; Add the current factor to it
-	set	r1	r3		; r1 <- r3
+	pop	r4		   	; pop the factor we are testing
+	jf	r4	divide.end	; We quit when we read a zero from the stack
+	pop	r5			; pop the power of 2 for this factor
+	gt	r7	r4	r1	; Is the factor greater than the remainder?
+	jt	r7	divide.loop	; if so, don't do anything and loop
+	mod	r1	r1	r4	; remove this factor from the dividend
+	add	r6	r6	r5	; Add the current power of 2 to our quotient
 	jmp	divide.loop		; Return to the loop
 
 divide.end:
