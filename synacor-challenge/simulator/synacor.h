@@ -46,7 +46,7 @@ int read_in_file(FILE *, SWORD, long, size_t);
 int write_out_file(FILE *, SWORD, long, size_t);
 int init_machine();
 int enter_debug_mode();
-int printstack();
+int print_stack();
 int save_state();
 int load_state();
 SWORD get_add( SWORD );

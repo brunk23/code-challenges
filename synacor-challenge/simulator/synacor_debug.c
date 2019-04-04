@@ -32,6 +32,9 @@ void process_debug_str(char *s) {
   case SET:
     debug_set( s, &i );
     break;
+  case STACK:
+    print_stack();
+    break;
   case BREAK:
     debug_break(s, &i );
     break;
@@ -235,21 +238,20 @@ SWORD isdebugcommand( char *s ) {
     break;
 */
 
-int printstack() {
+int print_stack() {
+  const SWORD *stack = stack_buffer();
   int i = 0;
 
-  while(0) {
-    for( i = 1; i > 0; i-- ) {
-      printf("%i\n", 1 );
-    }
+  while(i < stack_size()) {
+    printf("%i: %i\n", i, stack[i] );
+    i++;
   }
   return 0;
 }
 
 int save_state() {
   FILE *source;
-  int words_written = 0, x = 0, y = 0;
-  SWORD *temp;
+  int words_written = 0, x = 0;
   
   if( !( source = fopen("synacor.dump", "w"))) {
     fprintf(stderr,"Could not open file for writing.\n");
@@ -272,28 +274,18 @@ int save_state() {
 			source);
   fprintf(stderr,"PROGRAM COUNTER: %i words\n",words_written);
 
-  /*
+  x = stack_size();
   words_written= fwrite(&x,
 			sizeof(SWORD),
 			1,
 			source);
   fprintf(stderr,"STACK SIZE: %i words\n",words_written);
-  if( x ) {
-    if( !(temp = malloc( x*STACKMAX*sizeof(SWORD)) ) ) {
-      fprintf(stderr,"Couldn't save stack.\n");
-    }
-    sptr = stack;
-    for( y = 1; y <= x; ++y ) {
-      temp[x-y] = sptr->values[y];  // XXX BROKEN
-      sptr = sptr->next;
-    }
-    words_written= fwrite(temp,
-			  sizeof(SWORD),
-			  x,
-			  source);
-    fprintf(stderr,"STACK CONTENTS: %i words\n",words_written);
-  }
-  */
+  words_written= fwrite(stack_buffer(),
+			sizeof(SWORD),
+			x,
+			source);
+  fprintf(stderr,"STACK CONTENTS: %i words\n",words_written);
+
   if( source ) {
     fclose(source);
   }
@@ -333,29 +325,17 @@ int load_state() {
 		     1,
 		     source);
   fprintf(stderr,"STACK SIZE: %i words\n",words_read);
-  /*
+
   while( x ) {
-    if( !(sptr = malloc( sizeof(struct STACKOBJ) ) ) ) {
-      fprintf(stderr,"Couldn't get memory for stack.\n");
-      break;
-    }
-    sptr->next = stack;
-    stack = sptr;
     
-    words_read= fread(&y,
-		      sizeof(SWORD),
-		      1,
-		      source);
-    stack->values[0] = y;  // BROKEN
+    words_read = fread(&y,
+		       sizeof(SWORD),
+		       1,
+		       source);
+    push_word( y );
     --x;
   }
-  x = 0;
-  sptr = stack;
-  while( sptr ) {
-    ++x;
-    sptr = sptr->next;
-  }
-  */
+
   fprintf(stderr,"STACK CONTENTS: %i words\n",words_read);
   if( source ) {
     fclose(source);
