@@ -12,7 +12,6 @@
  */
 
 int main(int argc, char *argv[]) {
-  struct STACKOBJ *obottom;
   char *test;
   int retval = 0;
   int source = 0;
@@ -93,13 +92,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  /* Unwind the stack and free it */
-  while(stack) {
-    obottom = stack;
-    stack = stack->next;
-    free(obottom);
-  }
-
   /*
    * Close open files
    */
@@ -162,7 +154,7 @@ int init_machine() {
   inst_tble[nop] = op_nop;
   inst_tble[dread] = op_dread;
   inst_tble[dwrite] = op_dwrite;
-  stack = NULL;
+  init_stack();
 
   pc = 0;
 

@@ -1,5 +1,5 @@
 SRCDIR = simulator
-CFILES = $(SRCDIR)/synacor.c $(SRCDIR)/synacor_debug.c $(SRCDIR)/synacor_stack.c
+CFILES = $(SRCDIR)/synacor.c $(SRCDIR)/synacor_debug.c
 CFILES += $(SRCDIR)/synacor_iset.c $(SRCDIR)/synacor_step.c
 HFILES = $(SRCDIR)/synacor.h $(SRCDIR)/synacor_stack.h
 DISASS = $(SRCDIR)/synacor_disassem.c

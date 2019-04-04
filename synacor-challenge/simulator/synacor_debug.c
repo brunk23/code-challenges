@@ -236,16 +236,12 @@ SWORD isdebugcommand( char *s ) {
 */
 
 int printstack() {
-  struct STACKOBJ *sptr = 0;
   int i = 0;
 
-  sptr = stack;
-
-  while(sptr) {
-    for( i = sptr->stack_size; i > 0; i-- ) {
-      printf("%i\n", sptr->values[ i - 1 ] );
+  while(0) {
+    for( i = 1; i > 0; i-- ) {
+      printf("%i\n", 1 );
     }
-    sptr = sptr->next;
   }
   return 0;
 }
@@ -253,7 +249,6 @@ int printstack() {
 int save_state() {
   FILE *source;
   int words_written = 0, x = 0, y = 0;
-  struct STACKOBJ *sptr;
   SWORD *temp;
   
   if( !( source = fopen("synacor.dump", "w"))) {
@@ -277,12 +272,7 @@ int save_state() {
 			source);
   fprintf(stderr,"PROGRAM COUNTER: %i words\n",words_written);
 
-  sptr = stack;
-  while( sptr ) {
-    ++x;
-    sptr = sptr->next;
-  }
-
+  /*
   words_written= fwrite(&x,
 			sizeof(SWORD),
 			1,
@@ -303,6 +293,7 @@ int save_state() {
 			  source);
     fprintf(stderr,"STACK CONTENTS: %i words\n",words_written);
   }
+  */
   if( source ) {
     fclose(source);
   }
@@ -312,17 +303,10 @@ int save_state() {
 int load_state() {
   FILE *source;
   int words_read = 0, x = 0, y = 0;
-  struct STACKOBJ *sptr;
 
   /* Free the stack, if there is one */
-  while(stack) {
-    sptr = stack->next;
-    free(stack);
-    stack = sptr;
-  }
+  init_stack();
 
-  stack = NULL;
-  
   if( !( source = fopen("synacor.dump", "r"))) {
     fprintf(stderr,"Could not open file for reading.\n");
     return 0;
@@ -349,6 +333,7 @@ int load_state() {
 		     1,
 		     source);
   fprintf(stderr,"STACK SIZE: %i words\n",words_read);
+  /*
   while( x ) {
     if( !(sptr = malloc( sizeof(struct STACKOBJ) ) ) ) {
       fprintf(stderr,"Couldn't get memory for stack.\n");
@@ -370,6 +355,7 @@ int load_state() {
     ++x;
     sptr = sptr->next;
   }
+  */
   fprintf(stderr,"STACK CONTENTS: %i words\n",words_read);
   if( source ) {
     fclose(source);
