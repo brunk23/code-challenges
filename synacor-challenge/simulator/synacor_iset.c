@@ -89,7 +89,7 @@ int op_add() {
   unsigned short int sum;
   sum = get_add(pc + 2);
   sum += get_add(pc + 3);
-  sum %= REGOFFSET;
+  sum &= MAXMEM;
   set_add(pc + 1, sum);
   pc += 4;
   return 0;
@@ -99,16 +99,20 @@ int op_mult() {
   unsigned int temp;
   temp = get_add(pc + 2);
   temp *= get_add(pc + 3);
-  temp %= REGOFFSET;
+  temp &= MAXMEM;
   set_add(pc + 1, temp);
   pc += 4;
   return 0;
 }
 
 int op_mod() {
-  unsigned short int temp;
+  unsigned short int temp, divisor;
   temp = get_add(pc + 2);
-  temp %= get_add(pc + 3);
+  if( (divisor = get_add(pc + 3)) ) {
+    temp %= divisor;
+  } else {
+    fprintf(stderr, "Divide by zero error!\n");
+  }
   set_add(pc + 1, temp);
   pc += 4;
   return 0;
@@ -136,7 +140,7 @@ int op_not() {
   unsigned short int temp;
   temp = get_add(pc + 2);
   temp = ~temp;
-  temp %= REGOFFSET;
+  temp &= MAXMEM;
   set_add(pc + 1, temp);
   pc += 3;
   return 0;

@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   while( 1 ) {
 
     /* Make sure pc loops down correctly */
-    pc %= REGOFFSET;
+    pc &= MAXMEM;
 
     if( memory[pc] > 23 ) {
       fprintf(stderr,"Error: Invalid operation %i",pc);
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
       process_debug_str(debugbuffer);
     }
 
-    /* Only halt returns 1 */
+    /* Only halt or errors return 1 */
     if( ( retval=inst_tble[ get_add(pc) ]() ) ) {
       break;
     }
@@ -183,7 +183,7 @@ int init_machine() {
   }
 
   /* Reset Registers */
-  for( x = 0; x < 8; ++x ) {
+  for( x = 0; x < REGISTERS; ++x ) {
     reg[x] = 0;
   } 
 
@@ -299,7 +299,7 @@ SWORD get_add(SWORD a) {
   /* a should be within memory, but if pc was near the top of
    * memory and we pass ( pc + 5 ) or similar, we could read
    * outside the array, protect against that by wrapping down */
-  a %= REGOFFSET;
+  a &= MAXMEM;
   b = memory[a];
 
   if( b < REGOFFSET ) {
@@ -311,7 +311,7 @@ SWORD get_add(SWORD a) {
     return reg[b];
   }
   fprintf(stderr,"Invalid access request: %i at %i\n",
-	  b+REGOFFSET, pc);
+	  b + REGOFFSET, pc);
   return 0;
 }
 
@@ -323,15 +323,15 @@ SWORD set_add(SWORD a, SWORD b) {
   SWORD c;
 
   /* ensure both are inside memory */
-  a %= REGOFFSET;
-  b %= REGOFFSET;
+  a &= MAXMEM;
+  b &= MAXMEM;
   c = memory[a];
 
   if( c >= REGOFFSET ) {
     c -= REGOFFSET;
     if( c >= 8 ) {
       fprintf(stderr,"Invalid access request: %i at %i\n",
-	      a+REGOFFSET, pc);
+	      a + REGOFFSET, pc);
       return 0;
     }
     return reg[c] = b;

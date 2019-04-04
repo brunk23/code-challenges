@@ -5,9 +5,9 @@
  * Synacor Machine Description
  */
 
-#define MAXDEV 10
-#define BUFFSIZE 160
-#define REGOFFSET 32768
+enum CONSTANTS {
+  REGISTERS = 8, MAXDEV = 10, BUFFSIZE = 160, MAXMEM = 32767, REGOFFSET
+};
 
 /* 15 bit addressable, 16 bit values. Values limited from
  * 0-32768, 8 registers, an unbounded stack. These are globals
@@ -19,14 +19,14 @@
  * Up to 10 attached files at a time
  */
 typedef unsigned short int SWORD;
-SWORD memory[32768];
-SWORD reg[8];
+SWORD memory[REGOFFSET];
+SWORD reg[REGISTERS];
 SWORD pc;
 SWORD stepmode;
 FILE *devices[MAXDEV];
 
 enum REGISTERS {
-  r0 = 32768, r1, r2, r3, r4, r5, r6, r7,
+  r0 = REGOFFSET, r1, r2, r3, r4, r5, r6, r7,
   INVALID, SET, JUMP, BREAK, CLEAR, PRINT, SAVE, STEP, PC,
   LOAD,STACK, QUIT
 };
@@ -96,6 +96,6 @@ void catch_int(int);
 /* There are 22 opcodes and we just call them
  * from here. +2 extensions */
 typedef int (*iPtr)();
-iPtr inst_tble[24];
+iPtr inst_tble[dwrite + 1];
 
 #endif

@@ -1,5 +1,5 @@
-	set	r1	2345
-	set	r2	12
+	set	r1	8192
+	set	r2	10
 	call	divide
 	halt
 
