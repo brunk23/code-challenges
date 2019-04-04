@@ -19,7 +19,6 @@ divide.notzero:
 	ret				; return to main function
 
 divide.start:
-	push	r6
 	push	r5
 	push	r4
 	push	r3
@@ -39,7 +38,7 @@ divide.findfactor:
 	or	r3	r3	r7	; Either one is a done situation
 	jf	r3	divide.findfactor
 
-	set	r6	0		; keep quotient in r6
+	set	r3	0		; keep quotient in r6
 divide.loop:
 	pop	r4		   	; pop the factor we are testing
 	jf	r4	divide.end	; We quit when we read a zero from the stack
@@ -47,16 +46,15 @@ divide.loop:
 	gt	r7	r4	r1	; Is the factor greater than the remainder?
 	jt	r7	divide.loop	; if so, don't do anything and loop
 	mod	r1	r1	r4	; remove this factor from the dividend
-	add	r6	r6	r5	; Add the current power of 2 to our quotient
+	add	r3	r3	r5	; Add the current power of 2 to our quotient
 	jmp	divide.loop		; Return to the loop
 
 divide.end:
 	set	r2	r1	; save remainder in r2
-	set	r1	r6	; save quotient in r1
+	set	r1	r3	; save quotient in r1
 	;; restore other registers
 	pop	r3
 	pop	r4
 	pop	r5
-	pop	r6
 	pop	r7
 	ret
