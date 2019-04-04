@@ -124,15 +124,30 @@ void debug_print(char *s, int *i) {
   }
 }
 
+/*
+ * Will print a range of memory in columns of 10 words each
+ */
 void print_mem_range(SWORD x, SWORD y) {
-  int i = 0;
+  int i = 0, j = 1;
+  if( x > y ) {
+    i = y;
+    y = x;
+    x = i;
+    i = 0;
+  }
   fprintf(stderr,"MEMORY: %i to %i\n",x,y);
-  for( i = x; i <= y; ++i ) {
+  for( i = x; i <= y; ++i, ++j ) {
     fprintf(stderr,"%05i\t",memory[i]);
+    if( !( j % 10 ) ) {
+      fprintf(stderr,"\n");
+    }
   }
   fprintf(stderr,"\n");
 }
 
+/*
+ * This should probably be reworked. It's messy and ugly.
+ */
 SWORD next_word(char *s, int *i) {
   SWORD value = INVALID;
   int start = 0, end = 0;
@@ -157,6 +172,9 @@ SWORD next_word(char *s, int *i) {
   return value;
 }
 
+/*
+ * We should use a constant character pointer array here to simplify this function
+ */
 SWORD isdebugcommand( char *s ) {
   if( !(strcmp( s, "set" )) ) {
     return SET;
