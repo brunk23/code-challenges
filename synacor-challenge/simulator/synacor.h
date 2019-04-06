@@ -34,7 +34,7 @@ enum REGISTERS {
 enum INSTSET {
   halt = 0, set, push, pop, eq, gt, jmp, jt, jf, add, mult,
   mod, and, or, not, rmem, wmem, call, ret, out, in, nop,
-  dread, dwrite
+  rndm, dread, dwrite
 };
 
 char inbuffer[BUFFSIZE];
@@ -104,6 +104,7 @@ int op_ret();
 int op_out();
 int op_in();
 int op_nop();
+int op_rndm();
 int op_dread();
 int op_dwrite();
 

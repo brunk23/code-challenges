@@ -188,6 +188,12 @@ SWORD print_instruction(SWORD addr) {
       delta = 1;
       break;
 
+    case rndm:
+      fprintf(stderr,"%05i:\trndm\t",addr);
+      print_addr(addr+1,"\n");
+      delta = 2;
+      break;
+
     case dread:
       fprintf(stderr,"%05i:\tdread\t",addr);
       print_addr(addr+1,",\t");

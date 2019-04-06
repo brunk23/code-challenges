@@ -249,6 +249,7 @@ int pass1() {
 	  case out:
 	  case push:
 	  case pop:
+	  case rndm:
 	  case jmp:
 	  case call:
 	    curr = one_ops_handler(curr, &compile_status);
@@ -370,7 +371,8 @@ TOKEN *one_ops_handler(TOKEN *curr, int *compile_status) {
   curr = curr->next;
   compile_token(curr);
 
-  if( val == pop && (curr->value < r0 || curr->value > r7 )) {
+  if( (val == pop || val == rndm) &&
+      (curr->value < r0 || curr->value > r7 )) {
     fprintf(stderr,"WARNING: 1st argument to %s should be a register.\n",inst);
     fprintf(stderr,"%s: %s",curr->file_name,curr->source_line);
   }
@@ -614,13 +616,13 @@ SWORD reserved(char *str) {
   const char *words[] = { "halt", "set", "push", "pop", "eq", "gt", "jmp",
 			  "jt", "jf", "add", "mult", "mod", "and", "or",
 			  "not", "rmem", "wmem", "call", "ret", "out", "in",
-			  "nop", "dread", "dwrite", "origin", "include",
-			  "data", 0 };
+			  "nop", "rndm", "dread", "dwrite", "origin",
+			  "include", "data", 0 };
   const SWORD values[] = { halt, set, push, pop, eq, gt, jmp,
 			   jt, jf, add, mult, mod, and, or,
 			   not, rmem, wmem, call, ret, out, in,
-			   nop, dread, dwrite, ORIGIN, INCLUDE,
-			   DATA, USERWORD };
+			   nop, rndm, dread, dwrite, ORIGIN,
+			   INCLUDE, DATA, USERWORD };
   int i = 0;
 
   while( words[i] != 0 ) {

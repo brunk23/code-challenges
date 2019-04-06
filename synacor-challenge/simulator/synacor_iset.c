@@ -3,6 +3,7 @@
 
 #include "synacor.h"
 #include "synacor_stack.h"
+#include "synacor_random.h"
 
 /*
  * Implement the actual instruction set
@@ -197,6 +198,15 @@ int op_in() {
 /* Just increment the program counter and return */
 int op_nop() {
   ++pc;
+  return 0;
+}
+
+/*
+ * Return a random number, set_add forces it to be in range.
+ */
+int op_rndm() {
+  set_add(pc + 1, next_random());
+  pc += 2;
   return 0;
 }
 

@@ -6,6 +6,7 @@
 
 #include "synacor.h"
 #include "synacor_stack.h"
+#include "synacor_random.h"
 
 /*
  * Synacor Emulator
@@ -149,9 +150,11 @@ int init_machine() {
   inst_tble[out] = op_out;
   inst_tble[in] = op_in;
   inst_tble[nop] = op_nop;
+  inst_tble[rndm] = op_rndm;
   inst_tble[dread] = op_dread;
   inst_tble[dwrite] = op_dwrite;
   init_stack();
+  init_random();
 
   pc = 0;
 
