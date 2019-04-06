@@ -13,6 +13,29 @@
 	;; rooting are not permitted. Each of the five cards must be used once
 	;; and only once. 
 
+	set	r0	10
+again:
+	set	r1	games_left
+	call	pstr
+	set	r1	r0
+	call	pnumber
+	out	10
+	call	main
+	add	r0	r0	32767
+	jt	r0	again
+	rmem	r1	win_count
+	call	pnumber
+	out	47
+	set	r1	10
+	call	pnumber
+	out	10
+	halt
+main:
+	push	r0
+	push	r1
+	push	r2
+	push	r3
+	push	r7
 	set	r0	4		; Number of moves
 	call	pick_six		; get our six numbers
 input:
@@ -36,7 +59,12 @@ input:
 	jt	r0	input		; Loop if we have operations left to go
 	call	win_lose		; check if we won
 	out	10
-	halt
+	pop	r7
+	pop	r3
+	pop	r2
+	pop	r1
+	pop	r0
+	ret
 
 win_lose:
 	push	r0
@@ -64,6 +92,9 @@ next_value:
 won:
 	set	r1	win_text 	; print the win string
 	call	pstr
+	rmem	r1	win_count
+	add	r1	r1	1
+	wmem	win_count	r1
 	pop	r2
 	pop	r1
 	pop	r0
@@ -248,11 +279,13 @@ print_game_next:
 	ret
 
 	;; Pick 6 random numbers and put them in the buffer
+	;; Put the numbers back before we return.
 pick_six:
 	push	r1
 	push	r2
 	push	r3
 	push	r4
+	push	r5
 	set	r1	6	     	; We need six numbers
 	set	r3	game_numbers	; We save the six numbers here
 	add	r3	r3	r1	; This is our index into it
@@ -267,6 +300,20 @@ pick_6_loop:
 	add	r3	r3	32767	; save value
 	wmem	r3	r4		; game_numbers[r1] <- r2
 	jt	r1	pick_6_loop	; Get 6 numbers
+	set	r1	6
+	set	r3	game_numbers
+	set	r2	numbers
+put_away:
+	add	r1	r1	32767
+	rmem	r4	r3
+put_away2:
+	rmem	r5	r2
+	add	r2	r2	1
+	jt	r5	put_away2
+	add	r2	r2	32767
+	wmem	r2	r4
+	jt	r1	put_away
+	pop	r5
 	pop	r4
 	pop	r3
 	pop	r2
@@ -297,6 +344,8 @@ second_let:
 	data	0
 command:
 	data	0
+win_count:
+	data	0
 strings:
 	data	"[a]	"
 	data	"[b]	"
@@ -312,3 +361,5 @@ negative_message:
 	data	"Negative numbers are not allowed."
 divide_error:
 	data	"You divided by zero, or the quotient was not a whole number."
+games_left:
+	data	"Games left to play: "
