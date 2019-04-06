@@ -110,7 +110,7 @@ void catch_int(int none) {
  * This will clear the inbuff of debug strings
  */
 int scan_inbuff() {
-  int count = 0, i = 0;
+  int i = 0;
   while( isspace(inbuffer[i])) {
     i++;
   }
@@ -120,10 +120,9 @@ int scan_inbuff() {
       process_debug_str(&inbuffer[i+1]);
     } else {
       i++;
-      count++;
     }
   }
-  return count;
+  return i;
 }
 
 int init_machine() {

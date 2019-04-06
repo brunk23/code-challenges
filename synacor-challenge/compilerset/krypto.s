@@ -134,11 +134,11 @@ parse_input_first_let:
 parse_input_f_let:	
 	in	r1			; Get the next char
 	gt	r7	r1	101	; Over 'e'
-	jt	r7	parse_input_first_let
+	jt	r7	parse_input_f_let
 	gt	r7	r1	96 	; under 'a'
 	jt	r7	parse_input_1cap_let
 	gt	r7	r1	69 	; Over 'E'
-	jt	r7	parse_input_first_let
+	jt	r7	parse_input_f_let
 	gt	r7	r1	65 	; under 'A'
 	jt	r7	parse_input_1low_let
 	jmp	parse_input_f_let
@@ -237,6 +237,7 @@ pick_six:
 	push	r1
 	push	r2
 	push	r3
+	push	r4
 	set	r1	6	     	; We need six numbers
 	set	r3	game_numbers	; We save the six numbers here
 	add	r3	r3	r1	; This is our index into it
@@ -244,12 +245,14 @@ pick_6_loop:
 	rndm	r2
 	mod	r2	r2	56	; Index into numbers[]
 	add	r2	r2	numbers ; Add address of number
-	rmem	r2	r2		; r2 = numbers[i]
-	jf	r2	pick_6_loop
+	rmem	r4	r2		; r2 = numbers[i]
+	jf	r4	pick_6_loop
+	wmem	r2	0
 	add	r1	r1	32767 	; r1--
 	add	r3	r3	32767	; save value
-	wmem	r3	r2		; game_numbers[r1] <- r2
+	wmem	r3	r4		; game_numbers[r1] <- r2
 	jt	r1	pick_6_loop	; Get 6 numbers
+	pop	r4
 	pop	r3
 	pop	r2
 	pop	r1
