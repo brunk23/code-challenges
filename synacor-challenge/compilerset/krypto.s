@@ -13,9 +13,9 @@
 	;; rooting are not permitted. Each of the five cards must be used once
 	;; and only once. 
 
-	set	r0	4	; Number of moves
-	call	pick_six
-input:	
+	set	r0	4		; Number of moves
+	call	pick_six		; get our six numbers
+input:
 	call	parse_input
 	rmem	r1	first_let 	; offset of first word
 	rmem	r2	second_let	; offset of second word
@@ -33,54 +33,56 @@ input:
 	jt	r7	input		; if not we quit and loop
 	rmem	r3	command		; get the address for the command
 	call	r3			; call it
-	jt	r0	input
-	call	win_lose
+	jt	r0	input		; Loop if we have operations left to go
+	call	win_lose		; check if we won
 	out	10
 	halt
-	
+
 win_lose:
 	push	r0
 	push	r1
 	push	r2
-	set	r0	5
-	set	r1	game_numbers
-	add	r1	r1	r0
-	rmem	r2	r1
-next_value:	
-	add	r0	r0	32767
-	set	r1	game_numbers
-	add	r1	r0	r1
-	rmem	r1	r1
-	eq	r1	r1	r2
-	jt	r1	won
-	jt	r0	next_value
-	set	r1	lose_text
-	call	pstr
+	set	r0	5		; We grab the goal number first
+	set	r1	game_numbers	; we index off this address
+	add	r1	r1	r0	; Get the memory address
+	rmem	r2	r1		; r2 = the goal
+next_value:
+	add	r0	r0	32767 	; decrement i
+	set	r1	game_numbers	; point to the values we played with
+	add	r1	r0	r1	; add the index
+	rmem	r1	r1		; read the value into r1
+	eq	r1	r1	r2	; if r2 == r1
+	jt	r1	won		; we won
+	jt	r0	next_value	; if not, check the next value
+	set	r1	lose_text	; we didn't have any values that matched
+	call	pstr			; print the lose string
 	pop	r2
 	pop	r1
 	pop	r0
 	ret
 
 won:
-	set	r1	win_text
+	set	r1	win_text 	; print the win string
 	call	pstr
 	pop	r2
 	pop	r1
 	pop	r0
 	ret
-	
+
+	;; This will do the multiplication step
 cmd_mult:
-	mult	r7	r1	r2
-	rmem	r1	first_let
-	set	r3	game_numbers
-	add	r1	r1	r3
-	wmem	r1	r7
-	rmem	r2	second_let
-	add	r2	r2	r3
-	wmem	r2	999
-	add	r0	r0	32767
+	mult	r7	r1	r2   	; the actual multiplication
+	rmem	r1	first_let 	; get the first letter index
+	set	r3	game_numbers	; the address we index off of
+	add	r1	r1	r3 	; index to first location
+	wmem	r1	r7		; write the new value to the first location
+	rmem	r2	second_let	; get the second letter index
+	add	r2	r2	r3	; calculate the new location
+	wmem	r2	999		; mark the second location as invalid
+	add	r0	r0	32767	; decrement the counter
 	ret
 
+	;; See cmd_mult for comments
 cmd_add:
 	add	r7	r1	r2
 	rmem	r1	first_let
@@ -93,11 +95,12 @@ cmd_add:
 	add	r0	r0	32767
 	ret
 
+	;; See cmd_sub for comments
 cmd_sub:
-	gt	r7	r2	r1
-	jt	r7	not_neg
-	mult	r2	r2	32767
-	add	r7	r1	r2
+	gt	r7	r2	r1 	; ensure that we don't get a negative
+	jt	r7	not_neg		; as negative's aren't allowed.
+	mult	r2	r2	32767	; Negate the second number
+	add	r7	r1	r2	; the rest is similar to the other cmd_s
 	rmem	r1	first_let
 	set	r3	game_numbers
 	add	r1	r1	r3
@@ -106,13 +109,20 @@ cmd_sub:
 	add	r2	r2	r3
 	wmem	r2	999
 	add	r0	r0	32767
-not_neg:	
+	ret
+
+not_neg:
+	push	r1
+	set	r1	negative_message
+	call	pstr
+	out	10
+	pop	r1
 	ret
 
 cmd_div:
-	jf	r2	no_div
+	jf	r2	no_div		; We don't divide by 0, ignore move
 	call	divide
-	jt	r2	no_div
+	jt	r2	no_div		; If we have a remainder, move denied
 	rmem	r7	first_let
 	set	r3	game_numbers
 	add	r7	r7	r3
@@ -121,7 +131,13 @@ cmd_div:
 	add	r2	r2	r3
 	wmem	r2	999
 	add	r0	r0	32767
-no_div:	
+	ret
+no_div:
+	push	r1
+	set	r1	divide_error
+	call	pstr
+	out	10
+	pop	r1
 	ret
 
 	;; * = 42, + = 43, - = 45, / = 47, NL = 10
@@ -129,9 +145,9 @@ no_div:
 parse_input:
 	push	r1			; first let
 	push	r7
-parse_input_first_let:	
+parse_input_first_let:
 	call	print_game
-parse_input_f_let:	
+parse_input_f_let:
 	in	r1			; Get the next char
 	gt	r7	r1	101	; Over 'e'
 	jt	r7	parse_input_f_let
@@ -142,9 +158,9 @@ parse_input_f_let:
 	gt	r7	r1	65 	; under 'A'
 	jt	r7	parse_input_1low_let
 	jmp	parse_input_f_let
-parse_get_command:	
+parse_get_command:
 	wmem	first_let	r1
-parse_get_command2:	
+parse_get_command2:
 	in	r1
 	eq	r7	r1	10 	; restart if we get a newline
 	jt	r7	parse_input_first_let
@@ -179,7 +195,7 @@ parse_input_second_let:
 	gt	r7	r1	64 	; under 'A'
 	jt	r7	parse_input_2low_let
 	jmp	parse_input_second_let
-parse_end:	
+parse_end:
 	wmem	second_let	r1
 	pop	r7
 	pop	r1
@@ -201,7 +217,6 @@ parse_input_2low_let:
 	add	r1	r1	32703 	; subtract 'A'
 	jmp	parse_end
 
-	
 	;; Print the 5 numbers and the goal. This will be the start of the game
 print_game:
 	push	r1
@@ -211,7 +226,7 @@ print_game:
 	set	r2	6		; Just control the loop
 	set	r1	strings		; The start of the strings
 	set	r3	game_numbers	; Our six numbers
-print_game_loop:	
+print_game_loop:
 	rmem	r4	r3		; Print the associated number
 	eq	r4	r4	999	; Not a valid number
 	jt	r4	print_game_next	; We don't print numbers we used
@@ -220,7 +235,7 @@ print_game_loop:
 	call	pnumber
 	pop	r1			; Restore the string pointer
 	call	pstr			; Print the current string
-print_game_next:	
+print_game_next:
 	add	r1	r1	5	; Next string is 5 bytes forward
 	add	r3	r3	1	; Increase data pointer
 	add	r2	r2	32767	; Decrease counter
@@ -241,7 +256,7 @@ pick_six:
 	set	r1	6	     	; We need six numbers
 	set	r3	game_numbers	; We save the six numbers here
 	add	r3	r3	r1	; This is our index into it
-pick_6_loop:	
+pick_6_loop:
 	rndm	r2
 	mod	r2	r2	56	; Index into numbers[]
 	add	r2	r2	numbers ; Add address of number
@@ -263,7 +278,7 @@ pick_6_loop:
 	.include "pstr.s"
 
 	;; There are 56 numbers
-numbers:	
+numbers:
 	data	1	2	3	4	5	6
 	data	1	2	3	4	5	6
 	data	1	2	3	4	5	6
@@ -293,3 +308,7 @@ win_text:
 	data	"You did it!"
 lose_text:
 	data	"You lose."
+negative_message:
+	data	"Negative numbers are not allowed."
+divide_error:
+	data	"You divided by zero, or the quotient was not a whole number."
