@@ -5,10 +5,14 @@
 #include "assembler.h"
 
 int main(int argc, char *argv[]) {
-  int compile_status = 0, source = 0, dest = 0;
+  int compile_status = 0, source = 0, dest = 0, verbose = 0;
 
   /* COMMAND LINE ARGUMENTS */
   for( compile_status = 1; compile_status < argc; compile_status++) {
+    if( strcmp(argv[compile_status],"-v" ) == 0 ) {
+      verbose = 1;
+      continue;
+    }
     if( strcmp(argv[compile_status],"-o" ) == 0 ) {
       dest = compile_status + 1;
       compile_status++;
@@ -23,11 +27,14 @@ int main(int argc, char *argv[]) {
   }
 
   /* Make sure the command line arguments are correct */
-  if( !source || dest >= argc || (dest == 0 && argc > 2) ) {
+  if( !source || dest >= argc ) {
     help_menu(argv[0]);
     return 1;
   }
 
+  instruction_count = 0;
+  data_words = 0;
+  arguments_count = 0;
   tokencount = 0;
   linecount = 0;
   symbolcount = 0;
@@ -43,6 +50,15 @@ int main(int argc, char *argv[]) {
     compile_status = pass2(tokens, filelines);
   }
 
+  if( verbose ) {
+    fprintf(stderr, "\tProgram Statistics\n\n");
+    fprintf(stderr, "Lines of source code: %i\n", linecount);
+    fprintf(stderr, "Tokens Generated: %i\n", tokencount);
+    fprintf(stderr, "Symbols Found: %i\n\n", symbolcount);
+    fprintf(stderr, "Instructions compiled: %i with %i arguments\n",
+	    instruction_count, arguments_count);
+    fprintf(stderr, "Data words: %i\n\n", data_words);
+  }
   /*
    * Free all the structures created by process_input
    */
@@ -56,16 +72,16 @@ int main(int argc, char *argv[]) {
   */
   if( compile_status == GOOD ) {
     if( dest ) {
-      process_output(argv[dest]);
+      process_output(argv[dest], verbose);
     } else {
-      process_output("syn-asm.bin");
+      process_output("syn-asm.bin", verbose);
     }
   }
 
   return compile_status;
 }
 
-int process_output(const char *filename) {
+int process_output(const char *filename, int verbose) {
   FILE *fp;
   int x, y;
 
@@ -84,7 +100,11 @@ int process_output(const char *filename) {
   y = fwrite(memory, sizeof(SWORD), x, fp);
 
   if( y != x ) {
-    fprintf(stderr,"Wrote %i words\nExpected to write %i words\n",y,x);
+    fprintf(stderr, "Wrote %i words\nExpected to write %i words\n", y, x);
+  }
+
+  if( verbose ) {
+    fprintf(stderr, "Wrote %i words to %s\n", y, filename);
   }
 
   fclose(fp);

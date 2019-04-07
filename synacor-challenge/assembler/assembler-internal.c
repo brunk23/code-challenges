@@ -238,6 +238,7 @@ int pass1() {
 	  memory[pc] = inst;
 	  curr->location = pc;
 	  pc++;
+	  instruction_count++;
 	  switch (inst) {
 
 	  case eq:
@@ -247,6 +248,7 @@ int pass1() {
 	  case mod:
 	  case and:
 	  case or:
+	    arguments_count += 3;
 	    curr = three_ops_handler(curr, &compile_status);
 	    break;
 
@@ -256,6 +258,7 @@ int pass1() {
 	  case not:
 	  case rmem:
 	  case wmem:
+	    arguments_count += 2;
 	    curr = two_ops_handler(curr, &compile_status);
 	    break;
 
@@ -266,6 +269,7 @@ int pass1() {
 	  case rndm:
 	  case jmp:
 	  case call:
+	    arguments_count++;
 	    curr = one_ops_handler(curr, &compile_status);
 	    break;
 
@@ -515,6 +519,7 @@ TOKEN *data_handler(TOKEN *curr, int *compile_status) {
 
   if( curr->type == STRING ) {
     curr->location = pc;
+    data_words += curr->value;
     while( i < curr->value ) {
       memory[pc] = curr->word[i];
       pc++;
@@ -525,6 +530,7 @@ TOKEN *data_handler(TOKEN *curr, int *compile_status) {
     while( curr && (curr->line == line) ) {
       compile_token(curr);
       curr = curr->next;
+      data_words++;
     }
   }
 

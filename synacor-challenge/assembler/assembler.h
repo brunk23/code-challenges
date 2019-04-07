@@ -59,6 +59,9 @@ SWORD pc;
 int linecount;
 int symbolcount;
 int tokencount;
+int instruction_count;
+int data_words;
+int arguments_count;
 SYMBOL *syms;
 TOKEN *tokens;
 LINE *filelines;
@@ -68,7 +71,7 @@ LINE *filelines;
  */
 int help_menu( const char * );
 int init_machine();
-int process_output( const char * );
+int process_output( const char *, int );
 void print_token( TOKEN * );
 
 TOKEN *process_input( const char * );
