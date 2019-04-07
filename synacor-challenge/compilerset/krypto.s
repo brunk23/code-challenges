@@ -17,36 +17,34 @@
 	set	r1	start_message
 	call	pstr
 again:
-	rmem	r0	games_left_num
-	set	r1	games_left
-	call	pstr
-	set	r1	r0
-	call	pnumber
+	rmem	r0	games_left_num 		; We default to 10 games
+	set	r1	games_left		; This is the message string
+	call	pstr				; print the message
+	set	r1	r0			; and then the number
+	call	pnumber				; for the remaining games
 	out	10
-	call	main
-	add	r0	r0	32767
-	wmem	games_left_num	r0
-	jt	r0	again
+	call	main				; call the main loop, to play
+	rmem	r0	games_left_num		; get games left
+	add	r0	r0	32767		; decrement the count of games
+	wmem	games_left_num	r0		; and save it
+	jt	r0	again			; if there are more to play, loop
 end_game:
-	set	r1	quit_message
+	set	r1	quit_message 		; Print the quit message
 	call	pstr
-	rmem	r1	win_count
+	rmem	r1	win_count 		; Print how many we won
 	call	pnumber
-	set	r1	quit_message2
+	set	r1	quit_message2 		; Print out of
 	call	pstr
-	rmem	r0	games_left_num
-	mult	r0	r0	32767
-	add	r0	r0	10
+	rmem	r0	games_left_num 		; calculate how many games played
+	mult	r0	r0	32767		; by subtracting the games left
+	add	r0	r0	10		; from 10
 	set	r1	r0
-	call	pnumber
+	call	pnumber				; print the number of games
 	out	10
 	halt
 
-	;; Only preserves r0, it is the only register that the
-	;; calling function needs preserved.
-	;; Destroys r1, r2, r3, r7 {Possibly r4, r5, r6}
+	;; Destroys r0, r1, r2, r3, r7 {Possibly r4, r5, r6}
 main:
-	push	r0
 	set	r0	4		; Number of moves
 	call	pick_six		; get our six numbers
 input:
@@ -69,7 +67,6 @@ input:
 	call	r3			; call it
 	jt	r0	input		; Loop if we have operations left to go
 	call	win_lose		; check if we won
-	pop	r0
 	ret
 
 	;; Called from main. This does not need to preserve any registers
@@ -95,9 +92,9 @@ next_value:
 won:
 	set	r1	win_text 	; print the win string
 	call	pstr
-	rmem	r1	win_count
-	add	r1	r1	1
-	wmem	win_count	r1
+	rmem	r1	win_count 	; Get current number of wins
+	add	r1	r1	1	; increment it
+	wmem	win_count	r1	; save it
 	ret
 
 	;; This will do the multiplication step
@@ -129,7 +126,7 @@ cmd_add:
 	add	r0	r0	32767
 	ret
 
-	;; See cmd_sub for comments
+	;; See cmd_mult for comments
 cmd_sub:
 	gt	r7	r2	r1 	; ensure that we don't get a negative
 	jt	r7	not_neg		; as negative's aren't allowed.
@@ -261,7 +258,7 @@ end_get_char:
 	ret
 	;; Helper for get_char
 quit:
-	wmem	reta	end_game
+	wmem	reta	end_game 	; change return address
 	jmp	end_get_char
 
 help_message:
