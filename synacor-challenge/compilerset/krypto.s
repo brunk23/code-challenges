@@ -41,12 +41,12 @@ end_game:
 	call	pnumber
 	out	10
 	halt
+
+	;; Only preserves r0, it is the only register that the
+	;; calling function needs preserved.
+	;; Destroys r1, r2, r3, r7 {Possibly r4, r5, r6}
 main:
 	push	r0
-	push	r1
-	push	r2
-	push	r3
-	push	r7
 	set	r0	4		; Number of moves
 	call	pick_six		; get our six numbers
 input:
@@ -58,28 +58,23 @@ input:
 	set	r3	game_numbers	; point to the start of the game_numbers
 	add	r3	r3	r1	; add the offset
 	rmem	r1	r3		; read the value
-	eq	r7	r1	999 	; Is this a valid word?
+	eq	r7	r1	9973 	; Is this a valid word?
 	jt	r7	input		; if Not we quit and loop
 	set	r3	game_numbers	; point to the start of the game_numbers
 	add	r3	r3	r2	; add the offset
 	rmem	r2	r3		; read the value
-	eq	r7	r2	999	; is this a valid word?
+	eq	r7	r2	9973	; is this a valid word?
 	jt	r7	input		; if not we quit and loop
 	rmem	r3	command		; get the address for the command
 	call	r3			; call it
 	jt	r0	input		; Loop if we have operations left to go
 	call	win_lose		; check if we won
-	pop	r7
-	pop	r3
-	pop	r2
-	pop	r1
 	pop	r0
 	ret
 
+	;; Called from main. This does not need to preserve any registers
+	;; Destroys r0, r1, r2
 win_lose:
-	push	r0
-	push	r1
-	push	r2
 	set	r0	5		; We grab the goal number first
 	set	r1	game_numbers	; we index off this address
 	add	r1	r1	r0	; Get the memory address
@@ -94,20 +89,15 @@ next_value:
 	jt	r0	next_value	; if not, check the next value
 	set	r1	lose_text	; we didn't have any values that matched
 	call	pstr			; print the lose string
-	pop	r2
-	pop	r1
-	pop	r0
 	ret
 
+	;; This is a helper for win_lose and prints a string saying we won.
 won:
 	set	r1	win_text 	; print the win string
 	call	pstr
 	rmem	r1	win_count
 	add	r1	r1	1
 	wmem	win_count	r1
-	pop	r2
-	pop	r1
-	pop	r0
 	ret
 
 	;; This will do the multiplication step
@@ -119,7 +109,7 @@ cmd_mult:
 	wmem	r1	r7		; write the new value to the first location
 	rmem	r2	second_let	; get the second letter index
 	add	r2	r2	r3	; calculate the new location
-	wmem	r2	999		; mark the second location as invalid
+	wmem	r2	9973		; mark the second location as invalid
 	add	r0	r0	32767	; decrement the counter
 	ret
 
@@ -132,7 +122,7 @@ cmd_add:
 	wmem	r1	r7
 	rmem	r2	second_let
 	add	r2	r2	r3
-	wmem	r2	999
+	wmem	r2	9973
 	add	r0	r0	32767
 	ret
 
@@ -148,7 +138,7 @@ cmd_sub:
 	wmem	r1	r7
 	rmem	r2	second_let
 	add	r2	r2	r3
-	wmem	r2	999
+	wmem	r2	9973
 	add	r0	r0	32767
 	ret
 
@@ -169,7 +159,7 @@ cmd_div:
 	wmem	r7	r1
 	rmem	r2	second_let
 	add	r2	r2	r3
-	wmem	r2	999
+	wmem	r2	9973
 	add	r0	r0	32767
 	ret
 no_div:
@@ -179,30 +169,22 @@ no_div:
 	pop	r1
 	ret
 
+	;; Must preserve r0, but does not use r0.
+	;; Destroys r1, r7
 	;; * = 42, + = 43, - = 45, / = 47, NL = 10
 	;; a/A = 97/65, b/B = 98/66, c/C = 99/67, d/D = 100/68, e/E = 101/69
 parse_input:
-	push	r1			; first let
-	push	r7
-parse_input_first_let:
 	call	print_game
 parse_input_f_let:
 	call	get_char		; Get the next char
-	gt	r7	r1	101	; Over 'e'
+	call	get_letter
+	gt	r7	r1	4	; Over 'e'
 	jt	r7	parse_input_f_let
-	gt	r7	r1	96 	; under 'a'
-	jt	r7	parse_input_1cap_let
-	gt	r7	r1	69 	; Over 'E'
-	jt	r7	parse_input_f_let
-	gt	r7	r1	65 	; under 'A'
-	jt	r7	parse_input_1low_let
-	jmp	parse_input_f_let
-parse_get_command:
 	wmem	first_let	r1
 parse_get_command2:
 	call	get_char
 	eq	r7	r1	10 	; restart if we get a newline
-	jt	r7	parse_input_first_let
+	jt	r7	parse_input
 	eq	r7	r1	42 	; This is mult
 	jf	r7	parse_not_mult
 	wmem	command	cmd_mult
@@ -222,27 +204,46 @@ parse_not_sub:
 	jf	r7	parse_get_command2
 	wmem	command	cmd_div
 parse_input_second_let:
-	call	get_char		; Get the next char
-	eq	r7	r1	10
-	jt	r7	parse_input_first_let
-	gt	r7	r1	101	; Over 'e'
+	call	get_char			; Get the next char
+	eq	r7	r1	10		; Found newline, restart
+	jt	r7	parse_input
+	call	get_letter
+	gt	r7	r1	4   		; Was it over e?
 	jt	r7	parse_input_second_let
-	gt	r7	r1	96 	; under 'a'
-	jt	r7	parse_input_2cap_let
-	gt	r7	r1	69 	; Over 'E'
-	jt	r7	parse_input_second_let
-	gt	r7	r1	64 	; under 'A'
-	jt	r7	parse_input_2low_let
-	jmp	parse_input_second_let
-parse_end:
 	wmem	second_let	r1
-	pop	r7
-	pop	r1
 	ret
 
+	;; This will return 0-4 when valid letter and something
+	;; over 4 when it was invalid. It destroys r7, but the
+	;; function that calls it will overwrite r7 anyway
+get_letter:
+	gt	r7	r1	101		; Over 'e'
+	jt	r7	get_letter_done
+	gt	r7	r1	96 		; under 'a'
+	jt	r7	parse_input_cap_let
+	gt	r7	r1	69 		; Over 'E'
+	jt	r7	get_letter_done
+	gt	r7	r1	64 		; under 'A'
+	jt	r7	parse_input_low_let
+	set	r1	100			; An invalid value
+get_letter_done:
+	ret
+
+	;; Helper for get_letter
+parse_input_cap_let:
+	add	r1	r1	32671 	; subtract 'a'
+	jmp	get_letter_done
+
+	;; Helper for get_letter
+parse_input_low_let:
+	add	r1	r1	32703 	; subtract 'A'
+	jmp	get_letter_done
+
+	;; This will get a character from the input and quit the
+	;; game if it is a q. It leaves the stack full, but we
+	;; will not need the stack any more
 get_char:
 	pop	r1
-	push	r7
 	wmem	reta	r1
 	in	r1
 	eq	r7	r1	81 	; capital Q
@@ -250,42 +251,24 @@ get_char:
 	eq	r7	r1	113 	; lowercase q
 	jt	r7	quit
 end_get_char:
-	pop	r7
 	push	reta:
 	ret
 
+	;; Helper for get_char
 quit:
 	wmem	reta	end_game
 	jmp	end_get_char
 
-parse_input_1cap_let:
-	add	r1	r1	32671 	; subtract 'a'
-	jmp	parse_get_command
-
-parse_input_1low_let:
-	add	r1	r1	32703 	; subtract 'A'
-	jmp	parse_get_command
-
-parse_input_2cap_let:
-	add	r1	r1	32671 	; subtract 'a'
-	jmp	parse_end
-
-parse_input_2low_let:
-	add	r1	r1	32703 	; subtract 'A'
-	jmp	parse_end
-
 	;; Print the 5 numbers and the goal. This will be the start of the game
+	;; Must preserve r0, but does not use r0
+	;; Destroys r1, r2, r3, r4
 print_game:
-	push	r1
-	push	r2
-	push	r3
-	push	r4
 	set	r2	6		; Just control the loop
 	set	r1	strings		; The start of the strings
 	set	r3	game_numbers	; Our six numbers
 print_game_loop:
 	rmem	r4	r3		; Print the associated number
-	eq	r4	r4	999	; Not a valid number
+	eq	r4	r4	9973	; Not a valid number
 	jt	r4	print_game_next	; We don't print numbers we used
 	push	r1			; Save this address for the next loop
 	rmem	r1	r3		; Read the number to print
@@ -298,20 +281,13 @@ print_game_next:
 	add	r2	r2	32767	; Decrease counter
 	jt	r2	print_game_loop	; Loop while we have data to print
 	out	10
-	pop	r4
-	pop	r3
-	pop	r2
-	pop	r1
 	ret
 
 	;; Pick 6 random numbers and put them in the buffer
 	;; Put the numbers back before we return.
+	;; Must preserve r0, does not use it.
+	;; Destroys r1, r2, r3, r4, r5
 pick_six:
-	push	r1
-	push	r2
-	push	r3
-	push	r4
-	push	r5
 	set	r1	6	     	; We need six numbers
 	set	r3	game_numbers	; We save the six numbers here
 	add	r3	r3	r1	; This is our index into it
@@ -339,11 +315,6 @@ put_away2:
 	add	r2	r2	32767
 	wmem	r2	r4
 	jt	r1	put_away
-	pop	r5
-	pop	r4
-	pop	r3
-	pop	r2
-	pop	r1
 	ret
 
 	.include "pnumber.s"
@@ -382,9 +353,9 @@ strings:
 	data	"[e]	\0"
 	data	"[Goal]\0"
 win_text:
-	data	"You did it!\n\0"
+	data	"You did it!\n\n\0"
 lose_text:
-	data	"You lose.\n\0"
+	data	"You lost this time.\n\n\0"
 negative_message:
 	data	"Negative numbers are not allowed.\n\0"
 divide_error:
