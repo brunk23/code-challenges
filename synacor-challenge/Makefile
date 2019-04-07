@@ -1,6 +1,6 @@
 SRCDIR = simulator
 DSRCDIR = disassem
-ASMDIR = compilerset/assembler
+ASMDIR = assembler
 CFILES = $(SRCDIR)/synacor.c $(SRCDIR)/synacor_debug.c
 CFILES += $(SRCDIR)/synacor_iset.c $(SRCDIR)/synacor_step.c
 CFILES += $(SRCDIR)/synacor_random.c

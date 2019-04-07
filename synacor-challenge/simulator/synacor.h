@@ -48,8 +48,6 @@ int breakpoint;
 int read_in_file(FILE *, SWORD, long, size_t);
 int write_out_file(FILE *, SWORD, long, size_t);
 int init_machine();
-SWORD get_add( SWORD );
-SWORD set_add( SWORD, SWORD );
 int scan_inbuff();
 void catch_int(int);
 
@@ -112,5 +110,56 @@ int op_dwrite();
  * from here. +2 extensions */
 typedef int (*iPtr)();
 iPtr inst_tble[dwrite + 1];
+
+
+/*
+ * Helper function for memory access to return
+ * register values when those are requested.
+ */
+static inline SWORD get_add(SWORD a) {
+  SWORD b;
+
+  /* a should be within memory, but if pc was near the top of
+   * memory and we pass ( pc + 5 ) or similar, we could read
+   * outside the array, protect against that by wrapping down */
+  a &= MAXMEM;
+  b = memory[a];
+
+  if( b < REGOFFSET ) {
+    return b;
+  } else {
+    b -= REGOFFSET;
+  }
+  if( b <= r7 ) {
+    return reg[b];
+  }
+  fprintf(stderr,"Invalid access request: %i at %i\n",
+	  b + REGOFFSET, pc);
+  return 0;
+}
+
+/*
+ * Helper function for memory setting. It also sets
+ * registers correctly.
+ */
+static inline SWORD set_add(SWORD a, SWORD b) {
+  SWORD c;
+
+  /* ensure both are inside memory */
+  a &= MAXMEM;
+  b &= MAXMEM;
+  c = memory[a];
+
+  if( c >= REGOFFSET ) {
+    c -= REGOFFSET;
+    if( c >= 8 ) {
+      fprintf(stderr,"Invalid access request: %i at %i\n",
+	      a + REGOFFSET, pc);
+      return 0;
+    }
+    return reg[c] = b;
+  }
+  return memory[c] = b;
+}
 
 #endif

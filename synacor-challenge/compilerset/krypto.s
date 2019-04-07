@@ -13,8 +13,11 @@
 	;; rooting are not permitted. Each of the five cards must be used once
 	;; and only once. 
 
-	set	r0	10
+	;; TODO: write a separate "solver" program for these games in synacor
+	set	r1	start_message
+	call	pstr
 again:
+	rmem	r0	games_left_num
 	set	r1	games_left
 	call	pstr
 	set	r1	r0
@@ -22,11 +25,19 @@ again:
 	out	10
 	call	main
 	add	r0	r0	32767
+	wmem	games_left_num	r0
 	jt	r0	again
+end_game:
+	set	r1	quit_message
+	call	pstr
 	rmem	r1	win_count
 	call	pnumber
-	out	47
-	set	r1	10
+	set	r1	quit_message2
+	call	pstr
+	rmem	r0	games_left_num
+	mult	r0	r0	32767
+	add	r0	r0	10
+	set	r1	r0
 	call	pnumber
 	out	10
 	halt
@@ -58,7 +69,6 @@ input:
 	call	r3			; call it
 	jt	r0	input		; Loop if we have operations left to go
 	call	win_lose		; check if we won
-	out	10
 	pop	r7
 	pop	r3
 	pop	r2
@@ -146,7 +156,6 @@ not_neg:
 	push	r1
 	set	r1	negative_message
 	call	pstr
-	out	10
 	pop	r1
 	ret
 
@@ -167,7 +176,6 @@ no_div:
 	push	r1
 	set	r1	divide_error
 	call	pstr
-	out	10
 	pop	r1
 	ret
 
@@ -179,7 +187,7 @@ parse_input:
 parse_input_first_let:
 	call	print_game
 parse_input_f_let:
-	in	r1			; Get the next char
+	call	get_char		; Get the next char
 	gt	r7	r1	101	; Over 'e'
 	jt	r7	parse_input_f_let
 	gt	r7	r1	96 	; under 'a'
@@ -192,7 +200,7 @@ parse_input_f_let:
 parse_get_command:
 	wmem	first_let	r1
 parse_get_command2:
-	in	r1
+	call	get_char
 	eq	r7	r1	10 	; restart if we get a newline
 	jt	r7	parse_input_first_let
 	eq	r7	r1	42 	; This is mult
@@ -214,7 +222,7 @@ parse_not_sub:
 	jf	r7	parse_get_command2
 	wmem	command	cmd_div
 parse_input_second_let:
-	in	r1			; Get the next char
+	call	get_char		; Get the next char
 	eq	r7	r1	10
 	jt	r7	parse_input_first_let
 	gt	r7	r1	101	; Over 'e'
@@ -231,6 +239,24 @@ parse_end:
 	pop	r7
 	pop	r1
 	ret
+
+get_char:
+	pop	r1
+	push	r7
+	wmem	reta	r1
+	in	r1
+	eq	r7	r1	81 	; capital Q
+	jt	r7	quit
+	eq	r7	r1	113 	; lowercase q
+	jt	r7	quit
+end_get_char:
+	pop	r7
+	push	reta:
+	ret
+
+quit:
+	wmem	reta	end_game
+	jmp	end_get_char
 
 parse_input_1cap_let:
 	add	r1	r1	32671 	; subtract 'a'
@@ -271,7 +297,7 @@ print_game_next:
 	add	r3	r3	1	; Increase data pointer
 	add	r2	r2	32767	; Decrease counter
 	jt	r2	print_game_loop	; Loop while we have data to print
-	out	10			; End with a newline
+	out	10
 	pop	r4
 	pop	r3
 	pop	r2
@@ -346,20 +372,32 @@ command:
 	data	0
 win_count:
 	data	0
+games_left_num:
+	data	10
 strings:
-	data	"[a]	"
-	data	"[b]	"
-	data	"[c]	"
-	data	"[d]	"
-	data	"[e]	"
-	data	"[Goal]"
+	data	"[a]	\0"
+	data	"[b]	\0"
+	data	"[c]	\0"
+	data	"[d]	\0"
+	data	"[e]	\0"
+	data	"[Goal]\0"
 win_text:
-	data	"You did it!"
+	data	"You did it!\n\0"
 lose_text:
-	data	"You lose."
+	data	"You lose.\n\0"
 negative_message:
-	data	"Negative numbers are not allowed."
+	data	"Negative numbers are not allowed.\n\0"
 divide_error:
-	data	"You divided by zero, or the quotient was not a whole number."
+	data	"You divided by zero, or the quotient was not a whole number.\n\0"
 games_left:
-	data	"Games left to play: "
+	data	"Games left to play: \0"
+quit_message:
+	data	"You won \0"
+quit_message2:
+	data	" games out of \0"
+start_message:
+	data	"This is the game of krypto. You will be given 5 numbers\n"
+	data	"and a goal number. You must use the four basic math operations\n"
+	data	"to create the goal number. You must use all 5 numbers. You can\n"
+	data	"only use each number 1 time.\n\nNo fractions or decimals allowed."
+	data	"\n\nType q to quit.\n\0"

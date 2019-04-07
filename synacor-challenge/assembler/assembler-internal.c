@@ -6,6 +6,7 @@
 
 /*
  * This will tokenize the source file.  It's a pre-processing step.
+ * We don't null terminate strings.
  */
 TOKEN *token(char *s, int start) {
   TOKEN *curr = NULL;
@@ -65,9 +66,6 @@ TOKEN *token(char *s, int start) {
       if( j == 0 ) {
 	i++;
 	curr->type = STRING;
-	tmp[j] = s[i];
-	j++;
-	i++;
 	while( s[i] != '\"' && i < size ) {
 	  if( s[i] != '\\' ) {
 	    tmp[j] = s[i];
@@ -75,7 +73,20 @@ TOKEN *token(char *s, int start) {
 	    i++;
 	  } else {
 	    i++;
-	    tmp[j] = s[i];
+	    switch (s[i]) {
+	    case '0':
+	      tmp[j] = 0;
+	      break;
+	    case 'n':
+	      tmp[j] = '\n';
+	      break;
+	    case 't':
+	      tmp[j] = '\t';
+	      break;
+	    default:
+	      tmp[j] = s[i];
+	      break;
+	    }
 	    i++;
 	    j++;
 	  }
@@ -84,6 +95,7 @@ TOKEN *token(char *s, int start) {
 	j++;
 	i++;
       }
+      curr->value = j - 1;
     }
     if( isspace(s[i]) || s[i] == ';' ) {
       if( j == 0 ) {
@@ -105,8 +117,10 @@ TOKEN *token(char *s, int start) {
   }
   strncpy(curr->word,tmp,j);
   curr->word[j] = '\0';
-  curr->value = strtol(curr->word, 0, 10);
   curr->length = i;
+  if( curr->type != STRING ) {
+    curr->value = strtol(curr->word, 0, 10);
+  }
   return curr;
 }
 
@@ -501,13 +515,11 @@ TOKEN *data_handler(TOKEN *curr, int *compile_status) {
 
   if( curr->type == STRING ) {
     curr->location = pc;
-    while( curr->word[i] != '\0' ) {
+    while( i < curr->value ) {
       memory[pc] = curr->word[i];
       pc++;
       i++;
     }
-    memory[pc] = 0;
-    pc++;
     curr = curr->next;
   } else {
     while( curr && (curr->line == line) ) {

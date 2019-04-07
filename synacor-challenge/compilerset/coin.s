@@ -7,7 +7,6 @@
 	.origin	00000
 	set	r1	disp
 	call	pstr
-	out	10
 inp:	call	readnum
 	jf	r1	tryagain
 	gt	r0	r1	499 ; We don't have $5 bills, so limit to under $5
@@ -136,12 +135,12 @@ upcount:
 counts:	data	0	0	0	0	0	0
 vals:	data	0	0	0	0	0	0
 coins:	data	1	5	10	25	50	100
-disp:	data	"How much cents? "
-emsg:	data	"Pick a different number: "
+disp:	data	"How much cents? \0"
+emsg:	data	"Pick a different number: \0"
 strgs:	data	penny nickel dime quarter half-dollar dollar
-penny:	data	"Pennies: "
-nickel:	data	"Nickels: "
-dime:	data	"Dimes: "
-quarter:	data	"Quarters: "
-half-dollar:	data	"Halfs: "
-dollar:	data	"Dollars: "
+penny:	data	"Pennies: \0"
+nickel:	data	"Nickels: \0"
+dime:	data	"Dimes: \0"
+quarter:	data	"Quarters: \0"
+half-dollar:	data	"Halfs: \0"
+dollar:	data	"Dollars: \0"
