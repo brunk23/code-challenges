@@ -101,6 +101,9 @@ won:
 	ret
 
 	;; This will do the multiplication step
+	;; None of these functions preserve any registers
+	;; Destroy r1, r2, r3, r7
+	;; Decrements r0 in the main function (step counter)
 cmd_mult:
 	mult	r7	r1	r2   	; the actual multiplication
 	rmem	r1	first_let 	; get the first letter index
@@ -141,7 +144,6 @@ cmd_sub:
 	wmem	r2	9973
 	add	r0	r0	32767
 	ret
-
 not_neg:
 	push	r1
 	set	r1	negative_message
@@ -250,13 +252,23 @@ get_char:
 	jt	r7	quit
 	eq	r7	r1	113 	; lowercase q
 	jt	r7	quit
+	eq	r7	r1	72 	; capital H
+	jt	r7	help_message
+	eq	r7	r1	104 	; lowercase h
+	jt	r7	help_message
 end_get_char:
-	push	reta:
+	push	reta:			; Self-modifying, change where we return to
 	ret
-
 	;; Helper for get_char
 quit:
 	wmem	reta	end_game
+	jmp	end_get_char
+
+help_message:
+	push	r1
+	set	r1	start_message
+	call	pstr
+	pop	r1
 	jmp	end_get_char
 
 	;; Print the 5 numbers and the goal. This will be the start of the game
@@ -296,24 +308,28 @@ pick_6_loop:
 	mod	r2	r2	56	; Index into numbers[]
 	add	r2	r2	numbers ; Add address of number
 	rmem	r4	r2		; r2 = numbers[i]
-	jf	r4	pick_6_loop
-	wmem	r2	0
+	jf	r4	pick_6_loop	; If the number is already used, pick again
+	wmem	r2	0	      	; 0 the address so we don't pick it twice
 	add	r1	r1	32767 	; r1--
 	add	r3	r3	32767	; save value
 	wmem	r3	r4		; game_numbers[r1] <- r2
 	jt	r1	pick_6_loop	; Get 6 numbers
+
+	;; We now put the numbers we picked back. As we will need to use
+	;; them for the next game, if we play one.
 	set	r1	6
 	set	r3	game_numbers
 	set	r2	numbers
 put_away:
-	add	r1	r1	32767
-	rmem	r4	r3
+	add	r1	r1	32767 	; count of our picked numbers
+	rmem	r4	r3		; pointer into our picked numbers
 put_away2:
-	rmem	r5	r2
-	add	r2	r2	1
-	jt	r5	put_away2
-	add	r2	r2	32767
-	wmem	r2	r4
+	rmem	r5	r2		; Check the current location
+	add	r2	r2	1	; Go forward one spot
+	jt	r5	put_away2	; If we read a value, continue to move
+	add	r2	r2	32767	; We didn't read a value, go back one spot
+	wmem	r2	r4		; Write our first number back
+	add	r3	r3	1	; Point to next number to put away
 	jt	r1	put_away
 	ret
 
@@ -367,8 +383,11 @@ quit_message:
 quit_message2:
 	data	" games out of \0"
 start_message:
-	data	"This is the game of krypto. You will be given 5 numbers\n"
+	data	"\nThis is the game of krypto. You will be given 5 numbers\n"
 	data	"and a goal number. You must use the four basic math operations\n"
 	data	"to create the goal number. You must use all 5 numbers. You can\n"
 	data	"only use each number 1 time.\n\nNo fractions or decimals allowed."
-	data	"\n\nType q to quit.\n\0"
+	data	"\n\nCommands are entered: \"c/a\" which will divide the number\n"
+	data	"in location c by the number in location a and store the result\n"
+	data	"in location c. e.g.  c <- c/a\n\nType h to show this message "
+	data	"again. Type q to quit.\n\n\0"
