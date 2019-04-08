@@ -3,6 +3,8 @@
 
 /*
  * This is readnum.s in synacor machine
+ *
+ * Implemented in synacor asm
  */
 int getval() {
   char input[80];
@@ -68,7 +70,7 @@ void print_win(int *a, int *ops) {
 int try_all(int *a, int goal) {
   int i, j, k, m;
   int ops[4];
-  
+
   for( i = 0; i < 4; i++) {
     ops[0] = i;
     for( j = 0; j < 4; j++) {
@@ -92,6 +94,8 @@ int try_all(int *a, int goal) {
  * This is Heap's Algorithm (non-recursive) and it goes through
  * all of the variations without affecting the stack
  * requires an array equal to the amount of numbers
+ *
+ * Implemented in synacor asm
  */
 int find_solution(int *a, int goal) {
   int i = 0, c[5], tmp;
@@ -100,6 +104,9 @@ int find_solution(int *a, int goal) {
   for( i = 0; i < 5; i++ ) {
     c[i] = 0;
   }
+
+  /* Try the initial order as well */
+  try_all(a, goal);
 
   i = 0;
   while( i < 5 ) {
@@ -126,13 +133,9 @@ int find_solution(int *a, int goal) {
   return 0;
 }
 
+/* Implemented in synacor asm */
 int main() {
   int nums[5], goal;
-  char solution[17];
-
-  for( goal = 0; goal < 17; goal++ ) {
-    solution[goal] = 0;
-  }
   
   /*
    * Get the inputs
