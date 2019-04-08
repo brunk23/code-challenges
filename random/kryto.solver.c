@@ -35,14 +35,18 @@ int value(int *a, int *ops) {
       if( val > a[j+1] ) {
 	val -= a[j+1];
       } else {
-	return -1;
+	val = a[j+1] - val;;
       }
       break;
     case 3:
       if( (val % a[j+1]) == 0 ) {
 	val /= a[j+1];
       } else {
-	return -1;
+	if( (a[j + 1] % val) == 0 ) {
+	  val = a[j + 1] % val;
+	} else {
+	  return -1;
+	}
       }
       break;
     default:
@@ -57,11 +61,38 @@ int value(int *a, int *ops) {
  */
 void print_win(int *a, int *ops) {
   char oper[4] = { '+', '*', '-', '/' };
-  int i;
+  int i, val = a[0];
   for( i = 0; i < 4; i++ ) {
-    printf("%i %c ",a[i], oper[ ops[i] ]);
+    switch( oper[ ops[i] ] ) {
+    case '+':
+      printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+      val += a[i+1];
+      break;
+    case '*':
+      printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+      val *= a[i+1];
+      break;
+    case '-':
+      if( val > a[i+1] ) {
+	printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+	val -= a[i+1];
+      } else {
+	printf("(%i %c %i)",a[i+1], oper[ ops[i] ], val);
+	val = a[i+1] - val;
+      }
+      break;
+    case '/':
+      if( val > a[i+1] ) {
+	printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+	val /= a[i+1];
+      } else {
+	printf("(%i %c %i)",a[i+1], oper[ ops[i] ], val);
+	val = a[i+1] / val;
+      }
+      break;
+    }
   }
-  printf("%i\n",a[i]);
+  printf("\n");
 }
 
 /*
