@@ -330,9 +330,9 @@ put_away2:
 	jt	r1	put_away
 	ret
 
-	.include "pnumber.s"
-	.include "bindivide.s"
-	.include "pstr.s"
+	.include "utils/pnumber.s"
+	.include "utils/bindivide.s"
+	.include "utils/pstr.s"
 
 	;; There are 56 numbers
 numbers:

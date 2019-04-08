@@ -127,10 +127,10 @@ upcount:
 	set	r6	0
 	jmp	hitvalue2
 
-	.include	"readnum.s"
-	.include	"bindivide.s"
-	.include	"pstr.s"
-	.include	"pnumber.s"
+	.include	"utils/readnum.s"
+	.include	"utils/bindivide.s"
+	.include	"utils/pstr.s"
+	.include	"utils/pnumber.s"
 
 counts:	data	0	0	0	0	0	0
 vals:	data	0	0	0	0	0	0
