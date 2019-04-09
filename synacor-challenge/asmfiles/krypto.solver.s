@@ -315,9 +315,9 @@ pri_div2:
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
 value_ops:
-	data	val_add	val_sub	val_mul	val_div
+	data	val_add	val_mul	val_sub	val_div
 print_ops:
-	data	pri_add	pri_sub	pri_mul	pri_div
+	data	pri_add	pri_mul	pri_sub	pri_div
 game_nums:
 	data	0	0	0	0	0
 goal:	data	0
