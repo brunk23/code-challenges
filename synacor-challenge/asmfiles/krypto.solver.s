@@ -1,5 +1,11 @@
 	;; This will solve a given krypto puzzle, if it has a solution
+	;; It will print out all the solutions and the steps you need to
+	;; take in order.
+	;; You enter the 5 numbers first and then the goal number last
+
 	.origin 0
+
+
 	;; main() -- The following code implements main()
 	set	r1	prompt		; the prompt for the user
 	call	pstr			; print it
@@ -15,8 +21,10 @@ get_nums:
 	call	find_solution
 	halt
 
+
 	;; find_solution() -- Does not need to preserve any registers
 	;; r6 = &c[i] r5 = c[i], r4 = &a[i] r3 = a[i], r2 = tmp
+	;; This is Heap's algorithm.
 find_solution:
 	set	r0	game_nums 	; r0 = a
 	set	r1	c		; r1 = c
@@ -60,31 +68,32 @@ while_bottom:
 	jt	r2	permutation
 	ret
 
-	;; Not implemented yet -- Currently just prints the current permutation
+
 	;; Must preserve r0, r1, and r7
+	;; This will try all the combinations of the operations.
 try_all:
 	push	r0
 	push	r1
 	push	r7
-	set	r7	4
-try_i:				; do {
-	add	r7	r7	32767
-	set	r6	4
-try_j:				; do {
-	add	r6	r6	32767
-	set	r5	4
-try_k:				; do {
-	add	r5	r5	32767
-	set	r4	4
-try_m:				; do {
-	add	r4	r4	32767
+	set	r7	4	      	; r7 = 4
+try_i:					; do { (r7)
+	add	r7	r7	32767	; r7--
+	set	r6	4		; r6 = 4
+try_j:					; do { (r6)
+	add	r6	r6	32767	; r6--
+	set	r5	4		; r5 = 4
+try_k:					; do { (r5)
+	add	r5	r5	32767	; r5--
+	set	r4	4		; r4 = 4
+try_m:					; do { (r4)
+	add	r4	r4	32767	; r4--
 	call	get_value		; r3 = value
 	set	r1	goal		; r1 = &goal
 	rmem	r1	r1		; r1 = &goal
 	eq	r1	r1	r3	; are they equal?
 	jf	r1	no_print_match
-	call	print_match
-	out	10
+	call	print_match		; This will print the match correctly
+	out	10			; We need the newline here not in print_match
 no_print_match:
 	jt	r4	try_m		; } while(r4)
 	jt	r5	try_k		; } while(r5)
@@ -95,9 +104,10 @@ no_print_match:
 	pop	r0
 	ret
 
+
 	;; Must preserve r4, r5, r6, r7
 	;; Can we avoid touching them?
-	;; 1 = +, 2 = *, 3 = -, 4 = /
+	;; 0 = +, 1 = *, 2 = -, 3 = /
 	;; WARNING {Black Magic} ret here returns to other functions!
 get_value:
 	set	r0	game_nums
@@ -116,58 +126,68 @@ get_value:
 	rmem	r3	r0			; r3 <- first value
 	add	r0	r0	1	 	; point to next number
 get_value_error:
-	ret					; Return calls 1st operation function
+	ret				; Return calls 1st operation function
 
+
+	;; Get the value for addition at this step
 val_add:
-	eq	r1	r3	32767	  	; Error
-	jt	r1	get_value_error		; Return right away
-	rmem	r2	r0			; Read next number
-	add	r3	r3	r2		; Add it to r3 (value)
-	add	r0	r0	1		; point to next number
+	eq	r1	r3	32767	; Error
+	jt	r1	get_value_error	; Return right away
+	rmem	r2	r0		; Read next number
+	add	r3	r3	r2	; Add it to r3 (value)
+	add	r0	r0	1	; point to next number
 	ret
 
+
+	;; Get the value for subtraction for this step
 val_sub:
-	eq	r1	r3	32767		; Error
-	jt	r1	get_value_error		; Return right away
-	rmem	r2	r0			; Read the next number
-	add	r0	r0	1 		; Point to next number
-	gt	r1	r2	r3
+	eq	r1	r3	32767	; Error
+	jt	r1	get_value_error	; Return right away
+	rmem	r2	r0		; Read the next number
+	add	r0	r0	1 	; Point to next number
+	gt	r1	r2	r3	; No negatives allowed
 	jt	r1	val_sub_2
-	mult	r2	r2	32767 		; subtract r2
+	mult	r2	r2	32767 	; subtract r2
 	add	r3	r3	r2
 	ret
 val_sub_2:
-	mult	r3	r3	32767 		; subtract r3
+	mult	r3	r3	32767 	; subtract r3
 	add	r3	r3	r2
 	ret
 
+
+	;; Get the value for multiplication at this step
+	;; error if we get too large
 val_mul:
-	eq	r1	r3	32767		; Error
-	jt	r1	get_value_error		; Return right away
-	gt	r1	r3	1280		; Check for potential overflow
-	jf	r1	val_mul2		; Don't allow it
+	eq	r1	r3	32767	; Error
+	jt	r1	get_value_error	; Return right away
+	gt	r1	r3	1280	; Check for potential overflow
+	jf	r1	val_mul2	; Don't allow it
 	set	r3	32767
 	jmp	get_value_error
 val_mul2:
-	rmem	r2	r0			; Read next number
-	mult	r3	r3	r2		; r3 <- r3 * r2
-	add	r0	r0	1		; point to next number1
+	rmem	r2	r0		; Read next number
+	mult	r3	r3	r2	; r3 <- r3 * r2
+	add	r0	r0	1	; point to next number1
 	ret
 
+
+	;; Get the value for division at this step, error if we can't
+	;; divide
 val_div:
 	eq	r1	r3	32767
 	jt	r1	get_value_error
-	rmem	r2	r0
-	add	r0	r0	1
-	mod	r1	r3	r2 		; r1 <- r3 mod r2
-	jt	r1	val_div2
-	set	r1	r3			; We divide r3 by r2
+	rmem	r2	r0		; Read the next number
+	add	r0	r0	1	; point to the next number
+	mod	r1	r3	r2 	; r1 <- r3 mod r2
+	jt	r1	val_div2	; no fractions or decimals
+	set	r1	r3		; We divide r3 by r2
 	call	divide
 	set	r3	r1
 	ret
 val_div2:
-	mod	r1	r2	r3
-	jt	r1	val_div3
+	mod	r1	r2	r3 	; can we evenly divide?
+	jt	r1	val_div3	; if not, error
 	set	r1	r2
 	set	r2	r3
 	call	divide
@@ -176,6 +196,7 @@ val_div2:
 val_div3:
 	set	r3	32767
 	ret
+
 
 	;; Must preserve r7, r6, r5, r4
 	;; More black magic
@@ -197,73 +218,81 @@ print_match:
 	add	r0	r0	1	 	; point to next number
 	ret					; Return calls 1st operation function
 
+
+	;; Print out an addition expression
 pri_add:
-	out	40		   		; '('
+	out	40	   		; '('
 	set	r1	r3
 	call	pnumber
-	out	43		   		; '+'
+	out	43	   		; '+'
 	rmem	r2	r0			; Read next number
-	add	r3	r3	r2		; Add it to r3 (value)
-	add	r0	r0	1		; point to next number
+	add	r3	r3	r2	; Add it to r3 (value)
+	add	r0	r0	1	; point to next number
 	set	r1	r2
 	call	pnumber
-	out	41				; ')'
+	out	41			; ')'
 	ret
 
+
+	;; Print out a subtraction expression
 pri_sub:
-	out	40
-	rmem	r2	r0			; Read the next number
-	add	r0	r0	1 		; Point to next number
-	gt	r1	r2	r3
-	jt	r1	pri_sub_2
+	out	40		  	; '('
+	rmem	r2	r0		; a[i]
+	add	r0	r0	1 	; i++
+	gt	r1	r2	r3	; if a[i] > val
+	jt	r1	pri_sub_2	; we subtract val insteas
 	set	r1	r3
-	call	pnumber
-	out	45
+	call	pnumber			; print val
+	out	45			; '-'
 	set	r1	r2
-	call	pnumber
-	out	41
-	mult	r2	r2	32767 		; subtract r2
-	add	r3	r3	r2
+	call	pnumber		      	; print a[i]
+	out	41		      	; ')'
+	mult	r2	r2	32767 	; negate a[i]
+	add	r3	r3	r2	; val -= a[i]
 	ret
 pri_sub_2:
 	set	r1	r2
-	call	pnumber
-	out	45		      ; '-'
+	call	pnumber			; print a[i]
+	out	45		      	; '-'
 	set	r1	r3
-	call	pnumber
-	out	41
-	mult	r3	r3	32767 		; subtract r3
-	add	r3	r3	r2
+	call	pnumber		      	; print val
+	out	41		      	; ')'
+	mult	r3	r3	32767 	; negate val
+	add	r3	r3	r2	; val = a[i] - val
 	ret
 
+
+	;; Print out a multiplication expression
 pri_mul:
-	out	40
+	out	40			; '('
 	set	r1	r3
-	call	pnumber
-	out	42
-	rmem	r2	r0			; Read next number
+	call	pnumber			; print val
+	out	42			; '*'
+	rmem	r2	r0		; Read next number
 	set	r1	r2
-	call	pnumber
-	out	41
-	mult	r3	r3	r2		; r3 <- r3 * r2
-	add	r0	r0	1		; point to next number1
+	call	pnumber		   	; print a[i]
+	out	41		   	; ')'
+	mult	r3	r3	r2	; val <- val * a[i]
+	add	r0	r0	1	; i++
 	ret
 
+
+	;; Print out a division expresssion
 pri_div:
-	out	40
+	out	40			; '('
 	rmem	r2	r0
-	add	r0	r0	1
-	mod	r1	r3	r2 		; r1 <- r3 mod r2
-	jt	r1	pri_div2
+	add	r0	r0	1  	; i++
+	mod	r1	r3	r2 	; r1 <- r3 mod r2
+	jt	r1	pri_div2	; if (val % a[i]) == 0
 	set	r1	r3
-	call	pnumber
-	out	47
+	call	pnumber			; print val
+	out	47			; '/'
 	set	r1	r2
-	call	pnumber
-	set	r1	r3			; We divide r3 by r2
+	call	pnumber			; print a[i]
+	set	r1	r3		; We divide r3 by r2
 	call	divide
-	set	r3	r1
-	out	41
+	set	r3	r1		; val /= a[i]
+	out	41			; ')'
 	ret
 pri_div2:
 	set	r1	r2
