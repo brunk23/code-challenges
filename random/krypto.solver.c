@@ -43,7 +43,7 @@ int value(int *a, int *ops) {
 	val /= a[j+1];
       } else {
 	if( (a[j + 1] % val) == 0 ) {
-	  val = a[j + 1] % val;
+	  val = a[j + 1] / val;
 	} else {
 	  return -1;
 	}
