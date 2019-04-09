@@ -134,7 +134,7 @@ val_add:
 	eq	r1	r3	32767	; Error
 	jt	r1	get_value_error	; Return right away
 	rmem	r2	r0		; Read next number
-	add	r3	r3	r2	; Add it to r3 (value)
+	add	r3	r3	r2	; val += a[i]
 	add	r0	r0	1	; point to next number
 	ret
 
@@ -148,11 +148,11 @@ val_sub:
 	gt	r1	r2	r3	; No negatives allowed
 	jt	r1	val_sub_2
 	mult	r2	r2	32767 	; subtract r2
-	add	r3	r3	r2
+	add	r3	r3	r2	; val -= a[i]
 	ret
 val_sub_2:
 	mult	r3	r3	32767 	; subtract r3
-	add	r3	r3	r2
+	add	r3	r3	r2	; val = a[i] - val
 	ret
 
 
@@ -167,7 +167,7 @@ val_mul:
 	jmp	get_value_error
 val_mul2:
 	rmem	r2	r0		; Read next number
-	mult	r3	r3	r2	; r3 <- r3 * r2
+	mult	r3	r3	r2	; val <- val * a[i]
 	add	r0	r0	1	; point to next number1
 	ret
 
@@ -183,7 +183,7 @@ val_div:
 	jt	r1	val_div2	; no fractions or decimals
 	set	r1	r3		; We divide r3 by r2
 	call	divide
-	set	r3	r1
+	set	r3	r1		; val = val / a[i]
 	ret
 val_div2:
 	mod	r1	r2	r3 	; can we evenly divide?
@@ -191,7 +191,7 @@ val_div2:
 	set	r1	r2
 	set	r2	r3
 	call	divide
-	set	r3	r1
+	set	r3	r1		; val = a[i] / val
 	ret
 val_div3:
 	set	r3	32767
@@ -223,13 +223,13 @@ print_match:
 pri_add:
 	out	40	   		; '('
 	set	r1	r3
-	call	pnumber
+	call	pnumber		   	; print val
 	out	43	   		; '+'
-	rmem	r2	r0			; Read next number
+	rmem	r2	r0		; Read next number
 	add	r3	r3	r2	; Add it to r3 (value)
 	add	r0	r0	1	; point to next number
 	set	r1	r2
-	call	pnumber
+	call	pnumber			; print a[i]
 	out	41			; ')'
 	ret
 
@@ -296,15 +296,15 @@ pri_div:
 	ret
 pri_div2:
 	set	r1	r2
-	call	pnumber
-	out	47
+	call	pnumber			; print a[i]
+	out	47			; '/'
 	set	r1	r3
-	call	pnumber
+	call	pnumber			; print val
 	set	r1	r2
 	set	r2	r3
-	call	divide
-	set	r3	r1
-	out	41
+	call	divide			; we divide a[i] by val
+	set	r3	r1		; val = a[i] / val
+	out	41			; ')'
 	ret
 
 	.include	"utils/readnum.s"
