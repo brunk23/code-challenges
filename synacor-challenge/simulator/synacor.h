@@ -130,7 +130,7 @@ static inline SWORD get_add(SWORD a) {
   } else {
     b -= REGOFFSET;
   }
-  if( b <= r7 ) {
+  if( b < REGISTERS ) {
     return reg[b];
   }
   fprintf(stderr,"Invalid access request: %i at %i\n",
@@ -152,7 +152,7 @@ static inline SWORD set_add(SWORD a, SWORD b) {
 
   if( c >= REGOFFSET ) {
     c -= REGOFFSET;
-    if( c >= 8 ) {
+    if( c >= REGISTERS ) {
       fprintf(stderr,"Invalid access request: %i at %i\n",
 	      a + REGOFFSET, pc);
       return 0;
