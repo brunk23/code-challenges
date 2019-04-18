@@ -10,11 +10,15 @@
 	set	r1	prompt		; the prompt for the user
 	call	pstr			; print it
 	set	r7	6		; count of numbers to read
+	set	r0	wordstrs	; where to save the strings
+	rmem	r0	r0		; get the index
 	set	r6	game_nums	; where to store the numbers
 get_nums:
 	call	readnum			; read a number
 	wmem	r6	r1		; store it in the current location
 	add	r6	r6	1	; point to next location
+	call	num2str			; saves r1 as a string to r0
+	add	r0	r0	3	; increment to next location
 	add	r7	r7	32767	; decrement counter
 	jt	r7	get_nums	; loop while r7 > 0
 	set	r0	4		; We enter find_solution with n=4
