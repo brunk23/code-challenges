@@ -46,16 +46,10 @@ out_body:
 	set	r2	r0		; set inner loop counter to r0
 in_body:
 	call	copy_array		; copy the arrays
-	add	r0	r0	32767	; decrement for when we recurse
-	;; call try_sum
-	call	find_solution
+	call	try_sum
 	;; call try_diff
-	call	find_solution
 	;; call try_div
-	call	find_solution
 	;; call try_mult
-	call	find_solution
-	add	r0	r0	1 	; increment for when we loop back up
 	add	r2	r2	32767	; decrement inner loop counter
 	eq	r4	r2	r1	; compare r2 to r1, as that is the end cond
 	jf	r4	in_body		; inner loop is r0 to r1
@@ -69,9 +63,15 @@ find_solution_done:
 
 
 	;; We need to find a sum, and create the string
+	;; r0 points to current array, r0-1 points to destination
+	;; must decrement r0 before calling find_solution at the end.
+	;; r1 and r2 are the indexes into the current array for our value
+	;; dest[0] is where the results will be stored.
 try_sum:
 	push	r0
 
+	add	r0	r0	32767 	; decrement before calling find_solution
+	call	find_solution
 	pop	r0
 	ret
 
