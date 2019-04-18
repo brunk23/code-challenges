@@ -27,17 +27,44 @@ get_nums:
 
 
 	;; find_solution() -- Does not need to preserve any registers
-	;; Needs to do "ab ac ad ae bc bd be cd ce de" and all the variations
-	;; Under that.
+	;; We do preserve r0, r1, r2 but destroy r4
+	;; r0 is the counter coming in, which we use to control the
+	;; recursion and the index into the various arrays
 find_solution:
-	eq	r7	r0	1
-	jt	r7	find_solution_done
-	set	r1	0
-	set	r2	1
-	call	copy_array
-	add	r0	r0	32767
+	push	r0
+	push	r1
+	push	r2
+
+	jt	r0	find_solution_main ; If we have 1 number, we
+	;; call	check_answer		; check to see if it is the correct one
+	jmp	find_solution_done 	; then print it and return
+
+find_solution_main:
+	set	r1	r0		; outer loop is r0-1 to 0
+out_body:
+	add	r1	r1	32767 	; decrement outer loop counter
+	set	r2	r0		; set inner loop counter to r0
+in_body:
+	call	copy_array		; copy the arrays
+	add	r0	r0	32767	; decrement for when we recurse
+	;; call try_sum
 	call	find_solution
+	;; call try_diff
+	call	find_solution
+	;; call try_div
+	call	find_solution
+	;; call try_mult
+	call	find_solution
+	add	r0	r0	1 	; increment for when we loop back up
+	add	r2	r2	32767	; decrement inner loop counter
+	eq	r4	r2	r1	; compare r2 to r1, as that is the end cond
+	jf	r4	in_body		; inner loop is r0 to r1
+	jt	r1	out_body	; while not 0, loop back again
+
 find_solution_done:
+	pop	r2
+	pop	r1
+	pop	r0
 	ret
 
 	;; copy_array()
