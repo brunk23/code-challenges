@@ -151,6 +151,11 @@ val_sub:
 	add	r3	r3	r2	; val -= a[i]
 	ret
 val_sub_2:
+	eq	r1	third_num r0
+	jf	r1	val_sub_3
+	set	r3	32767
+	jmp	get_value_error
+val_sub_3:	
 	mult	r3	r3	32767 	; subtract r3
 	add	r3	r3	r2	; val = a[i] - val
 	ret
@@ -319,6 +324,8 @@ value_ops:
 print_ops:
 	data	pri_add	pri_mul	pri_sub	pri_div
 game_nums:
-	data	0	0	0	0	0
+	data	0	0
+third_num:
+	data	0	0	0
 goal:	data	0
 c:	data	0	0	0	0	0

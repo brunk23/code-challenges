@@ -22,21 +22,27 @@ int getval() {
  * Returns -1 when an operation is invalid.
  */
 int value(int *a, int *ops) {
-  int val = a[0], j;
+  int val = a[0], j, first = 1;
   for( j = 0; j < 4; j++ ) {
     switch( ops[j] ) {
     case 0:
       val += a[j+1];
+      first = 0;
       break;
     case 1:
       val *= a[j+1];
+      first = 0;
       break;
     case 2:
       if( val > a[j+1] ) {
 	val -= a[j+1];
       } else {
-	val = a[j+1] - val;;
+	if( first ) {
+	  return -1;
+	}
+	val = a[j+1] - val;
       }
+      first = 0;
       break;
     case 3:
       if( (val % a[j+1]) == 0 ) {
@@ -48,6 +54,7 @@ int value(int *a, int *ops) {
 	  return -1;
 	}
       }
+      first = 0;
       break;
     default:
       return -1;
@@ -65,28 +72,28 @@ void print_win(int *a, int *ops) {
   for( i = 0; i < 4; i++ ) {
     switch( oper[ ops[i] ] ) {
     case '+':
-      printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+      printf("(%i%c%i)",val, oper[ ops[i] ], a[i+1]);
       val += a[i+1];
       break;
     case '*':
-      printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+      printf("(%i%c%i)",val, oper[ ops[i] ], a[i+1]);
       val *= a[i+1];
       break;
     case '-':
       if( val > a[i+1] ) {
-	printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+	printf("(%i%c%i)",val, oper[ ops[i] ], a[i+1]);
 	val -= a[i+1];
       } else {
-	printf("(%i %c %i)",a[i+1], oper[ ops[i] ], val);
+	printf("(%i%c%i)",a[i+1], oper[ ops[i] ], val);
 	val = a[i+1] - val;
       }
       break;
     case '/':
       if( val > a[i+1] ) {
-	printf("(%i %c %i)",val, oper[ ops[i] ], a[i+1]);
+	printf("(%i%c%i)",val, oper[ ops[i] ], a[i+1]);
 	val /= a[i+1];
       } else {
-	printf("(%i %c %i)",a[i+1], oper[ ops[i] ], val);
+	printf("(%i%c%i)",a[i+1], oper[ ops[i] ], val);
 	val = a[i+1] / val;
       }
       break;
@@ -101,7 +108,7 @@ void print_win(int *a, int *ops) {
 int try_all(int *a, int goal) {
   int i, j, k, m;
   int ops[4];
-
+  
   for( i = 0; i < 4; i++) {
     ops[0] = i;
     for( j = 0; j < 4; j++) {
@@ -112,7 +119,6 @@ int try_all(int *a, int goal) {
 	  ops[3] = m;
 	  if( goal == value(a, ops) ) {
 	    print_win(a, ops);
-	    return 1;
 	  }
 	}
       }

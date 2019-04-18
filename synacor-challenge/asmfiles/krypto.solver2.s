@@ -67,6 +67,15 @@ find_solution_done:
 	pop	r0
 	ret
 
+
+	;; We need to find a sum, and create the string
+try_sum:
+	push	r0
+
+	pop	r0
+	ret
+
+
 	;; copy_array()
 	;;
 	;; This will copy the array contents, except for the numbers
@@ -132,7 +141,6 @@ copy_array_done:
 	.include	"utils/readnum.s"
 	.include	"utils/bindivide.s"
 	.include	"utils/pstr.s"
-	.include	"utils/prepend_str.s"
 	.include	"utils/strlen.s"
 	.include	"utils/num2str.s"
 	.include	"utils/append_str.s"
