@@ -324,7 +324,7 @@ strsaddr:
 	;; 10003 automatically.
 wordstrs:
 	data	10000	10003	10006	10009	10012
-strs:	data	10154	10136	10123	10115 ; first, second, third, final
+strs:	data	10154	10136	10123	10115	; first, second, third, final
 game_nums:
 	data	0	0	0	0	0
 goal:	data	0
