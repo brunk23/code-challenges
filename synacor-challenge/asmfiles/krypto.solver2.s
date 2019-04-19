@@ -35,12 +35,16 @@ find_solution:
 	push	r1
 	push	r2
 
+	;; Check if this is the last value
 	jt	r0	find_solution_main ; If we have 1 number, we
-	set	r1	strsaddr
-	rmem	r1	r1
-	rmem	r1	r1
-	call	pstr
-	out	10
+	rmem	r1	9009		   ; avoid the double read with 9009
+	rmem	r2	goal		   ; get the goal value
+	eq	r1	r1	r2	   ; are we equal
+	jf	r1	find_solution_done ; if not, quit
+	;; This was the right answer, print the string
+	set	r1	10154 		; we could probably avoid this
+	call	pstr			; print the answer string
+	out	10			; print a newline
 	;; call	check_answer		; check to see if it is the correct one
 	jmp	find_solution_done 	; then print it and return
 
@@ -241,4 +245,3 @@ strsaddr:
 wordstrs:
 	data	10000	10003	10006	10009	10012
 strs:	data	10154	10136	10123	10115 ; first, second, third, final
-	data	11
