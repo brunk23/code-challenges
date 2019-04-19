@@ -101,6 +101,6 @@ TOKEN *include_handler( TOKEN *, int * );
 void delete_token_tree();
 void delete_line_tree();
 void delete_sym_tree();
-void print_sym_tree();
+void print_sym_tree(const char *);
 
 #endif

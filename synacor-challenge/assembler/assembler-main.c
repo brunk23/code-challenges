@@ -4,8 +4,13 @@
 
 #include "assembler.h"
 
+/*
+ * I want to change this to take the base name of the file and produce
+ * {file}.bin [the binary], {file}.sym [the symbol table], {file}.lst [listing]
+ */
 int main(int argc, char *argv[]) {
   int compile_status = 0, source = 0, dest = 0, verbose = 0;
+  char *src_file = NULL, *dest_file = NULL, *sym_file = NULL;
 
   /* COMMAND LINE ARGUMENTS */
   for( compile_status = 1; compile_status < argc; compile_status++) {
@@ -32,6 +37,35 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  if( dest == 0 ) {
+    if( !(dest_file = malloc( strlen(argv[source]) + 5))) {
+      fprintf(stderr, "Fatal Error creating filename.\n");
+      return 1;
+    }
+    strncpy(dest_file, argv[source], strlen(argv[source]));
+    strncat(dest_file, ".bin", 4);
+  } else {
+    if( !(dest_file = malloc( strlen(argv[dest]) + 1))) {
+      fprintf(stderr, "Fatal Error creating filename.\n");
+      return 1;
+    }
+    strncpy(dest_file, argv[dest], strlen(argv[dest]));
+  }
+
+  if( !(src_file = malloc( strlen(argv[source]) + 5))) {
+    fprintf(stderr, "Fatal Error creating filename.\n");
+    return 1;
+  }
+  strncpy(src_file, argv[source], strlen(argv[source]));
+  strncat(src_file, ".s", 2);
+
+  if( !(sym_file = malloc( strlen(argv[source]) + 5))) {
+    fprintf(stderr, "Fatal Error creating filename.\n");
+    return 1;
+  }
+  strncpy(sym_file, argv[source], strlen(argv[source]));
+  strncat(sym_file, ".sym", 4);
+
   instruction_count = 0;
   data_words = 0;
   arguments_count = 0;
@@ -41,7 +75,7 @@ int main(int argc, char *argv[]) {
 
   init_machine();
 
-  if( !(tokens = process_input(argv[source]) )) {
+  if( !(tokens = process_input( src_file ))) {
     return 1;
   }
 
@@ -50,7 +84,7 @@ int main(int argc, char *argv[]) {
     compile_status = pass2(tokens, filelines);
   }
 
-  print_sym_tree();
+  print_sym_tree( sym_file );
 
   if( verbose ) {
     fprintf(stderr, "\tProgram Statistics\n\n");
@@ -73,13 +107,12 @@ int main(int argc, char *argv[]) {
 	 tokencount,linecount,symbolcount);
   */
   if( compile_status == GOOD ) {
-    if( dest ) {
-      process_output(argv[dest], verbose);
-    } else {
-      process_output("syn-asm.bin", verbose);
-    }
+    process_output(dest_file, verbose);
   }
 
+  free( dest_file );
+  free( sym_file );
+  free( src_file );
   return compile_status;
 }
 
@@ -192,13 +225,21 @@ TOKEN *process_input(const char *filename) {
  * This will eventually become a command line option and
  * be changed to allow dumping to a file.
  */
-void print_sym_tree() {
+void print_sym_tree(const char *filename) {
   SYMBOL *curr = syms;
+  FILE *fp = NULL;
+
+  if( !(fp = fopen(filename,"w"))) {
+    fprintf(stderr,"Couldn't open file: %s\n",filename);
+    return;      /* This should probably be exit(1) */
+  }
 
   while(curr) {
-    fprintf(stdout, "%s: %i\n", curr->str, curr->value);
+    fprintf(fp, "%s: %i\n", curr->str, curr->value);
     curr = curr->next;
   }
+
+  fclose(fp);
 }
 
 void delete_sym_tree() {
