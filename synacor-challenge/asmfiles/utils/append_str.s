@@ -9,7 +9,7 @@ append_str:
 	rmem	r3	r1
 	jf	r3	append_str_loop
 end_str:
-	add	r1	r1	1 	; point to next char
+	add	r1	r1	1	; point to next char
 	rmem	r3	r1
 	jt	r3	end_str
 append_str_loop:

@@ -17,7 +17,7 @@
 	set	r1	start_message
 	call	pstr
 again:
-	rmem	r0	games_left_num 		; We default to 10 games
+	rmem	r0	games_left_num		; We default to 10 games
 	set	r1	games_left		; This is the message string
 	call	pstr				; print the message
 	set	r1	r0			; and then the number
@@ -29,13 +29,13 @@ again:
 	wmem	games_left_num	r0		; and save it
 	jt	r0	again			; if there are more to play, loop
 end_game:
-	set	r1	quit_message 		; Print the quit message
+	set	r1	quit_message		; Print the quit message
 	call	pstr
-	rmem	r1	win_count 		; Print how many we won
+	rmem	r1	win_count		; Print how many we won
 	call	pnumber
-	set	r1	quit_message2 		; Print out of
+	set	r1	quit_message2		; Print out of
 	call	pstr
-	rmem	r0	games_left_num 		; calculate how many games played
+	rmem	r0	games_left_num		; calculate how many games played
 	mult	r0	r0	32767		; by subtracting the games left
 	add	r0	r0	10		; from 10
 	set	r1	r0
@@ -49,14 +49,14 @@ main:
 	call	pick_six		; get our six numbers
 input:
 	call	parse_input
-	rmem	r1	first_let 	; offset of first word
+	rmem	r1	first_let	; offset of first word
 	rmem	r2	second_let	; offset of second word
 	eq	r7	r1	r2	; if they are the same,
 	jt	r7	input		; we loop back
 	set	r3	game_numbers	; point to the start of the game_numbers
 	add	r3	r3	r1	; add the offset
 	rmem	r1	r3		; read the value
-	eq	r7	r1	9973 	; Is this a valid word?
+	eq	r7	r1	9973	; Is this a valid word?
 	jt	r7	input		; if Not we quit and loop
 	set	r3	game_numbers	; point to the start of the game_numbers
 	add	r3	r3	r2	; add the offset
@@ -77,7 +77,7 @@ win_lose:
 	add	r1	r1	r0	; Get the memory address
 	rmem	r2	r1		; r2 = the goal
 next_value:
-	add	r0	r0	32767 	; decrement i
+	add	r0	r0	32767	; decrement i
 	set	r1	game_numbers	; point to the values we played with
 	add	r1	r0	r1	; add the index
 	rmem	r1	r1		; read the value into r1
@@ -90,9 +90,9 @@ next_value:
 
 	;; This is a helper for win_lose and prints a string saying we won.
 won:
-	set	r1	win_text 	; print the win string
+	set	r1	win_text	; print the win string
 	call	pstr
-	rmem	r1	win_count 	; Get current number of wins
+	rmem	r1	win_count	; Get current number of wins
 	add	r1	r1	1	; increment it
 	wmem	win_count	r1	; save it
 	ret
@@ -102,10 +102,10 @@ won:
 	;; Destroy r1, r2, r3, r7
 	;; Decrements r0 in the main function (step counter)
 cmd_mult:
-	mult	r7	r1	r2   	; the actual multiplication
-	rmem	r1	first_let 	; get the first letter index
+	mult	r7	r1	r2	; the actual multiplication
+	rmem	r1	first_let	; get the first letter index
 	set	r3	game_numbers	; the address we index off of
-	add	r1	r1	r3 	; index to first location
+	add	r1	r1	r3	; index to first location
 	wmem	r1	r7		; write the new value to the first location
 	rmem	r2	second_let	; get the second letter index
 	add	r2	r2	r3	; calculate the new location
@@ -128,7 +128,7 @@ cmd_add:
 
 	;; See cmd_mult for comments
 cmd_sub:
-	gt	r7	r2	r1 	; ensure that we don't get a negative
+	gt	r7	r2	r1	; ensure that we don't get a negative
 	jt	r7	not_neg		; as negative's aren't allowed.
 	mult	r2	r2	32767	; Negate the second number
 	add	r7	r1	r2	; the rest is similar to the other cmd_s
@@ -182,24 +182,24 @@ parse_input_f_let:
 	wmem	first_let	r1
 parse_get_command2:
 	call	get_char
-	eq	r7	r1	10 	; restart if we get a newline
+	eq	r7	r1	10	; restart if we get a newline
 	jt	r7	parse_input
-	eq	r7	r1	42 	; This is mult
+	eq	r7	r1	42	; This is mult
 	jf	r7	parse_not_mult
 	wmem	command	cmd_mult
 	jmp	parse_input_second_let
 parse_not_mult:
-	eq	r7	r1	43 	; This is add
+	eq	r7	r1	43	; This is add
 	jf	r7	parse_not_add
 	wmem	command	cmd_add
 	jmp	parse_input_second_let
 parse_not_add:
-	eq	r7	r1	45 	; This is sub
+	eq	r7	r1	45	; This is sub
 	jf	r7	parse_not_sub
 	wmem	command	cmd_sub
 	jmp	parse_input_second_let
 parse_not_sub:
-	eq	r7	r1	47 	; This is div
+	eq	r7	r1	47	; This is div
 	jf	r7	parse_get_command2
 	wmem	command	cmd_div
 parse_input_second_let:
@@ -207,7 +207,7 @@ parse_input_second_let:
 	eq	r7	r1	10		; Found newline, restart
 	jt	r7	parse_input
 	call	get_letter
-	gt	r7	r1	4   		; Was it over e?
+	gt	r7	r1	4		; Was it over e?
 	jt	r7	parse_input_second_let
 	wmem	second_let	r1
 	ret
@@ -218,11 +218,11 @@ parse_input_second_let:
 get_letter:
 	gt	r7	r1	101		; Over 'e'
 	jt	r7	get_letter_done
-	gt	r7	r1	96 		; under 'a'
+	gt	r7	r1	96		; under 'a'
 	jt	r7	parse_input_cap_let
-	gt	r7	r1	69 		; Over 'E'
+	gt	r7	r1	69		; Over 'E'
 	jt	r7	get_letter_done
-	gt	r7	r1	64 		; under 'A'
+	gt	r7	r1	64		; under 'A'
 	jt	r7	parse_input_low_let
 	set	r1	100			; An invalid value
 get_letter_done:
@@ -230,12 +230,12 @@ get_letter_done:
 
 	;; Helper for get_letter
 parse_input_cap_let:
-	add	r1	r1	32671 	; subtract 'a'
+	add	r1	r1	32671	; subtract 'a'
 	jmp	get_letter_done
 
 	;; Helper for get_letter
 parse_input_low_let:
-	add	r1	r1	32703 	; subtract 'A'
+	add	r1	r1	32703	; subtract 'A'
 	jmp	get_letter_done
 
 	;; This will get a character from the input and quit the
@@ -245,20 +245,20 @@ get_char:
 	pop	r1
 	wmem	reta	r1
 	in	r1
-	eq	r7	r1	81 	; capital Q
+	eq	r7	r1	81	; capital Q
 	jt	r7	quit
-	eq	r7	r1	113 	; lowercase q
+	eq	r7	r1	113	; lowercase q
 	jt	r7	quit
-	eq	r7	r1	72 	; capital H
+	eq	r7	r1	72	; capital H
 	jt	r7	help_message
-	eq	r7	r1	104 	; lowercase h
+	eq	r7	r1	104	; lowercase h
 	jt	r7	help_message
 end_get_char:
 	push	reta:			; Self-modifying, change where we return to
 	ret
 	;; Helper for get_char
 quit:
-	wmem	reta	end_game 	; change return address
+	wmem	reta	end_game	; change return address
 	jmp	end_get_char
 
 help_message:
@@ -297,7 +297,7 @@ print_game_next:
 	;; Must preserve r0, does not use it.
 	;; Destroys r1, r2, r3, r4, r5
 pick_six:
-	set	r1	6	     	; We need six numbers
+	set	r1	6		; We need six numbers
 	set	r3	game_numbers	; We save the six numbers here
 	add	r3	r3	r1	; This is our index into it
 pick_6_loop:
@@ -306,8 +306,8 @@ pick_6_loop:
 	add	r2	r2	numbers ; Add address of number
 	rmem	r4	r2		; r2 = numbers[i]
 	jf	r4	pick_6_loop	; If the number is already used, pick again
-	wmem	r2	0	      	; 0 the address so we don't pick it twice
-	add	r1	r1	32767 	; r1--
+	wmem	r2	0		; 0 the address so we don't pick it twice
+	add	r1	r1	32767	; r1--
 	add	r3	r3	32767	; save value
 	wmem	r3	r4		; game_numbers[r1] <- r2
 	jt	r1	pick_6_loop	; Get 6 numbers
@@ -318,7 +318,7 @@ pick_6_loop:
 	set	r3	game_numbers
 	set	r2	numbers
 put_away:
-	add	r1	r1	32767 	; count of our picked numbers
+	add	r1	r1	32767	; count of our picked numbers
 	rmem	r4	r3		; pointer into our picked numbers
 put_away2:
 	rmem	r5	r2		; Check the current location

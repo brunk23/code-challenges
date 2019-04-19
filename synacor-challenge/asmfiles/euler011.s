@@ -1,4 +1,4 @@
-# Attempt to solve project Euler #11 in 
+# Attempt to solve project Euler #11 in
 # Synacor assembly
 
 # Due to limitations, the product will be kept in 4 words.
@@ -14,7 +14,7 @@
 	set r0 grid		# r0 will be current location 0 - > 399
 	add r1 r0 339		# MAXDOWN
 	set r6 0
-:main_loop
+main_loop:
 	gt r7 r0 r1
 	jt r7 main_right	# skip all down routines if past grid+339
 
@@ -27,20 +27,20 @@
 	call downl
 	call compare
 
-:main_downr
+main_downr:
 	mod r7 r6 20
 	gt r7 r7 16
 	jt r7 main_noright
 	call downr
 	call compare
-:main_right
+main_right:
 	mod r7 r6 20
 	gt r7 r7 16
 	jt r7 main_noright
 	call right
 	call compare
 
-:main_noright
+main_noright:
 	add r0 r0 1
 	add r6 r6 1
 	eq r7 r0 gstop		# should be gstop not r1
@@ -56,7 +56,7 @@
 	# print() prints the 4 digit number, starting at
 	# r3, to the output, followed by a newline.
 	##
-:print
+print:
 	push r0
 	push r2
 	push r3
@@ -80,7 +80,7 @@
 
 	# pnum() is a helper function that prints a
 	# number pair
-:pnum
+pnum:
 	rmem r2 r3		# r2 is the number
 	mod r5 r2 10		# r5 is ones place
 	set r4 0
@@ -98,7 +98,7 @@
 	out r5
 	ret
 
-:down
+down:
 	# Zero out the 3 higher digit pairs
 	set r5 prod
 	add r5 r5 1
@@ -125,7 +125,7 @@
 	call mult
 	ret
 
-:downl
+downl:
 	# Zero out the 3 higher digit pairs
 	set r5 prod
 	add r5 r5 1
@@ -151,8 +151,8 @@
 	rmem r3 r2
 	call mult
 	ret
-	
-:downr
+
+downr:
         # Zero out the 3 higher digit pairs
 	set r5 prod
 	add r5 r5 1
@@ -179,7 +179,7 @@
 	call mult
 	ret
 
-:right
+right:
         # Zero out the 3 higher digit pairs
 	set r5 prod
 	add r5 r5 1
@@ -206,14 +206,14 @@
 	call mult
 	ret
 
-	
+
 	##
 	# multiplies curr by the number in r3
 	# r3 will be the head of the 4 numbers we
 	# are multiplying. The remaining 3 will be
 	# in curr
 	##
-:mult
+mult:
 	push r0
 	push r1
 	push r2
@@ -258,15 +258,15 @@
 	pop r0
 	ret
 
-:hundreds
+hundreds:
 	set r4 1
-:hstart
+hstart:
 	mult r5 r4 100		# we're going to loop until we find a
 	gt r5 r5 r1		# number that times 100 will be larger
 	jt r5 hunddone		# than the current partial product
 	add r4 r4 1		# this is probably a bottleneck.
 	jmp hstart
-:hunddone
+hunddone:
 	ret
 
 
@@ -275,14 +275,14 @@
 	# old max
 	# called from main_loop, only needs to preserve r0 and r1
 	##
-:compare
+compare:
 	push r0
 	push r1
 	set r0 prod		# set the numbers up to point to the
 	set r1 max		# highest pair of digits
 	add r0 r0 3		# will go down from here
 	add r1 r1 3
-:compare_start
+compare_start:
 	rmem r2 r0
 	rmem r3 r1
 	gt r7 r3 r2
@@ -294,7 +294,7 @@
 	gt r7 prod r0
 	jt r7 compare_done	# We've run out of digits to check
 	jmp compare_start	# loop to check the new digits
-:compare_copy
+compare_copy:
 	wmem r1 r2		# We only need to copy the digits we're at and down
 	add r0 r0 32767		# Shift both indexes down
 	add r1 r1 32767
@@ -302,15 +302,15 @@
 	jt r7 compare_done	# jump to done if we are
 	rmem r2 r0		# read the next didit pair in
 	jmp compare_copy	# loop to copy next pair
-:compare_done
-	pop r1
+compare_done:
+	pop r0
 	pop r0
 	ret
-	
-	
-:prod   data 00 00 00 00  	# product will be kept in 4 words
-:max	data 00 00 00 00
-:grid
+
+
+prod:   data 00 00 00 00	# product will be kept in 4 words
+max:	data 00 00 00 00
+grid:
 	data 08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
 	data 49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00
 	data 81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65

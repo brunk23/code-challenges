@@ -39,9 +39,9 @@ find_solution:
 
 	;; Check if this is the last value
 	jt	r0	find_solution_main ; If we have 1 number, we
-	rmem	r1	9009		   ; avoid the double read with 9009
-	rmem	r2	goal		   ; get the goal value
-	eq	r1	r1	r2	   ; are we equal
+	rmem	r1	9009		; avoid the double read with 9009
+	rmem	r2	goal		; get the goal value
+	eq	r1	r1	r2	; are we equal
 	jf	r1	find_solution_done	; if not, quit
 	;; This was the right answer, print the string
 	set	r1	10154		; we could probably avoid this

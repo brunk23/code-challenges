@@ -26,7 +26,7 @@ get_nums:
 	;; r6 = &c[i] r5 = c[i], r4 = &a[i] r3 = a[i], r2 = tmp
 	;; This is Heap's algorithm.
 find_solution:
-	set	r0	game_nums 	; r0 = a
+	set	r0	game_nums	; r0 = a
 	set	r1	c		; r1 = c
 	set	r7	0		; r7 = i <- 0
 permutation:				; while( i < 5 )
@@ -34,16 +34,16 @@ permutation:				; while( i < 5 )
 	rmem	r5	r6		; r5 = c[i]
 	gt	r2	r7	r5	; i > c[i]
 	jf	r2	perm_not_greater
-	mod	r2	r7	2  	; r2 <- i%2
+	mod	r2	r7	2	; r2 <- i%2
 	jt	r2	perm_not_even
-	add	r4	r0	r7 	; point to value at a[i]
+	add	r4	r0	r7	; point to value at a[i]
 	rmem	r2	r4		; r2 = a[i]
 	rmem	r3	r0		; r3 = a[0]
 	wmem	r0	r2		; a[0] = a[i]
 	wmem	r4	r3		; a[i] = a[]
 	jmp	try_perm
-perm_not_even:	
-	add	r6	r1	r7 	; r6 = &c[i]
+perm_not_even:
+	add	r6	r1	r7	; r6 = &c[i]
 	rmem	r6	r6		; r6 = c[i]
 	add	r6	r6	r0	; r6 = &a[ c[i] ]
 	add	r5	r0	r7	; r5 = &a[i]
@@ -60,11 +60,11 @@ try_perm:
 	set	r7	0
 	jmp	while_bottom
 perm_not_greater:
-	add	r6	r1	r7 	; We didn't permute
+	add	r6	r1	r7	; We didn't permute
 	wmem	r6	0		; c[i] = 0
 	add	r7	r7	1	; i++
 while_bottom:
-	gt	r2	5	r7 	; the while test condition is here
+	gt	r2	5	r7	; the while test condition is here
 	jt	r2	permutation
 	ret
 
@@ -75,7 +75,7 @@ try_all:
 	push	r0
 	push	r1
 	push	r7
-	set	r7	4	      	; r7 = 4
+	set	r7	4		; r7 = 4
 try_i:					; do { (r7)
 	add	r7	r7	32767	; r7--
 	set	r6	4		; r6 = 4
@@ -124,7 +124,7 @@ get_value:
 	rmem	r3	r3			; Read the fucntion address
 	push	r3				; Push it
 	rmem	r3	r0			; r3 <- first value
-	add	r0	r0	1	 	; point to next number
+	add	r0	r0	1		; point to next number
 get_value_error:
 	ret				; Return calls 1st operation function
 
@@ -144,10 +144,10 @@ val_sub:
 	eq	r1	r3	32767	; Error
 	jt	r1	get_value_error	; Return right away
 	rmem	r2	r0		; Read the next number
-	add	r0	r0	1 	; Point to next number
+	add	r0	r0	1	; Point to next number
 	gt	r1	r2	r3	; No negatives allowed
 	jt	r1	val_sub_2
-	mult	r2	r2	32767 	; subtract r2
+	mult	r2	r2	32767	; subtract r2
 	add	r3	r3	r2	; val -= a[i]
 	ret
 val_sub_2:
@@ -155,8 +155,8 @@ val_sub_2:
 	jf	r1	val_sub_3
 	set	r3	32767
 	jmp	get_value_error
-val_sub_3:	
-	mult	r3	r3	32767 	; subtract r3
+val_sub_3:
+	mult	r3	r3	32767	; subtract r3
 	add	r3	r3	r2	; val = a[i] - val
 	ret
 
@@ -184,14 +184,14 @@ val_div:
 	jt	r1	get_value_error
 	rmem	r2	r0		; Read the next number
 	add	r0	r0	1	; point to the next number
-	mod	r1	r3	r2 	; r1 <- r3 mod r2
+	mod	r1	r3	r2	; r1 <- r3 mod r2
 	jt	r1	val_div2	; no fractions or decimals
 	set	r1	r3		; We divide r3 by r2
 	call	divide
 	set	r3	r1		; val = val / a[i]
 	ret
 val_div2:
-	mod	r1	r2	r3 	; can we evenly divide?
+	mod	r1	r2	r3	; can we evenly divide?
 	jt	r1	val_div3	; if not, error
 	set	r1	r2
 	set	r2	r3
@@ -220,16 +220,16 @@ print_match:
 	rmem	r3	r3			; Read the fucntion address
 	push	r3				; Push it
 	rmem	r3	r0			; r3 <- first value
-	add	r0	r0	1	 	; point to next number
+	add	r0	r0	1		; point to next number
 	ret					; Return calls 1st operation function
 
 
 	;; Print out an addition expression
 pri_add:
-	out	40	   		; '('
+	out	40			; '('
 	set	r1	r3
-	call	pnumber		   	; print val
-	out	43	   		; '+'
+	call	pnumber			; print val
+	out	43			; '+'
 	rmem	r2	r0		; Read next number
 	add	r3	r3	r2	; Add it to r3 (value)
 	add	r0	r0	1	; point to next number
@@ -241,28 +241,28 @@ pri_add:
 
 	;; Print out a subtraction expression
 pri_sub:
-	out	40		  	; '('
+	out	40			; '('
 	rmem	r2	r0		; a[i]
-	add	r0	r0	1 	; i++
+	add	r0	r0	1	; i++
 	gt	r1	r2	r3	; if a[i] > val
 	jt	r1	pri_sub_2	; we subtract val insteas
 	set	r1	r3
 	call	pnumber			; print val
 	out	45			; '-'
 	set	r1	r2
-	call	pnumber		      	; print a[i]
-	out	41		      	; ')'
-	mult	r2	r2	32767 	; negate a[i]
+	call	pnumber			; print a[i]
+	out	41			; ')'
+	mult	r2	r2	32767	; negate a[i]
 	add	r3	r3	r2	; val -= a[i]
 	ret
 pri_sub_2:
 	set	r1	r2
 	call	pnumber			; print a[i]
-	out	45		      	; '-'
+	out	45			; '-'
 	set	r1	r3
-	call	pnumber		      	; print val
-	out	41		      	; ')'
-	mult	r3	r3	32767 	; negate val
+	call	pnumber			; print val
+	out	41			; ')'
+	mult	r3	r3	32767	; negate val
 	add	r3	r3	r2	; val = a[i] - val
 	ret
 
@@ -275,8 +275,8 @@ pri_mul:
 	out	42			; '*'
 	rmem	r2	r0		; Read next number
 	set	r1	r2
-	call	pnumber		   	; print a[i]
-	out	41		   	; ')'
+	call	pnumber			; print a[i]
+	out	41			; ')'
 	mult	r3	r3	r2	; val <- val * a[i]
 	add	r0	r0	1	; i++
 	ret
@@ -286,8 +286,8 @@ pri_mul:
 pri_div:
 	out	40			; '('
 	rmem	r2	r0
-	add	r0	r0	1  	; i++
-	mod	r1	r3	r2 	; r1 <- r3 mod r2
+	add	r0	r0	1	; i++
+	mod	r1	r3	r2	; r1 <- r3 mod r2
 	jt	r1	pri_div2	; if (val % a[i]) == 0
 	set	r1	r3
 	call	pnumber			; print val

@@ -12,7 +12,7 @@ divide:
 	ret
 divide_notzero:
 	push	r7
-	gt	r7	r2	1 	; If we divide by 1 or 0, just return right away
+	gt	r7	r2	1	; If we divide by 1 or 0, just return right away
 	jt	r7	divide_start	; Dividing by more than 1, jump forward
 	set	r2	0		; No remainder, don't change the dividend
 	pop	r7			; restore the register
@@ -33,14 +33,14 @@ divide_findfactor:
 	push	r4			; push the next factor on the stack
 	add	r4	r4	r4	; double the factor
 	add	r5	r5	r5	; double the power of 2
-	gt	r7	r4	r1 	; is r4 > dividend
+	gt	r7	r4	r1	; is r4 > dividend
 	gt	r3	r3	r4	; is the old number > the new number?
 	or	r3	r3	r7	; Either one is a done situation
 	jf	r3	divide_findfactor
 
 	set	r3	0		; keep quotient in r6
 divide_loop:
-	pop	r4		   	; pop the factor we are testing
+	pop	r4			; pop the factor we are testing
 	jf	r4	divide_end	; We quit when we read a zero from the stack
 	pop	r5			; pop the power of 2 for this factor
 	gt	r7	r4	r1	; Is the factor greater than the remainder?

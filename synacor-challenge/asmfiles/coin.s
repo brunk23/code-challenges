@@ -50,12 +50,12 @@ hitvalue2:
 	set	r3	counts		; r3 = counts[0]  i
 	jf	count:	hitvalue0	; count=# of 10k groups, skip forward if 0
 	rmem	r1	count
-	call	pnumber		  	; print the number of 10k groups we have
-	gt	r7	r6	9 	; 9 or lower needs 000 padding
+	call	pnumber			; print the number of 10k groups we have
+	gt	r7	r6	9	; 9 or lower needs 000 padding
 	jf	r7	three0s
-	gt	r7	r6	99 	; 10-99 needs 00 padding
+	gt	r7	r6	99	; 10-99 needs 00 padding
 	jf	r7	two0s
-	gt	r7	r6	999 	; 100-999 neext 0 padding
+	gt	r7	r6	999	; 100-999 neext 0 padding
 	jf	r7	one0
 	jmp	hitvalue0		; don't pad any digits
 three0s:
@@ -87,10 +87,10 @@ overvalue:
 	set	r4	counts		; r4 = counts[0]
 	set	r3	coins		; r3 = coins[0]
 overvalue1:
-	rmem	r2	r4	  	; r2 = counts[i]
-	add	r5	r5	1 	; i++
+	rmem	r2	r4		; r2 = counts[i]
+	add	r5	r5	1	; i++
 	add	r4	r4	1	; k++
-	add	r3	r3	1 	; j++
+	add	r3	r3	1	; j++
 	eq	r7	r5	coins	; &vals[i] == &coins[0] we are out of coins
 	jt	r7	endprogram
 	jf	r2	overvalue1	; if counts[i] == 0 go to next value
@@ -99,7 +99,7 @@ overvalue1:
 	add	r2	r3	r2	; r2 += r3
 	wmem	r5	r2		; vals[i] = r2
 	rmem	r3	r4
-	add	r3	r3	1     	; counts[k]++
+	add	r3	r3	1	; counts[k]++
 	wmem	r4	r3
 	add	r4	r4	32767	; k--
 	add	r5	r5	32767	; i--

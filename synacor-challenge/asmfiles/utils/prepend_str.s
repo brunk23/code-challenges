@@ -6,7 +6,7 @@ prepend_str:
 	push	r0
 	push	r2
 	push	r3
-	push	r1		   	; we need this after strlen
+	push	r1			; we need this after strlen
 	set	r1	r2		; point to src string
 	call	strlen			; r0 <- length of src
 	pop	r1			; get address of dest

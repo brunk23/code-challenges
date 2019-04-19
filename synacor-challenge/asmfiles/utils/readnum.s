@@ -2,7 +2,7 @@
 	;; Invoke: call readnum
 	;; Inputs: none
 	;; Outputs: r1 will contain the value of the number entered on stdin
-	;; 	    or 0, if no number was read.
+	;;	or 0, if no number was read.
 readnum:
 	push	r2
 	push	r7

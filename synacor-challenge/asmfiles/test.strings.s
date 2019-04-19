@@ -6,7 +6,7 @@
 	call	append_str
 	call	pstr
 	halt
-	
+
 	.include	"utils/append_str.s"
 	.include	"utils/pstr.s"
 	.include	"utils/strlen.s"
@@ -16,5 +16,5 @@
 src:	data	"foo\0"
 
 	.origin 600
-dest:	
+dest:
 	data	"bar\n\0"
