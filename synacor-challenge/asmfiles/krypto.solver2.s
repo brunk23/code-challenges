@@ -74,7 +74,7 @@ setup_vals:
 	add	r7	r7	r0 	; index to current array
 	add	r5	r7	32767	; r5 = destination address
 	rmem	r7	r7	      	; read address of current array
-	rmem	r5	r5		; read address of destination
+	rmem	r5	r5		; read address of destination array
 	add	r6	r7	r2	; r6 is the second number
 	add	r7	r7	r1 	; r7 is first number
 	rmem	r7	r7		; read first number
@@ -189,13 +189,13 @@ copy_array_loop:
 	wmem	r5	r7			; write to destination
 	rmem	r7	r4			; read source string
 	wmem	r6	r7			; write to destination
+	add	r5	r5	32767		; r5--
+	add	r6	r6	32767		; r6--
 copy_array_skip:
 	jf	r0	copy_array_done		; we copied the last value
 	add	r0	r0	32767		; r0--
 	add	r3	r3	32767		; r3--
 	add	r4	r4	32767		; r4--
-	add	r5	r5	32767		; r5--
-	add	r6	r6	32767		; r6--
 	jmp	copy_array_loop
 copy_array_done:
 	pop	r7

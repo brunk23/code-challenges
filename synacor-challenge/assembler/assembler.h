@@ -56,15 +56,16 @@ struct SYMBOL {
  */
 SWORD memory[32768];
 SWORD pc;
+SYMBOL *syms;
+TOKEN *tokens;
+LINE *filelines;
+/* These should be encapsulated in a struct with command line stuff */
 int linecount;
 int symbolcount;
 int tokencount;
 int instruction_count;
 int data_words;
 int arguments_count;
-SYMBOL *syms;
-TOKEN *tokens;
-LINE *filelines;
 
 /*
  * Function prototypes
@@ -100,5 +101,6 @@ TOKEN *include_handler( TOKEN *, int * );
 void delete_token_tree();
 void delete_line_tree();
 void delete_sym_tree();
+void print_sym_tree();
 
 #endif

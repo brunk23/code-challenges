@@ -50,6 +50,8 @@ int main(int argc, char *argv[]) {
     compile_status = pass2(tokens, filelines);
   }
 
+  print_sym_tree();
+
   if( verbose ) {
     fprintf(stderr, "\tProgram Statistics\n\n");
     fprintf(stderr, "Lines of source code: %i\n", linecount);
@@ -184,6 +186,19 @@ TOKEN *process_input(const char *filename) {
 
   fclose(fp);
   return head_token;
+}
+
+/*
+ * This will eventually become a command line option and
+ * be changed to allow dumping to a file.
+ */
+void print_sym_tree() {
+  SYMBOL *curr = syms;
+
+  while(curr) {
+    fprintf(stdout, "%s: %i\n", curr->str, curr->value);
+    curr = curr->next;
+  }
 }
 
 void delete_sym_tree() {
