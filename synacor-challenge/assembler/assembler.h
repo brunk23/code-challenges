@@ -4,7 +4,7 @@
 enum CONSTANTS {
   FAIL = -1, SUCCESS = 0, BUFFSIZE = 160, REGOFFSET = 32768, USERWORD = 32776,
   RESOLVED, UNRESOLVED, BAD, GOOD, DIRECTIVE, LABEL, WORD, NUMBER, STRING,
-  ORIGIN, DATA, INCLUDE
+  ORIGIN, DATA, INCLUDE, ASSIGN
 };
 
 enum REGISTERS {
@@ -97,6 +97,7 @@ TOKEN *one_ops_handler( TOKEN *, int * );
 TOKEN *two_ops_handler( TOKEN *, int * );
 TOKEN *three_ops_handler( TOKEN *, int * );
 TOKEN *include_handler( TOKEN *, int * );
+TOKEN *assign_handler( TOKEN *, int * );
 
 void delete_token_tree();
 void delete_line_tree();

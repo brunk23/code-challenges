@@ -5,6 +5,29 @@
 
 	.origin 0
 
+	;; Locations of our value arrays
+	.assign	finalv	9009	; 1 word and the final value
+	.assign va1	9007	; 2 words
+	.assign	va2	9004	; 3 words
+	.assign va3	9000	; 4 words
+
+	;; Locations of our string arrays
+	.assign wa1	9019	; 1 word
+	.assign wa2	9017	; 2 words
+	.assign	wa3	9014	; 3 words
+	.assign	wa4	9010	; 4 words
+
+	;; Locations of all our strings
+	.assign	st1	9020	; 3 chars
+	.assign	st2	9023	; 3 chars
+	.assign	st3	9026	; 3 chars
+	.assign	st4	9029	; 3 chars
+	.assign	st5	9032	; 3 chars
+	.assign	st6	9035	; 8 chars
+	.assign	st7	9043	; 13 chars
+	.assign st8	9056	; 18 chars
+	.assign	finals	9074	; 23 chars (next free word 9097)
+
 
 	;; main() -- The following code implements main()
 	set	r1	prompt		; the prompt for the user
@@ -39,12 +62,12 @@ find_solution:
 
 	;; Check if this is the last value
 	jt	r0	find_solution_main ; If we have 1 number, we
-	rmem	r1	9009		; avoid the double read with 9009
+	rmem	r1	finalv		; avoid the double read with 9009
 	rmem	r2	goal		; get the goal value
 	eq	r1	r1	r2	; are we equal
 	jf	r1	find_solution_done	; if not, quit
 	;; This was the right answer, print the string
-	set	r1	10154		; we could probably avoid this
+	set	r1	finals		; we could probably avoid this
 	call	pstr			; print the answer string
 	out	10			; print a newline
 	;; call	check_answer		; check to see if it is the correct one
@@ -314,17 +337,17 @@ divid:	data	"/\0"
 
 	;; These will be used to pass the array addresses.
 valsaddr:
-	data	9009	9007	9004	9000	game_nums
+	data	finalv	va1	va2	va3	game_nums
 strsaddr:
-	data	9019	9017	9014	9010	wordstrs
+	data	wa1	wa2	wa3	wa4	wordstrs
 
 	;; These will be the string locations. This begs two possible
 	;; improvements to the assembler.  The ability to use equ statements
 	;; like "first equ 10000" and compiled math like "first+3" to create
 	;; 10003 automatically.
 wordstrs:
-	data	10000	10003	10006	10009	10012
-strs:	data	10154	10136	10123	10115	; first, second, third, final
+	data	st1	st2	st3	st4	st5
+strs:	data	finals	st8	st7	st6	; first, second, third, final
 game_nums:
 	data	0	0	0	0	0
 goal:	data	0

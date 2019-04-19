@@ -219,7 +219,8 @@ int pass1() {
 
 	/*  Process instructions and directives  */
 	curr->value = inst;
-	if( (inst == ORIGIN) || (inst == INCLUDE) || (inst == DATA) ) {
+	if( (inst == ORIGIN) || (inst == INCLUDE) ||
+	    (inst == DATA) || (inst == ASSIGN) ) {
 	  switch (inst) {
 
 	  case ORIGIN:
@@ -234,6 +235,10 @@ int pass1() {
 
 	  case DATA:
 	    curr = data_handler(curr, &compile_status);
+	    break;
+
+	  case ASSIGN:
+	    curr = assign_handler(curr, &compile_status);
 	    break;
 
 	  default:   /* This should be unreachable */
@@ -547,6 +552,42 @@ TOKEN *data_handler(TOKEN *curr, int *compile_status) {
 }
 
 /*
+ * This adds a symbol to the table
+ */
+TOKEN *assign_handler(TOKEN *curr, int *compile_status) {
+  char *symstr = NULL;
+
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
+    return curr->next;
+  }
+  curr = curr->next;
+
+  if( curr->type != WORD ) {
+    fprintf(stderr, "WARNING: .assign lval should be a word. [Line %i]\n",
+	    curr->line);
+    return curr->next;
+  }
+  symstr = curr->word;
+
+  if( verify_next_token(curr) == BAD ) {
+    *compile_status = BAD;
+    return curr->next;
+  }
+  curr = curr->next;
+
+  if( curr->type != NUMBER ) {
+    fprintf(stderr, "WARNING: .assign rval should be a number. [Line %i]\n",
+	    curr->line);
+    return curr->next;
+  }
+
+  add_symbol(symstr, RESOLVED, curr->value);
+
+  return curr->next;
+}
+
+/*
  * This changes where pc is pointing during pass1
  */
 TOKEN *origin_handler(TOKEN *curr, int *compile_status) {
@@ -644,12 +685,12 @@ SWORD reserved(char *str) {
 			  "jt", "jf", "add", "mult", "mod", "and", "or",
 			  "not", "rmem", "wmem", "call", "ret", "out", "in",
 			  "nop", "rndm", "dread", "dwrite", "origin",
-			  "include", "data", 0 };
+			  "include", "data", "assign", 0 };
   const SWORD values[] = { halt, set, push, pop, eq, gt, jmp,
 			   jt, jf, add, mult, mod, and, or,
 			   not, rmem, wmem, call, ret, out, in,
 			   nop, rndm, dread, dwrite, ORIGIN,
-			   INCLUDE, DATA, USERWORD };
+			   INCLUDE, DATA, ASSIGN, USERWORD };
   int i = 0;
 
   while( words[i] != 0 ) {
