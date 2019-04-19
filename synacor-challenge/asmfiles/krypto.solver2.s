@@ -56,7 +56,7 @@ out_body:
 in_body:
 	call	copy_array		; copy the arrays
 	call	try_sum
-	;; call try_diff
+	call	try_diff
 	;; call try_div
 	;; call try_mult
 	add	r2	r2	32767	; decrement inner loop counter
@@ -142,6 +142,24 @@ try_sum:
 	add	r7	r7	r6	; add them both together
 	wmem	r5	r7		; store it at the start of the array
 	set	r3	plus		; The addition string
+	call	generate_string		; generate the string
+	add	r0	r0	32767 	; decrement before calling find_solution
+	call	find_solution
+	pop	r2
+	pop	r1
+	pop	r0
+	ret
+
+
+try_diff:
+	push	r0
+	push	r1
+	push	r2
+	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	mult	r6	r6	32767	; make r6 negative
+	add	r7	r7	r6	; subtract them
+	wmem	r5	r7		; store it at the start of the array
+	set	r3	minus		; The addition string
 	call	generate_string		; generate the string
 	add	r0	r0	32767 	; decrement before calling find_solution
 	call	find_solution
