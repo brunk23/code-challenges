@@ -42,18 +42,18 @@ find_solution:
 	rmem	r1	9009		   ; avoid the double read with 9009
 	rmem	r2	goal		   ; get the goal value
 	eq	r1	r1	r2	   ; are we equal
-	jf	r1	find_solution_done ; if not, quit
+	jf	r1	find_solution_done	; if not, quit
 	;; This was the right answer, print the string
-	set	r1	10154 		; we could probably avoid this
+	set	r1	10154		; we could probably avoid this
 	call	pstr			; print the answer string
 	out	10			; print a newline
 	;; call	check_answer		; check to see if it is the correct one
-	jmp	find_solution_done 	; then print it and return
+	jmp	find_solution_done	; then print it and return
 
 find_solution_main:
 	set	r1	r0		; outer loop is r0-1 to 0
 out_body:
-	add	r1	r1	32767 	; decrement outer loop counter
+	add	r1	r1	32767	; decrement outer loop counter
 	set	r2	r0		; set inner loop counter to r0
 in_body:
 	call	copy_array		; copy the arrays
@@ -84,13 +84,13 @@ find_solution_done:
 	;;   r2 is the smaller number's index
 	;;   r5 is the destination for the answer
 setup_vals:
-	set	r7	valsaddr   	; address of vals[][]
-	add	r7	r7	r0 	; index to current array
+	set	r7	valsaddr	; address of vals[][]
+	add	r7	r7	r0	; index to current array
 	add	r5	r7	32767	; r5 = destination address
-	rmem	r7	r7	      	; read address of current array
+	rmem	r7	r7		; read address of current array
 	rmem	r5	r5		; read address of destination array
 	add	r6	r7	r2	; r6 is the second number
-	add	r7	r7	r1 	; r7 is first number
+	add	r7	r7	r1	; r7 is first number
 	rmem	r7	r7		; read first number
 	rmem	r6	r6		; read second number
 	gt	r4	r6	r7	; we need to switch r1 and r2
@@ -113,17 +113,17 @@ setup_vals_done:
 generate_string:
 	push	r1
 	push	r2
-	set	r4	r1	      	; more r1 to r4
-	set	r5	r2	      	; move r2 to r5
-	add	r7	strsaddr	r0 	; index it to the current
-	add	r7	r7	32767		; Point to correct spot
+	set	r4	r1		; move r1 to r4
+	set	r5	r2		; move r2 to r5
+	add	r7	strsaddr	r0	; index it to the current
+	add	r7	r7	32767	; Point to correct spot
 	add	r1	strs	r0	; r5 = destination address
 	add	r1	r1	32767	; get the address for the destinations str
 	rmem	r1	r1		; the destination string array
 	rmem	r7	r7		; read the current string array
 	wmem	r7	r1		; put the address of new string in r1[0]
 	add	r7	strsaddr	r0
-	rmem	r7	r7	   	; get the address of the source array
+	rmem	r7	r7		; get the address of the source array
 	add	r6	r7	r4	; first string r7[r4]
 	rmem	r6	r6
 	add	r7	r7	r5	; second string r7[r5]
@@ -159,12 +159,12 @@ try_sum:
 	push	r0
 	push	r1
 	push	r2
-	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	call	setup_vals		; r6, r7 <- values, r5 <- dest
 	add	r7	r7	r6	; add them both together
 	wmem	r5	r7		; store it at the start of the array
 	set	r3	plus		; The addition string
 	call	generate_string		; generate the string
-	add	r0	r0	32767 	; decrement before calling find_solution
+	add	r0	r0	32767	; decrement before calling find_solution
 	call	find_solution
 	pop	r2
 	pop	r1
@@ -176,13 +176,13 @@ try_diff:
 	push	r0
 	push	r1
 	push	r2
-	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	call	setup_vals		; r6, r7 <- values, r5 <- dest
 	mult	r6	r6	32767	; make r6 negative
 	add	r7	r7	r6	; subtract them
 	wmem	r5	r7		; store it at the start of the array
 	set	r3	minus		; The subtraction string
 	call	generate_string		; generate the string
-	add	r0	r0	32767 	; decrement before calling find_solution
+	add	r0	r0	32767	; decrement before calling find_solution
 	call	find_solution
 	pop	r2
 	pop	r1
@@ -194,12 +194,12 @@ try_mult:
 	push	r0
 	push	r1
 	push	r2
-	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	call	setup_vals		; r6, r7 <- values, r5 <- dest
 	mult	r7	r7	r6	; multiply them both together
 	wmem	r5	r7		; store it at the start of the array
 	set	r3	times		; The multiplication string
 	call	generate_string		; generate the string
-	add	r0	r0	32767 	; decrement before calling find_solution
+	add	r0	r0	32767	; decrement before calling find_solution
 	call	find_solution
 	pop	r2
 	pop	r1
@@ -211,7 +211,7 @@ try_div:
 	push	r0
 	push	r1
 	push	r2
-	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	call	setup_vals		; r6, r7 <- values, r5 <- dest
 	jf	r6	try_div_fail	; don't divide by zero, quit this attempt
 	mod	r3	r7	r6	; a remainder is not allowed
 	jt	r3	try_div_fail	; quit this attempt
@@ -225,7 +225,7 @@ try_div:
 	pop	r1			; and r1
 	set	r3	divid		; the division string
 	call	generate_string		; generate the string
-	add	r0	r0	32767 	; decrement before calling find_solution
+	add	r0	r0	32767	; decrement before calling find_solution
 	call	find_solution
 try_div_fail:
 	pop	r2
@@ -256,7 +256,7 @@ copy_array:
 	push	r6
 	push	r7
 	jf	r0	copy_array_done		; we are done if this is zero
-	add	r3	valsaddr	r0 	; Get addr of source values
+	add	r3	valsaddr	r0	; Get addr of source values
 	add	r5	r3	32767		; Get addr of dest values
 	rmem	r3	r3			; r3 <- source values
 	add	r3	r3	r0		; point to last value
@@ -271,11 +271,11 @@ copy_array:
 	add	r6	r6	r0		; pint to last string
 	add	r6	r6	32767		; one less than n
 copy_array_loop:
-	eq	r7	r0	r1    		; skip copy
+	eq	r7	r0	r1		; skip copy
 	jt	r7	copy_array_skip
-	eq	r7	r0	r2    		; skip copy
+	eq	r7	r0	r2		; skip copy
 	jt	r7	copy_array_skip
-	rmem	r7	r3	      		; read source value
+	rmem	r7	r3			; read source value
 	wmem	r5	r7			; write to destination
 	rmem	r7	r4			; read source string
 	wmem	r6	r7			; write to destination
