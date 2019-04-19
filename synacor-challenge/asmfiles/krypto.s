@@ -11,7 +11,7 @@
 	;; using addition, subtraction, division, multiplication and/or any
 	;; combination thereof ... fractions, negative numbers or square
 	;; rooting are not permitted. Each of the five cards must be used once
-	;; and only once. 
+	;; and only once.
 
 	;; TODO: write a separate "solver" program for these games in synacor
 	set	r1	start_message

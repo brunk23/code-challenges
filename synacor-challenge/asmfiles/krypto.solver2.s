@@ -29,8 +29,9 @@ get_nums:
 
 	;; find_solution() -- Does not need to preserve any registers
 	;; We do preserve r0, r1, r2 but destroy r4
-	;; r0 is the counter coming in, which we use to control the
-	;; recursion and the index into the various arrays
+	;; Expects:
+	;;   r0 is the counter coming in, which we use to control the
+	;;      recursion and the index into the various arrays
 find_solution:
 	push	r0
 	push	r1
@@ -72,9 +73,17 @@ find_solution_done:
 	ret
 
 
-	;; This sets up the values for each try
+	;; This sets up the values for each try_ function
+	;; Expects:
+	;;   r0 is the depth we are at
+	;;   r1 and r2 are the indexes we need from that array
+	;; Returns:
+	;;   r7 is the larger number
+	;;   r6 is the smaller number
+	;;   r1 is the larger number's index
+	;;   r2 is the smaller number's index
+	;;   r5 is the destination for the answer
 setup_vals:
-	push	r4
 	set	r7	valsaddr   	; address of vals[][]
 	add	r7	r7	r0 	; index to current array
 	add	r5	r7	32767	; r5 = destination address
@@ -92,10 +101,15 @@ setup_vals:
 	set	r4	r6		; make the larger value first
 	set	r6	r7		; for all math operations
 	set	r7	r4		; it is easier
+
 setup_vals_done:
-	pop	r4
 	ret
 
+
+	;; This will generate each new string in the try_ blocks
+	;; Expects:
+	;;   r3 points to the operation string
+	;;   r1 and r2 point to the numbers' indexes in order
 generate_string:
 	push	r1
 	push	r2
@@ -109,12 +123,12 @@ generate_string:
 	rmem	r7	r7		; read the current string array
 	wmem	r7	r1		; put the address of new string in r1[0]
 	add	r7	strsaddr	r0
-	rmem	r7	r7
+	rmem	r7	r7	   	; get the address of the source array
 	add	r6	r7	r4	; first string r7[r4]
 	rmem	r6	r6
 	add	r7	r7	r5	; second string r7[r5]
 	rmem	r7	r7
-	wmem	r1	40		; '('
+	wmem	r1	40		; start with '('
 	add	r1	r1	1	; increment
 	wmem	r1	0		; null terminate
 	set	r2	r6		; append the first string
@@ -123,7 +137,7 @@ generate_string:
 	call	append_str
 	set	r2	r7		; append the second string
 	call	append_str
-	set	r2	closep
+	set	r2	closep		; end with ")\0"
 	call	append_str
 	pop	r2
 	pop	r1
@@ -131,10 +145,16 @@ generate_string:
 
 
 	;; We need to find a sum, and create the string
-	;; r0 points to current array, r0-1 points to destination
-	;; must decrement r0 before calling find_solution at the end.
-	;; r1 and r2 are the indexes into the current array for our value
-	;; dest[0] is where the results will be stored.
+	;; Expects:
+	;;   r0 points to current array
+	;;      (r0-1) points to the destination array
+	;;   r1 and r2 are the indexes into our current arrays(string and val)
+	;; Provides:
+	;;   vals[r0-1][0] <- result
+	;;   strs[r0-1][0] <- new string to get result
+	;; Notes:
+	;;   must decrement r0 before calling find_solution at the end
+	;;   try_diff, try_mult, and try_div function the same way
 try_sum:
 	push	r0
 	push	r1
@@ -160,7 +180,7 @@ try_diff:
 	mult	r6	r6	32767	; make r6 negative
 	add	r7	r7	r6	; subtract them
 	wmem	r5	r7		; store it at the start of the array
-	set	r3	minus		; The addition string
+	set	r3	minus		; The subtraction string
 	call	generate_string		; generate the string
 	add	r0	r0	32767 	; decrement before calling find_solution
 	call	find_solution
@@ -192,18 +212,18 @@ try_div:
 	push	r1
 	push	r2
 	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
-	jf	r6	try_div_fail
-	mod	r3	r7	r6
-	jt	r3	try_div_fail
-	push	r1
-	push	r2
-	set	r1	r7
-	set	r2	r6
-	call	divide
+	jf	r6	try_div_fail	; don't divide by zero, quit this attempt
+	mod	r3	r7	r6	; a remainder is not allowed
+	jt	r3	try_div_fail	; quit this attempt
+	push	r1			; divide uses r1 and r2
+	push	r2			; and we don't want to lose them
+	set	r1	r7		; this will set them up right
+	set	r2	r6		; for the divide
+	call	divide			; actually do the division
 	wmem	r5	r1		; store it at the start of the array
-	pop	r2
-	pop	r1
-	set	r3	divid		; The addition string
+	pop	r2			; restore r2
+	pop	r1			; and r1
+	set	r3	divid		; the division string
 	call	generate_string		; generate the string
 	add	r0	r0	32767 	; decrement before calling find_solution
 	call	find_solution
@@ -284,9 +304,6 @@ copy_array_done:
 
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
-game_nums:
-	data	0	0	0	0	0
-goal:	data	0
 
 	;; We use these strings for printing the results.
 closep:	data	")\0"
@@ -308,3 +325,6 @@ strsaddr:
 wordstrs:
 	data	10000	10003	10006	10009	10012
 strs:	data	10154	10136	10123	10115 ; first, second, third, final
+game_nums:
+	data	0	0	0	0	0
+goal:	data	0
