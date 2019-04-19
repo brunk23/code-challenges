@@ -36,10 +36,10 @@ find_solution:
 	push	r2
 
 	jt	r0	find_solution_main ; If we have 1 number, we
-	set	r1	valsaddr
+	set	r1	strsaddr
 	rmem	r1	r1
 	rmem	r1	r1
-	call	pnumber
+	call	pstr
 	out	32
 	;; call	check_answer		; check to see if it is the correct one
 	jmp	find_solution_done 	; then print it and return
@@ -97,11 +97,14 @@ generate_string:
 	set	r4	r1	      	; more r1 to r4
 	set	r5	r2	      	; move r2 to r5
 	add	r7	strsaddr	r0 	; index it to the current
+	add	r7	r7	32767		; Point to correct spot
 	add	r1	strs	r0	; r5 = destination address
 	add	r1	r1	32767	; get the address for the destinations str
 	rmem	r1	r1		; the destination string array
 	rmem	r7	r7		; read the current string array
 	wmem	r7	r1		; put the address of new string in r1[0]
+	add	r7	strsaddr	r0
+	rmem	r7	r7
 	add	r6	r7	r4	; first string r7[r4]
 	rmem	r6	r6
 	add	r7	r7	r5	; second string r7[r5]
@@ -211,7 +214,6 @@ copy_array_done:
 	.include	"utils/pstr.s"
 	.include	"utils/num2str.s"
 	.include	"utils/append_str.s"
-	.include	"utils/pnumber.s"
 
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
