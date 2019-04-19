@@ -121,6 +121,15 @@ TOKEN *token(char *s, int start) {
   if( curr->type != STRING ) {
     curr->value = strtol(curr->word, 0, 10);
   }
+
+  /*
+   * Correctly handle EOF after last char on last line.
+   */
+  if( curr->length == start ) {
+    free(curr->word);
+    free(curr);
+    curr = NULL;
+  }
   return curr;
 }
 

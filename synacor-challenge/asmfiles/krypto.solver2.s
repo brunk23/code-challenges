@@ -40,7 +40,7 @@ find_solution:
 	rmem	r1	r1
 	rmem	r1	r1
 	call	pstr
-	out	32
+	out	10
 	;; call	check_answer		; check to see if it is the correct one
 	jmp	find_solution_done 	; then print it and return
 
@@ -240,4 +240,5 @@ strsaddr:
 	;; 10003 automatically.
 wordstrs:
 	data	10000	10003	10006	10009	10012
-strs:	data	10115	10123	10136	10154 ; first, second, third, final
+strs:	data	10154	10136	10123	10115 ; first, second, third, final
+	data	11
