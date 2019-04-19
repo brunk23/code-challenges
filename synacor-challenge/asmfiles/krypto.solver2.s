@@ -57,8 +57,8 @@ in_body:
 	call	copy_array		; copy the arrays
 	call	try_sum
 	call	try_diff
-	;; call try_div
-	;; call try_mult
+	call	try_div
+	call	try_mult
 	add	r2	r2	32767	; decrement inner loop counter
 	eq	r4	r2	r1	; compare r2 to r1, as that is the end cond
 	jf	r4	in_body		; inner loop is r0 to r1
@@ -163,6 +163,50 @@ try_diff:
 	call	generate_string		; generate the string
 	add	r0	r0	32767 	; decrement before calling find_solution
 	call	find_solution
+	pop	r2
+	pop	r1
+	pop	r0
+	ret
+
+
+try_mult:
+	push	r0
+	push	r1
+	push	r2
+	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	mult	r7	r7	r6	; multiply them both together
+	wmem	r5	r7		; store it at the start of the array
+	set	r3	times		; The multiplication string
+	call	generate_string		; generate the string
+	add	r0	r0	32767 	; decrement before calling find_solution
+	call	find_solution
+	pop	r2
+	pop	r1
+	pop	r0
+	ret
+
+
+try_div:
+	push	r0
+	push	r1
+	push	r2
+	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	jf	r6	try_div_fail
+	mod	r3	r7	r6
+	jt	r3	try_div_fail
+	push	r1
+	push	r2
+	set	r1	r7
+	set	r2	r6
+	call	divide
+	wmem	r5	r1		; store it at the start of the array
+	pop	r2
+	pop	r1
+	set	r3	divid		; The addition string
+	call	generate_string		; generate the string
+	add	r0	r0	32767 	; decrement before calling find_solution
+	call	find_solution
+try_div_fail:
 	pop	r2
 	pop	r1
 	pop	r0
