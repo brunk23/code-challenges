@@ -96,16 +96,16 @@ generate_string:
 	push	r2
 	set	r4	r1	      	; more r1 to r4
 	set	r5	r2	      	; move r2 to r5
-	set	r7	strsaddr   	; our string arrays
-	add	r7	r7	r0 	; index it to the current
-	add	r1	r7	32767	; r5 = destination address
-	rmem	r7	r7		; read the current string array
-	add	r6	r7	r4	; first string
-	rmem	r6	r6
-	add	r7	r7	r5	; second string
-	rmem	r7	r7
+	add	r7	strsaddr	r0 	; index it to the current
+	add	r1	strs	r0	; r5 = destination address
+	add	r1	r1	32767	; get the address for the destinations str
 	rmem	r1	r1		; the destination string array
-	rmem	r1	r1
+	rmem	r7	r7		; read the current string array
+	wmem	r7	r1		; put the address of new string in r1[0]
+	add	r6	r7	r4	; first string r7[r4]
+	rmem	r6	r6
+	add	r7	r7	r5	; second string r7[r5]
+	rmem	r7	r7
 	wmem	r1	40		; '('
 	add	r1	r1	1	; increment
 	wmem	r1	0		; null terminate
@@ -135,7 +135,7 @@ try_sum:
 	add	r7	r7	r6	; add them both together
 	wmem	r5	r7		; store it at the start of the array
 	set	r3	plus		; The addition string
-	;; 	call	generate_string		; generate the string
+	call	generate_string		; generate the string
 	add	r0	r0	32767 	; decrement before calling find_solution
 	call	find_solution
 	pop	r2
@@ -209,15 +209,12 @@ copy_array_done:
 	.include	"utils/readnum.s"
 	.include	"utils/bindivide.s"
 	.include	"utils/pstr.s"
-	.include	"utils/strlen.s"
 	.include	"utils/num2str.s"
 	.include	"utils/append_str.s"
 	.include	"utils/pnumber.s"
 
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
-value_ops:
-;;	data	val_add	val_mul	val_sub	val_div 
 game_nums:
 	data	0	0	0	0	0
 goal:	data	0
