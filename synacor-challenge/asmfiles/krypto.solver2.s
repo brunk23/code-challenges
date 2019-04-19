@@ -15,6 +15,7 @@
 	set	r6	game_nums	; where to store the numbers
 get_nums:
 	call	readnum			; read a number
+	jf	r1	get_nums
 	wmem	r6	r1		; store it in the current location
 	add	r6	r6	1	; point to next location
 	call	num2str			; saves r1 as a string to r0
