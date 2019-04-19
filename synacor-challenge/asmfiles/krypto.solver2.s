@@ -36,6 +36,11 @@ find_solution:
 	push	r2
 
 	jt	r0	find_solution_main ; If we have 1 number, we
+	set	r1	valsaddr
+	rmem	r1	r1
+	rmem	r1	r1
+	call	pnumber
+	out	32
 	;; call	check_answer		; check to see if it is the correct one
 	jmp	find_solution_done 	; then print it and return
 
@@ -62,6 +67,61 @@ find_solution_done:
 	ret
 
 
+	;; This sets up the values for each try
+setup_vals:
+	push	r4
+	set	r7	valsaddr   	; address of vals[][]
+	add	r7	r7	r0 	; index to current array
+	add	r5	r7	32767	; r5 = destination address
+	rmem	r7	r7	      	; read address of current array
+	rmem	r5	r5		; read address of destination
+	add	r6	r7	r2	; r6 is the second number
+	add	r7	r7	r1 	; r7 is first number
+	rmem	r7	r7		; read first number
+	rmem	r6	r6		; read second number
+	gt	r4	r6	r7	; we need to switch r1 and r2
+	jf	r4	setup_vals_done
+	set	r4	r1		; reverse the index for strings
+	set	r1	r2		; because we want to print correctly
+	set	r2	r4		; no matter what
+	set	r4	r6		; make the larger value first
+	set	r6	r7		; for all math operations
+	set	r7	r4		; it is easier
+setup_vals_done:
+	pop	r4
+	ret
+
+generate_string:
+	push	r1
+	push	r2
+	set	r4	r1	      	; more r1 to r4
+	set	r5	r2	      	; move r2 to r5
+	set	r7	strsaddr   	; our string arrays
+	add	r7	r7	r0 	; index it to the current
+	add	r1	r7	32767	; r5 = destination address
+	rmem	r7	r7		; read the current string array
+	add	r6	r7	r4	; first string
+	rmem	r6	r6
+	add	r7	r7	r5	; second string
+	rmem	r7	r7
+	rmem	r1	r1		; the destination string array
+	rmem	r1	r1
+	wmem	r1	40		; '('
+	add	r1	r1	1	; increment
+	wmem	r1	0		; null terminate
+	set	r2	r6		; append the first string
+	call	append_str
+	set	r2	r3		; the operation
+	call	append_str
+	set	r2	r7		; append the second string
+	call	append_str
+	set	r2	closep
+	call	append_str
+	pop	r2
+	pop	r1
+	ret
+
+
 	;; We need to find a sum, and create the string
 	;; r0 points to current array, r0-1 points to destination
 	;; must decrement r0 before calling find_solution at the end.
@@ -69,9 +129,17 @@ find_solution_done:
 	;; dest[0] is where the results will be stored.
 try_sum:
 	push	r0
-
+	push	r1
+	push	r2
+	call	setup_vals	   	; r6, r7 <- values, r5 <- dest
+	add	r7	r7	r6	; add them both together
+	wmem	r5	r7		; store it at the start of the array
+	set	r3	plus		; The addition string
+	;; 	call	generate_string		; generate the string
 	add	r0	r0	32767 	; decrement before calling find_solution
 	call	find_solution
+	pop	r2
+	pop	r1
 	pop	r0
 	ret
 
@@ -144,6 +212,7 @@ copy_array_done:
 	.include	"utils/strlen.s"
 	.include	"utils/num2str.s"
 	.include	"utils/append_str.s"
+	.include	"utils/pnumber.s"
 
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
@@ -154,7 +223,6 @@ game_nums:
 goal:	data	0
 
 	;; We use these strings for printing the results.
-openp:	data	"(\0"
 closep:	data	")\0"
 plus:	data	"+\0"
 minus:	data	"-\0"
