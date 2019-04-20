@@ -53,9 +53,22 @@ find_solution:
 	jf	r1	find_solution_done	; if not, quit
 	;; This was the right answer, print the string
 	set	r1	finals		; we could probably avoid this
+	add	r0	r1	23	; We store old solutions after finals
+
+find_solution_check:
+	rmem	r2	r0		; read the value at r0
+	jf	r2	find_solution_new
+	call	strcmp			; compare the string at r0 and r1
+	jt	r7	find_solution_done	; This is a duplicate quit
+	add	r0	r0	23		; next string
+	jmp	find_solution_check
+
+find_solution_new:
 	call	pstr			; print the answer string
 	out	10			; print a newline
-	;; call	check_answer		; check to see if it is the correct one
+	set	r2	r1		; save it in the buffer
+	set	r1	r0		; so we don't print it twice
+	call	append_str		; this works like strcpy here
 	jmp	find_solution_done	; then print it and return
 
 find_solution_main:
@@ -304,6 +317,7 @@ copy_array_done:
 	pop	r0
 	ret
 
+	.include	"utils/strcmp.s"
 	.include	"utils/readnum.s"
 	.include	"utils/bindivide.s"
 	.include	"utils/pstr.s"
