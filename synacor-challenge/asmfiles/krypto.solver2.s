@@ -10,8 +10,8 @@
 	.assign val	9000	; 4 words
 
 	;; Locations of all our strings
-	.assign	st1	9020	; 3 chars
-	.assign	finals	9074	; 23 chars (next free word 9097)
+	.assign	stri	9020	; 3 chars
+	.assign	finals	9074
 
 
 	;; main() -- The following code implements main()
@@ -331,8 +331,8 @@ strsaddr:
 	;; like "first equ 10000" and compiled math like "first+3" to create
 	;; 10003 automatically.
 wordstrs:
-	data	st1	st1+3	st1+6	st1+9	st1+12
-strs:	data	finals	st1+36	st1+23	st1+15	; first, second, third, final
+	data	stri	stri+3	stri+6	stri+9	stri+12
+strs:	data	finals	stri+36	stri+23	stri+15	; first, second, third, final
 game_nums:
 	data	0	0	0	0	0
 goal:	data	0

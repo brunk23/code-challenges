@@ -694,19 +694,24 @@ SWORD isregister(char *str) {
 }
 
 /*
+ * These global constants are really only used by reserved()
+ * but this keeps them off the stack
+ */
+const char *words[] = { "halt", "set", "push", "pop", "eq", "gt", "jmp",
+			"jt", "jf", "add", "mult", "mod", "and", "or",
+			"not", "rmem", "wmem", "call", "ret", "out", "in",
+			"nop", "rndm", "dread", "dwrite", "origin",
+			"include", "data", "assign", 0 };
+const SWORD values[] = { halt, set, push, pop, eq, gt, jmp,
+			 jt, jf, add, mult, mod, and, or,
+			 not, rmem, wmem, call, ret, out, in,
+			 nop, rndm, dread, dwrite, ORIGIN,
+			 INCLUDE, DATA, ASSIGN, USERWORD };
+
+/*
  * This will return the value of the reserved words.
  */
 SWORD reserved(char *str) {
-  const char *words[] = { "halt", "set", "push", "pop", "eq", "gt", "jmp",
-			  "jt", "jf", "add", "mult", "mod", "and", "or",
-			  "not", "rmem", "wmem", "call", "ret", "out", "in",
-			  "nop", "rndm", "dread", "dwrite", "origin",
-			  "include", "data", "assign", 0 };
-  const SWORD values[] = { halt, set, push, pop, eq, gt, jmp,
-			   jt, jf, add, mult, mod, and, or,
-			   not, rmem, wmem, call, ret, out, in,
-			   nop, rndm, dread, dwrite, ORIGIN,
-			   INCLUDE, DATA, ASSIGN, USERWORD };
   int i = 0;
 
   while( words[i] != 0 ) {
