@@ -36,15 +36,10 @@ get_nums:
 
 
 	;; find_solution() -- Does not need to preserve any registers
-	;; We do preserve r0, r1, r2 but destroy r4
 	;; Expects:
 	;;   r0 is the counter coming in, which we use to control the
 	;;      recursion and the index into the various arrays
 find_solution:
-	push	r0
-	push	r1
-	push	r2
-
 	;; Check if this is the last value
 	jt	r0	find_solution_main	; If we have 1 number, we
 	rmem	r1	finalv			; avoid the double read
@@ -91,9 +86,6 @@ in_body:
 	jt	r1	out_body	; while not 0, loop back again
 
 find_solution_done:
-	pop	r2
-	pop	r1
-	pop	r0
 	ret
 
 
@@ -133,9 +125,9 @@ setup_vals_done:
 	;; Expects:
 	;;   r3 points to the operation string
 	;;   r1 and r2 point to the numbers' indexes in order
+	;; This does not preserve r1 and r2. They are saved in the try_
+	;; functions and they are not used in those functions after this call
 generate_string:
-	push	r1
-	push	r2
 	set	r4	r1		; move r1 to r4
 	set	r5	r2		; move r2 to r5
 	add	r7	strsaddr	r0	; index it to the current
@@ -162,8 +154,6 @@ generate_string:
 	call	append_str
 	set	r2	closep		; end with ")\0"
 	call	append_str
-	pop	r2
-	pop	r1
 	ret
 
 
@@ -178,6 +168,7 @@ generate_string:
 	;; Notes:
 	;;   must decrement r0 before calling find_solution at the end
 	;;   try_diff, try_mult, and try_div function the same way
+	;;   must preserve r0, r1, and r2 for when we return to find_solution
 try_sum:
 	push	r0
 	push	r1
