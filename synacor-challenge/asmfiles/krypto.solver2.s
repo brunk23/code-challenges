@@ -7,25 +7,10 @@
 
 	;; Locations of our value arrays
 	.assign	finalv	9009	; 1 word and the final value
-	.assign va1	9007	; 2 words
-	.assign	va2	9004	; 3 words
-	.assign va3	9000	; 4 words
-
-	;; Locations of our string arrays
-	.assign wa1	9019	; 1 word
-	.assign wa2	9017	; 2 words
-	.assign	wa3	9014	; 3 words
-	.assign	wa4	9010	; 4 words
+	.assign val	9000	; 4 words
 
 	;; Locations of all our strings
 	.assign	st1	9020	; 3 chars
-	.assign	st2	9023	; 3 chars
-	.assign	st3	9026	; 3 chars
-	.assign	st4	9029	; 3 chars
-	.assign	st5	9032	; 3 chars
-	.assign	st6	9035	; 8 chars
-	.assign	st7	9043	; 13 chars
-	.assign st8	9056	; 18 chars
 	.assign	finals	9074	; 23 chars (next free word 9097)
 
 
@@ -337,17 +322,17 @@ divid:	data	"/\0"
 
 	;; These will be used to pass the array addresses.
 valsaddr:
-	data	finalv	va1	va2	va3	game_nums
+	data	finalv	val+7	val+4	val	game_nums
 strsaddr:
-	data	wa1	wa2	wa3	wa4	wordstrs
+	data	val+19	val+17	val+14	val+10	wordstrs
 
 	;; These will be the string locations. This begs two possible
 	;; improvements to the assembler.  The ability to use equ statements
 	;; like "first equ 10000" and compiled math like "first+3" to create
 	;; 10003 automatically.
 wordstrs:
-	data	st1	st2	st3	st4	st5
-strs:	data	finals	st8	st7	st6	; first, second, third, final
+	data	st1	st1+3	st1+6	st1+9	st1+12
+strs:	data	finals	st1+36	st1+23	st1+15	; first, second, third, final
 game_nums:
 	data	0	0	0	0	0
 goal:	data	0

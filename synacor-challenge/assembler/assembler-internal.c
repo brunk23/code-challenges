@@ -47,7 +47,11 @@ TOKEN *token(char *s, int start) {
 	    curr->type = WORD;
 	  }
 	} else {
-	  curr->type = NUMBER;
+	  if( s[i] == '+' || s[i] == '-' ) {
+	    curr->type = MATH;
+	  } else {
+	    curr->type = NUMBER;
+	  }
 	}
       }
     }
@@ -97,7 +101,8 @@ TOKEN *token(char *s, int start) {
       }
       curr->value = j - 1;
     }
-    if( isspace(s[i]) || s[i] == ';' ) {
+    if( isspace(s[i]) || s[i] == ';' ||
+	( j > 0 && (s[i] == '+' || s[i] == '-')) ) {
       if( j == 0 ) {
 	free(curr);
 	tokencount--;
@@ -171,9 +176,12 @@ int compile_token(TOKEN *curr) {
     }
     curr->location = pc;
   } else {
-
-    curr->location = pc;
-    memory[pc] = token_value(curr);
+    if( curr->type != MATH ) {
+      curr->location = pc;
+      memory[pc] = token_value(curr);
+    } else {
+      pc--;
+    }
   }
   pc++;
 
@@ -332,8 +340,11 @@ int pass2() {
       }
 
       c->value = s->value;
+      if( c->next && c->next->type == MATH ) {
+	c->value += c->next->value;
+      }
       s->count++;
-      memory[c->location] = s->value;
+      memory[c->location] = c->value;
     }
 
     c = c->next;
@@ -498,6 +509,7 @@ SWORD token_value(TOKEN *curr) {
     while ( curr->value < 0 ) {
       curr->value += 32768;
     }
+    curr->value %= 32768;
     return curr->value;
   }
 
@@ -513,6 +525,10 @@ SWORD token_value(TOKEN *curr) {
   } else {
     /* Will return the value or UNRESOLVED depending on contents */
     curr->value = csym->value;
+    if( curr->value != UNRESOLVED &&
+	curr->next && curr->next->type == MATH ) {
+      curr->value += curr->next->value;
+    }
   }
 
   return curr->value;
