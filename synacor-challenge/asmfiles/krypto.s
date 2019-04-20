@@ -14,6 +14,9 @@
 	;; and only once.
 
 	;; TODO: write a separate "solver" program for these games in synacor
+
+	.origin	0
+	.assign	invalid	9973
 	set	r1	start_message
 	call	pstr
 again:
@@ -56,12 +59,12 @@ input:
 	set	r3	game_numbers	; point to the start of the game_numbers
 	add	r3	r3	r1	; add the offset
 	rmem	r1	r3		; read the value
-	eq	r7	r1	9973	; Is this a valid word?
+	eq	r7	r1	invalid	; Is this a valid word?
 	jt	r7	input		; if Not we quit and loop
 	set	r3	game_numbers	; point to the start of the game_numbers
 	add	r3	r3	r2	; add the offset
 	rmem	r2	r3		; read the value
-	eq	r7	r2	9973	; is this a valid word?
+	eq	r7	r2	invalid	; is this a valid word?
 	jt	r7	input		; if not we quit and loop
 	rmem	r3	command		; get the address for the command
 	call	r3			; call it
@@ -109,7 +112,7 @@ cmd_mult:
 	wmem	r1	r7		; write the new value to the first location
 	rmem	r2	second_let	; get the second letter index
 	add	r2	r2	r3	; calculate the new location
-	wmem	r2	9973		; mark the second location as invalid
+	wmem	r2	invalid		; mark the second location as invalid
 	add	r0	r0	32767	; decrement the counter
 	ret
 
@@ -122,7 +125,7 @@ cmd_add:
 	wmem	r1	r7
 	rmem	r2	second_let
 	add	r2	r2	r3
-	wmem	r2	9973
+	wmem	r2	invalid
 	add	r0	r0	32767
 	ret
 
@@ -138,7 +141,7 @@ cmd_sub:
 	wmem	r1	r7
 	rmem	r2	second_let
 	add	r2	r2	r3
-	wmem	r2	9973
+	wmem	r2	invalid
 	add	r0	r0	32767
 	ret
 not_neg:
@@ -158,7 +161,7 @@ cmd_div:
 	wmem	r7	r1
 	rmem	r2	second_let
 	add	r2	r2	r3
-	wmem	r2	9973
+	wmem	r2	invalid
 	add	r0	r0	32767
 	ret
 no_div:
@@ -277,7 +280,7 @@ print_game:
 	set	r3	game_numbers	; Our six numbers
 print_game_loop:
 	rmem	r4	r3		; Print the associated number
-	eq	r4	r4	9973	; Not a valid number
+	eq	r4	r4	invalid	; Not a valid number
 	jt	r4	print_game_next	; We don't print numbers we used
 	push	r1			; Save this address for the next loop
 	rmem	r1	r3		; Read the number to print
