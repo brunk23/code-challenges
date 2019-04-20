@@ -273,11 +273,6 @@ try_div_fail:
 	;; also doesn't change them
 copy_array:
 	push	r0
-	push	r3
-	push	r4
-	push	r5
-	push	r6
-	push	r7
 	jf	r0	copy_array_done		; we are done if this is zero
 	add	r3	valsaddr	r0	; Get addr of source values
 	add	r5	r3	32767		; Get addr of dest values
@@ -311,11 +306,6 @@ copy_array_skip:
 	add	r4	r4	32767		; r4--
 	jmp	copy_array_loop
 copy_array_done:
-	pop	r7
-	pop	r6
-	pop	r5
-	pop	r4
-	pop	r3
 	pop	r0
 	ret
 
