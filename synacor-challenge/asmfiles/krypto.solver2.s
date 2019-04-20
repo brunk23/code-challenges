@@ -323,10 +323,7 @@ valsaddr:
 strsaddr:
 	data	val+19	val+17	val+14	val+10	wordstrs
 
-	;; These will be the string locations. This begs two possible
-	;; improvements to the assembler.  The ability to use equ statements
-	;; like "first equ 10000" and compiled math like "first+3" to create
-	;; 10003 automatically.
+	;; These will be the string locations.
 wordstrs:
 	data	stri	stri+3	stri+6	stri+9	stri+12
 strs:	data	finals	stri+36	stri+23	stri+15	; first, second, third, final
