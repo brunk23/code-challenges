@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "Fatal Error creating filename.\n");
       return 1;
     }
-    strncpy(dest_file, argv[source], strlen(argv[source]));
+    strncpy(dest_file, argv[source], strlen(argv[source])+1);
     strncat(dest_file, ".bin", 4);
   } else {
     if( !(dest_file = malloc( strlen(argv[dest]) + 1))) {
@@ -56,14 +56,14 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Fatal Error creating filename.\n");
     return 1;
   }
-  strncpy(src_file, argv[source], strlen(argv[source]));
+  strncpy(src_file, argv[source], strlen(argv[source])+1);
   strncat(src_file, ".s", 2);
 
   if( !(sym_file = malloc( strlen(argv[source]) + 5))) {
     fprintf(stderr, "Fatal Error creating filename.\n");
     return 1;
   }
-  strncpy(sym_file, argv[source], strlen(argv[source]));
+  strncpy(sym_file, argv[source], strlen(argv[source])+1);
   strncat(sym_file, ".sym", 4);
 
   instruction_count = 0;

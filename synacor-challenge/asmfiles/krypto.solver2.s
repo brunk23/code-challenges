@@ -260,8 +260,8 @@ try_div_fail:
 	;;   set r2 b  -- index of second number
 	;;   call copy_array
 	;;
-	;; Preserves all registers.  Doesn't save r1 and r2, but
-	;; also doesn't change them
+	;; Only preserves r0, must not change r1 and r2.
+	;; Doesn't save r1 and r2, but also doesn't change them
 copy_array:
 	push	r0
 	jf	r0	copy_array_done		; we are done if this is zero
