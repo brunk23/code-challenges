@@ -6,12 +6,12 @@
 	.origin 0
 
 	;; Locations of our value arrays
-	.assign	finalv	9009	; 1 word and the final value
-	.assign val	9000	; 4 words
+	.assign	finalv	2009	; should be val +9
+	.assign val	2000	; 4 words
 
 	;; Locations of all our strings
-	.assign	stri	9020	; 3 chars
-	.assign	finals	9074
+	.assign	stri	2020	; should be val +20
+	.assign	finals	2074	; should be val +74
 
 
 	;; main() -- The following code implements main()
@@ -23,7 +23,7 @@
 	set	r6	game_nums	; where to store the numbers
 get_nums:
 	call	readnum			; read a number
-	jf	r1	get_nums
+	jf	r1	get_nums	; zero is not allowed as a number
 	wmem	r6	r1		; store it in the current location
 	add	r6	r6	1	; point to next location
 	call	num2str			; saves r1 as a string to r0
@@ -31,7 +31,7 @@ get_nums:
 	add	r7	r7	32767	; decrement counter
 	jt	r7	get_nums	; loop while r7 > 0
 	set	r0	4		; We enter find_solution with n=4
-	call	find_solution
+	call	find_solution		; This does all the work
 	halt
 
 
@@ -46,23 +46,24 @@ find_solution:
 	push	r2
 
 	;; Check if this is the last value
-	jt	r0	find_solution_main ; If we have 1 number, we
-	rmem	r1	finalv		; avoid the double read with 9009
-	rmem	r2	goal		; get the goal value
-	eq	r1	r1	r2	; are we equal
+	jt	r0	find_solution_main	; If we have 1 number, we
+	rmem	r1	finalv			; avoid the double read
+	rmem	r2	goal			; get the goal value
+	eq	r1	r1	r2		; are we equal
 	jf	r1	find_solution_done	; if not, quit
-	;; This was the right answer, print the string
-	set	r1	finals		; we could probably avoid this
-	add	r0	r1	23	; We store old solutions after finals
 
+	;; This was the right answer, we check the old strings to make
+	;; sure we haven't printed it already. If we haven't, we save
+	;; it to the list of strings seen and print it.
+	set	r1	finals			; final string to print
+	add	r0	r1	23		; solutions stored after finals
 find_solution_check:
-	rmem	r2	r0		; read the value at r0
-	jf	r2	find_solution_new
-	call	strcmp			; compare the string at r0 and r1
-	jt	r7	find_solution_done	; This is a duplicate quit
-	add	r0	r0	23		; next string
+	rmem	r2	r0			; read the value at r0
+	jf	r2	find_solution_new	; this was a brand new string
+	call	strcmp				; compare strings r0 and r1
+	jt	r7	find_solution_done	; this is a duplicate quit
+	add	r0	r0	23		; check next string
 	jmp	find_solution_check
-
 find_solution_new:
 	call	pstr			; print the answer string
 	out	10			; print a newline
@@ -71,6 +72,8 @@ find_solution_new:
 	call	append_str		; this works like strcpy here
 	jmp	find_solution_done	; then print it and return
 
+	;; The main body of find_solution starts here. This works through
+	;; every possible combination and calls the try_ functions.
 find_solution_main:
 	set	r1	r0		; outer loop is r0-1 to 0
 out_body:
@@ -122,7 +125,6 @@ setup_vals:
 	set	r4	r6		; make the larger value first
 	set	r6	r7		; for all math operations
 	set	r7	r4		; it is easier
-
 setup_vals_done:
 	ret
 
