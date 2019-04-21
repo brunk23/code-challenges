@@ -137,10 +137,10 @@ vals:	data	0	0	0	0	0	0
 coins:	data	1	5	10	25	50	100
 disp:	data	"How much cents? \0"
 emsg:	data	"Pick a different number: \0"
-strgs:	data	penny nickel dime quarter half-dollar dollar
+strgs:	data	penny nickel dime quarter half_dollar dollar
 penny:	data	"Pennies: \0"
 nickel:	data	"Nickels: \0"
 dime:	data	"Dimes: \0"
 quarter:	data	"Quarters: \0"
-half-dollar:	data	"Halfs: \0"
+half_dollar:	data	"Halfs: \0"
 dollar:	data	"Dollars: \0"
