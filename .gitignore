@@ -4,6 +4,7 @@ a.out*
 *.core
 *.bin
 *.swp
+*.sym
 sml_basic
 sml_lisp
 sml_disass
