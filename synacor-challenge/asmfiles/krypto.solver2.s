@@ -23,7 +23,9 @@
 	set	r6	game_nums	; where to store the numbers
 get_nums:
 	call	readnum			; read a number
-	jf	r1	get_nums	; zero is not allowed as a number
+	jf	r1	bad_num		; zero is not allowed as a number
+	gt	r5	r1	99	; two digit numbers only
+	jt	r5	bad_num		; so get a new number
 	wmem	r6	r1		; store it in the current location
 	add	r6	r6	1	; point to next location
 	call	num2str			; saves r1 as a string to r0
@@ -33,6 +35,10 @@ get_nums:
 	set	r0	4		; We enter find_solution with n=4
 	call	find_solution		; This does all the work
 	halt
+bad_num:
+	set	r1	emesg
+	call	pstr
+	jmp	get_nums
 
 
 	;; find_solution() -- Does not need to preserve any registers
@@ -309,6 +315,7 @@ copy_array_done:
 
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
+emesg:	data	"Numbers must be between 1 and 99 inclusive.\n\0"
 
 	;; We use these strings for printing the results.
 closep:	data	")\0"
