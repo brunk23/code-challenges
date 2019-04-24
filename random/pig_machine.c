@@ -14,8 +14,8 @@ struct player {
   int myroll;
   int myscore;
   int mytotal;
+  int opponent;
   char *name;
-  struct player *opponent;
   int (*routine)(struct player *);   /* function that describes the play of this opponent */
 };
 
@@ -35,7 +35,7 @@ struct player *new_player( char *n, int (*strat)() ) {
   play->myscore = 0;
   play->mytotal = 0;
   play->name = n;
-  play->opponent = NULL;
+  play->opponent = 0;
   play->routine = strat;
 
   return play;
@@ -76,17 +76,19 @@ int randbetween(int a, int b) {
 }
 
 struct player *game(struct player *x, struct player *y) {
-  int n = 0, score, roll, rolltotal, p;
+  int n = 0, score, roll, rolltotal = 0, p, scores[2];
   struct player *players[2];
 
   players[0] = x;
   players[1] = y;
+  scores[0] = 0;
+  scores[1] = 0;
 
   while( 1 ) {
     /* We don't want to trust the values in players[n] although the routine
      * functions should not change them.
      */
-    score = players[n]->myscore;
+    score = scores[n];
     players[n]->myroll = 0;
     roll = randbetween( 1, 6 );
 
@@ -94,18 +96,30 @@ struct player *game(struct player *x, struct player *y) {
       fprintf(stdout, "%s rolled a 1. End of turn.\n",
 	      players[n]->name);
       n ^= 1;
+      rolltotal = 0;
       continue;
     }
 
-    players[n]->myroll += roll;
-    players[n]->mytotal = players[n]->myroll + score;
+    rolltotal += roll;
+    players[n]->myscore = scores[n];
+    players[n]->myroll = rolltotal;
+    players[n]->mytotal = roll + scores[n];
+    players[n]->opponent = scores[ n^1 ];
+
+    /*
+     * This is the win condition.
+     */
+    if( players[n]->mytotal >= 100 ) {
+      break;
+    }
 
     switch( players[n]->routine( players[n]) ) {
     case ROLL:
-
+      /* This just falls through */
       break;
     case ACCEPT:
-      players[n]->myscore = score + rolltotal;
+      scores[n] += rolltotal;
+      rolltotal = 0;
       n ^= 1;
       break;
     default:
