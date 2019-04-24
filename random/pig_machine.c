@@ -76,32 +76,40 @@ int randbetween(int a, int b) {
 }
 
 struct player *game(struct player *x, struct player *y) {
-  int n = 0, score, roll, p;
-  struct player players[2];
+  int n = 0, score, roll, rolltotal, p;
+  struct player *players[2];
 
   players[0] = x;
   players[1] = y;
 
-  while( true ) {
-    n ^= 1;
-    score = players[n].myscore;
-    roll = players[n].myroll;
+  while( 1 ) {
+    /* We don't want to trust the values in players[n] although the routine
+     * functions should not change them.
+     */
+    score = players[n]->myscore;
+    players[n]->myroll = 0;
+    roll = randbetween( 1, 6 );
 
     if( roll == 1 ) {
-      fprintf(stdout, "%s rolled a 1 on their first roll. End of turn.\n",
-	      players[n].name);
+      fprintf(stdout, "%s rolled a 1. End of turn.\n",
+	      players[n]->name);
+      n ^= 1;
       continue;
     }
 
-    switch( players[n].routine() ) {
+    players[n]->myroll += roll;
+    players[n]->mytotal = players[n]->myroll + score;
+
+    switch( players[n]->routine( players[n]) ) {
     case ROLL:
 
       break;
     case ACCEPT:
-
+      players[n]->myscore = score + rolltotal;
+      n ^= 1;
       break;
     default:
-      fprintf(stdout, "%s made an illegal move. Forfeit.\n",players[n].name);
+      fprintf(stdout, "%s made an illegal move. Forfeit.\n",players[n]->name);
       break;
     }
   }
