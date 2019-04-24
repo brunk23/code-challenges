@@ -84,12 +84,13 @@ struct player *game(struct player *x, struct player *y) {
   scores[0] = 0;
   scores[1] = 0;
 
+  n = randbetween( 0, 1 );
+
   while( 1 ) {
     /* We don't want to trust the values in players[n] although the routine
      * functions should not change them.
      */
     score = scores[n];
-    players[n]->myroll = 0;
     roll = randbetween( 1, 6 );
 
     if( roll == 1 ) {
@@ -99,11 +100,13 @@ struct player *game(struct player *x, struct player *y) {
       rolltotal = 0;
       continue;
     }
+    fprintf(stdout, "%s rolled a %i.\n",
+	    players[n]->name, roll);
 
     rolltotal += roll;
     players[n]->myscore = scores[n];
     players[n]->myroll = rolltotal;
-    players[n]->mytotal = roll + scores[n];
+    players[n]->mytotal = rolltotal + scores[n];
     players[n]->opponent = scores[ n^1 ];
 
     /*
@@ -119,6 +122,8 @@ struct player *game(struct player *x, struct player *y) {
       break;
     case ACCEPT:
       scores[n] += rolltotal;
+      fprintf(stdout, "%s adds %i and has %i. End of turn.\n",
+	      players[n]->name, rolltotal, scores[n]);
       rolltotal = 0;
       n ^= 1;
       break;
@@ -131,23 +136,55 @@ struct player *game(struct player *x, struct player *y) {
   return players[n];
 }
 
+int always_accept(struct player *p) {
+  return ACCEPT;
+}
+
+int never_accept(struct player *p) {
+  return ROLL;
+}
+
+int math_strategy20(struct player *p) {
+  if( p->myroll >= 20 ) {
+    return ACCEPT;
+  }
+  return ROLL;
+}
+
+int math_strategy19(struct player *p) {
+  if( p->myroll >= 19 ) {
+    return ACCEPT;
+  }
+  return ROLL;
+}
+
 int main() {
   int values[6], n;
   init_random_dev();
 
-  for( n = 0; n < 6; n++ ) {
-    values[n] = 0;
+  struct player *a, *b, *c, *d, *winner;
+
+  a = new_player("Conservative", always_accept);
+  b = new_player("Gambler", never_accept);
+  c = new_player("Math Guy", math_strategy20);
+  d = new_player("Math Guy2", math_strategy19);
+
+  for( n = 0; n < 100; n++ ) {
+    winner = game(d,c);
+    if( winner == d ) {
+      values[0]++;
+    } else {
+      values[1]++;
+    }
   }
 
-  for( n = 0; n < 1000000; n++ ) {
-    values[ randbetween(1,6) - 1]++;
-  }
-  
-  for( n = 0; n < 6; n++ ) {
-   printf("%i\t", values[n]);
-  }
-  printf("\n");
+  printf("%s won %i.\n",d->name, values[0]);
+  printf("%s won %i.\n",c->name, values[1]);
 
+  free(a);
+  free(b);
+  free(c);
+  free(d);
   destroy_random_dev();
   return 0;
 }
