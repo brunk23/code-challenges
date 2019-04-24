@@ -76,7 +76,7 @@ int randbetween(int a, int b) {
 }
 
 struct player *game(struct player *x, struct player *y) {
-  int n = 0, score, roll, rolltotal = 0, p, scores[2];
+  int n = 0, score, roll, rolltotal = 0, scores[2];
   struct player *players[2];
 
   players[0] = x;
@@ -94,14 +94,14 @@ struct player *game(struct player *x, struct player *y) {
     roll = randbetween( 1, 6 );
 
     if( roll == 1 ) {
-      fprintf(stdout, "%s rolled a 1. End of turn.\n",
-	      players[n]->name);
+      fprintf(stdout, "%s rolled a 1 hand has %i. End of turn.\n",
+	      players[n]->name, scores[n]);
       n ^= 1;
       rolltotal = 0;
       continue;
     }
-    fprintf(stdout, "%s rolled a %i.\n",
-	    players[n]->name, roll);
+    fprintf(stdout, "%s rolled a %i for a total of %i and %i this turn.\n",
+	    players[n]->name, roll, rolltotal+roll, score+roll+rolltotal);
 
     rolltotal += roll;
     players[n]->myscore = scores[n];
@@ -151,40 +151,78 @@ int math_strategy20(struct player *p) {
   return ROLL;
 }
 
-int math_strategy19(struct player *p) {
-  if( p->myroll >= 19 ) {
+int human(struct player *p) {
+  char a = '\0';
+  printf("Roll (1) or Accept (2)? ");
+  while( a < '1' || a > '2') {
+    a = getchar();
+    if( a == 'q' ) {
+      exit(0);
+    }
+  }
+
+  if( a == '2' ) {
     return ACCEPT;
   }
   return ROLL;
 }
 
+struct player *select_player() {
+  struct player *p = NULL;
+  char a = '\0';
+
+  printf("1. Human\n2. Conservative\n3. Gambler\n4. Max Turn\n");
+  printf("Which player? ");
+  while( a < '1' || a > '4') {
+    a = getchar();
+    if ( a == 'q' ) {
+      exit(0);
+    }
+  }
+  switch( a ) {
+  case '1':
+    p = new_player("Human", human);
+    break;
+  case '2':
+    p = new_player("Conservative", always_accept);
+    break;
+  case '3':
+    p = new_player("Gambler", never_accept);
+    break;
+  case '4':
+    p = new_player("Max Turn", math_strategy20);
+    break;
+  default:
+    return NULL;
+  }
+  return p;
+}
+
 int main() {
-  int values[6], n;
+  int values[2] = {0, 0}, n;
   init_random_dev();
 
-  struct player *a, *b, *c, *d, *winner;
+  struct player *a, *b, *winner;
 
-  a = new_player("Conservative", always_accept);
-  b = new_player("Gambler", never_accept);
-  c = new_player("Math Guy", math_strategy20);
-  d = new_player("Math Guy2", math_strategy19);
+  a = select_player();
+  b = select_player();
 
   for( n = 0; n < 100; n++ ) {
-    winner = game(d,c);
-    if( winner == d ) {
+    winner = game( a, b );
+    printf("%s won that game\n\n", winner->name);
+    if( winner == a ) {
       values[0]++;
     } else {
       values[1]++;
     }
   }
 
-  printf("%s won %i.\n",d->name, values[0]);
-  printf("%s won %i.\n",c->name, values[1]);
+  printf("%s won %i.\n",a->name, values[0]);
+  printf("%s won %i.\n",b->name, values[1]);
 
   free(a);
   free(b);
-  free(c);
-  free(d);
   destroy_random_dev();
+
   return 0;
 }
