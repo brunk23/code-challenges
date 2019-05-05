@@ -116,25 +116,25 @@ iPtr inst_tble[dwrite + 1];
  * Helper function for memory access to return
  * register values when those are requested.
  */
-static inline SWORD get_add(SWORD a) {
-  SWORD b;
+static inline SWORD get_add(SWORD source) {
+  SWORD location_value;
 
-  /* a should be within memory, but if pc was near the top of
+  /* source should be within memory, but if pc was near the top of
    * memory and we pass ( pc + 5 ) or similar, we could read
    * outside the array, protect against that by wrapping down */
-  a &= MAXMEM;
-  b = memory[a];
+  source &= MAXMEM;
+  location_value = memory[ source ];
 
-  if( b < REGOFFSET ) {
-    return b;
+  if( location_value < REGOFFSET ) {
+    return location_value;
   } else {
-    b -= REGOFFSET;
+    location_value -= REGOFFSET;
   }
-  if( b < REGISTERS ) {
-    return reg[b];
+  if( location_value < REGISTERS ) {
+    return reg[ location_value ];
   }
   fprintf(stderr,"Invalid access request: %i at %i\n",
-	  b + REGOFFSET, pc);
+	  location_value + REGOFFSET, pc);
   return 0;
 }
 
@@ -142,24 +142,24 @@ static inline SWORD get_add(SWORD a) {
  * Helper function for memory setting. It also sets
  * registers correctly.
  */
-static inline SWORD set_add(SWORD a, SWORD b) {
-  SWORD c;
+static inline SWORD set_add(SWORD destination, SWORD source) {
+  SWORD real_destination;
 
   /* ensure both are inside memory */
-  a &= MAXMEM;
-  b &= MAXMEM;
-  c = memory[a];
+  destination &= MAXMEM;
+  source &= MAXMEM;
+  real_destination = memory[destination];
 
-  if( c >= REGOFFSET ) {
-    c -= REGOFFSET;
-    if( c >= REGISTERS ) {
+  if( real_destination >= REGOFFSET ) {
+    real_destination -= REGOFFSET;
+    if( real_destination >= REGISTERS ) {
       fprintf(stderr,"Invalid access request: %i at %i\n",
-	      a + REGOFFSET, pc);
+	      destination + REGOFFSET, pc);
       return 0;
     }
-    return reg[c] = b;
+    return reg[ real_destination ] = source;
   }
-  return memory[c] = b;
+  return memory[ real_destination ] = source;
 }
 
 #endif
