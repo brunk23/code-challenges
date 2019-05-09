@@ -34,10 +34,11 @@ get_nums:
 	jt	r7	get_nums	; loop while r7 > 0
 	set	r0	4		; We enter find_solution with n=4
 	call	find_solution		; This does all the work
+	data	999			; intentionally crash to save state
 	halt
 bad_num:
-	set	r1	emesg
-	call	pstr
+	set	r1	emesg		; the number was out of range
+	call	pstr			; print error message and try again
 	jmp	get_nums
 
 
@@ -57,12 +58,12 @@ find_solution:
 	;; sure we haven't printed it already. If we haven't, we save
 	;; it to the list of strings seen and print it.
 	set	r1	finals			; final string to print
-	add	r0	r1	23		; solutions stored after finals
+	set	r0	32744			; solutions stored at top of memory
 find_solution_check:
 	rmem	r2	r0			; read the value at r0
 	jf	r2	find_solution_new	; this was a brand new string
-	set	r4	r0
-	set	r5	r1
+	set	r4	r0			; r4 and r5 need to point to
+	set	r5	r1			; the strings to compare
 
 	;; This will compare each string
 strcmp_loop:
@@ -77,7 +78,7 @@ strcmp_loop:
 strcmp_done:
 
 	jt	r7	find_solution_done	; this is a duplicate quit
-	add	r0	r0	23		; check next string
+	add	r0	r0	32745		; check next string 23 below this
 	jmp	find_solution_check
 find_solution_new:
 	call	pstr			; print the answer string
@@ -101,11 +102,10 @@ in_body:
 	;; currently being picked as the two active numbers. Those will
 	;; be stored as the array[n-1][0] values
 	;;
-	;; Call method:
+	;; Expects:
 	;;   set r0 n  -- index of array
 	;;   set r1 a  -- index of first number
 	;;   set r2 b  -- index of second number
-	;;   call copy_array
 	;;
 	;; Only preserves r0, must not change r1 and r2.
 	;; Doesn't save r1 and r2, but also doesn't change them

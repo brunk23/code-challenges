@@ -52,7 +52,8 @@ int main(int argc, char *argv[]) {
     pc &= MAXMEM;
 
     if( memory[pc] > 23 ) {
-      fprintf(stderr,"Error: Invalid operation %i",pc);
+      fprintf(stderr,"Error: Invalid operation @ %i :: %i\n\n",pc, memory[pc]);
+      save_state();
       break;
     }
 

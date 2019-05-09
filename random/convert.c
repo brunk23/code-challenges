@@ -12,7 +12,7 @@ int main() {
 	int output, n;
 
 	printf("Word#:\n");
-	while( next = fgets(inbuffer, 80, stdin) ) {
+	while( (next = fgets(inbuffer, 80, stdin)) ) {
 		for( n = 0; n < 9; n++ ) {
 			if( n ) {
 				output = strtol(next, &next, 10);
