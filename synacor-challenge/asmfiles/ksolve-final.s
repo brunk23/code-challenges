@@ -6,13 +6,13 @@
 	.origin 0
 
 	;; Locations of our value arrays
-	.assign	finalv	2009	; should be val +9
-	.assign val	2000	; 4 words
+	.assign	finalv	1209	; should be val +9
+	.assign val	1200	; 4 words
 
 	;; Locations of all our strings
-	.assign	stri	2020	; should be val +20
-	.assign	finals	2074	; should be val +74
-
+	.assign	stri	1220	; should be val +20
+	.assign	finals	1274	; should be val +74
+	.assign progtop	1320	; should be val +120 (46 more than finals)
 
 	;; main() -- The following code implements main()
 	set	r1	prompt		; the prompt for the user
@@ -34,7 +34,6 @@ get_nums:
 	jt	r7	get_nums	; loop while r7 > 0
 	set	r0	4		; We enter find_solution with n=4
 	call	find_solution		; This does all the work
-	data	999			; intentionally crash to save state
 	halt
 bad_num:
 	set	r1	emesg		; the number was out of range
@@ -79,10 +78,18 @@ strcmp_done:
 
 	jt	r7	find_solution_done	; this is a duplicate quit
 	add	r0	r0	32745		; check next string 23 below this
+	gt	r2	progtop	r0		; stay above the program
+	jt	r2	find_solution_new	; or overflow and don't save string
 	jmp	find_solution_check
 find_solution_new:
 	call	pstr			; print the answer string
 	out	10			; print a newline
+	jf	r2	find_solution_norm
+	push	r1			; We overflowed and stopped checking
+	set	r1	overflow	; for duplicates, print warning.
+	call	pstr
+	pop	r1
+find_solution_norm:
 	set	r2	r1		; save it in the buffer
 	set	r1	r0		; so we don't print it twice
 	call	append_str		; this works like strcpy here
@@ -315,6 +322,8 @@ generate_string:
 prompt:
 	data	"Enter the 5 numbers followed by the goal number: \0"
 emesg:	data	"Numbers must be between 1 and 99 inclusive.\n\0"
+overflow:
+	data	"Overflow!\n\0"
 
 	;; We use these strings for printing the results.
 closep:	data	")\0"
