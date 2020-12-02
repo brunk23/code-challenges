@@ -34,10 +34,7 @@
   (let* ((fields (split-string passwd " "))
 	 (range (mapcar 'string-to-number (split-string (car fields) "-")))
 	 (char (elt (elt fields 1) 0))
-	 (pstr (elt fields 2))
-	 (len (length pstr))
-	 (count 0)
-	 (current 0))
+	 (pstr (elt fields 2)))
     (if (and (= char (elt pstr (- (elt range 0) 1)))
 	     (not (= char (elt pstr (- (elt range 1) 1)))))
 	t
