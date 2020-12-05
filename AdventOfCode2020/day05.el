@@ -14,8 +14,27 @@
   "This just returns the sample data for test runs."
   '("BFFFBBFRRR" "FFFBBBFRRR" "BBFFBBFRLL"))
 
+(defun descrtoseat (str)
+  (let ((row 0)
+	(col 0)
+	(curr 0)
+	(max (length str)))
+    (while (< curr max)
+      (cond ((= (elt str curr) ?B) (setq row (+ (* 2 row) 1)))
+	    ((= (elt str curr) ?F) (setq row (* 2 row)))
+	    ((= (elt str curr) ?R) (setq col (+ (* 2 col) 1)))
+	    ((= (elt str curr) ?L) (setq col (* 2 col))))
+      (setq curr (1+ curr)))
+    (list row col)))
+
 (defun process (boardingpasses)
-  '((23 5) (34 7) (77 6) (5 36)))
+  (let ((seatlist nil)
+	(curr 0)
+	(max (length boardingpasses)))
+    (while (< curr max)
+      (setq seatlist (append seatlist (list (descrtoseat (elt boardingpasses curr)))))
+      (setq curr (1+ curr)))
+    seatlist))
 
 (defun findmaxid (seatlist)
   "Given a list of seats '((2 3)(4 5)(6 7)...) will return the highest id."
@@ -26,7 +45,7 @@
 	(numpasses (length seatlist)))
     (while (< curr numpasses)
       (setq seat (elt seatlist curr))
-      (setq id (* (elt seat 0) (elt seat 1)))
+      (setq id (+ (* (elt seat 0) 8) (elt seat 1)))
       (if (> id max) (setq max id))
       (setq curr (1+ curr)))
     max))
@@ -37,3 +56,4 @@
 
 
 (part1 (sample))
+(part1 (loaddaydata "./day05.input"))
