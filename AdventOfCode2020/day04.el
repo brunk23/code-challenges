@@ -39,7 +39,6 @@ iyr:2011 ecl:brn hgt:59in" "\n" nil))
 
 (defun hair (str)
   "This will check for valid hair."
-  (message "Checking Hair: %s" str)
   (let ((n 1)
 	(state t))
     (if (and (= (length str) 7) (= ?# (elt str 0)))
@@ -53,7 +52,6 @@ iyr:2011 ecl:brn hgt:59in" "\n" nil))
 
 (defun pid (str)
   "This will check for a valid pid."
-  (message "Checking PID: %s" str)
   (let ((n 1)
 	(state t))
     (if (not (= (length str) 9))
@@ -66,7 +64,6 @@ iyr:2011 ecl:brn hgt:59in" "\n" nil))
 
 (defun height (str)
   "This must determine if the height is valid between cm and inches."
-  (message "Checking height: %s" str)
   (let* ((data (split-string str "[ic]" t))
 	 (val (string-to-number (car data)))
 	 (unit (elt data 1)))
@@ -82,7 +79,6 @@ iyr:2011 ecl:brn hgt:59in" "\n" nil))
 
 (defun eye (str)
   "This will determine if the eye color is valid."
-  (message "Checking eyes: %s" str)
   (or (string= (elt passport next) "amb")
       (string= (elt passport next) "blu")
       (string= (elt passport next) "brn")
@@ -93,19 +89,16 @@ iyr:2011 ecl:brn hgt:59in" "\n" nil))
 
 (defun birth (str)
   "This will check if birth year is valid."
-  (message "Checking birth: %s" str)
   (and (>= (string-to-number str) 1920)
        (<= (string-to-number str) 2002)))
 
 (defun iyr (str)
   "This will check the issue year."
-  (message "Checking issue: %s" str)
   (and (>= (string-to-number str) 2010)
        (<= (string-to-number str) 2020)))
 
 (defun expire (str)
   "This will check the expiration."
-  (message "Checking expiration: %s" str)
   (and (>= (string-to-number str) 2020)
        (<= (string-to-number str) 2030)))
 
@@ -189,4 +182,5 @@ hgt:72in byr:2001 iyr:2015 cid:88
 pid:545766238 ecl:hzl
 eyr:2022
 
-iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719" "\n"))
+iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
+" "\n"))
