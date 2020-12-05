@@ -31,9 +31,7 @@
 	    ((= (elt str curr) ?R) (setq val (+ (* 2 val) 1)))
 	    ((= (elt str curr) ?L) (setq val (* 2 val))))
       (setq curr (1+ curr)))
-    (if (= val 0)
-	(message "%s made a 0 value" str)
-      val)))
+    val))
 
 ;; Originally this created a list of lists, but we only need the seat ID numbers.
 (defun process (boardingpasses)
