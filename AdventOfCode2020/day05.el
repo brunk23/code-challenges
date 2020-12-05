@@ -40,7 +40,7 @@
 	(curr 0)
 	(max (length boardingpasses)))
     (while (< curr max)
-      (setq seatlist (append seatlist (list (descrtoseat (elt boardingpasses curr)))))
+      (setq seatlist (cons (descrtoseat (elt boardingpasses curr)) seatlist))
       (setq curr (1+ curr)))
     seatlist))
 
