@@ -25,7 +25,8 @@ a
 a
 a
 
-b" "\n" nil))
+b
+" "\n" nil))
 
 (defun sumcounts (counts)
   "Will count the number of non-zero elements in the vector."
@@ -50,6 +51,7 @@ b" "\n" nil))
     count))
 
 (defun andcounts (a b)
+  "Return vector of matches"
   (let ((curr 0))
     (while (< curr 26)
       (aset a curr (logand (aref a curr) (aref b curr)))
@@ -71,7 +73,6 @@ b" "\n" nil))
 	  (setq sum (+ sum (sumcounts counts)))
 	  (setq counts (make-vector 26 1))))
       (setq curr (1+ curr)))
-    (setq sum (+ sum (sumcounts counts)))
     sum))
 
 (defun sumgroupyes (inp)
@@ -101,5 +102,3 @@ b" "\n" nil))
 
 (part2 (sample))
 (part2 (loaddaydata "./day06.input"))
-
-(- 3492 26)
