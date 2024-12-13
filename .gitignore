@@ -10,8 +10,6 @@ sml_lisp
 sml_disass
 sml_sim
 bin
-notes
-utilities
 lex.yy.c
 y.tab.c
 y.tab.h

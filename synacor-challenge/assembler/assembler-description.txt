@@ -27,7 +27,8 @@ jmp:	jmp	jmp	# not do this! But, it would work. There are no "reserved"
 
 Data commands put the numbers or string directly after them into memory.
 	data	0 0 4533 234 99  
-	dat	"Hello"		# will write ascii for "Hello" followed by a 0.
+	data	"Hello\0"	# will write ascii for "Hello" followed by a 0.
+				# strings are not null terminated by default
 
     # registers start with r
 -- OPCODES and number of args --
@@ -53,5 +54,7 @@ ret
 rmem a b
 set a b
 wmem a b
+rndm a
+# The following codes are not implemented by the assembler
 dread a b c d e
 dwrite a b c d e

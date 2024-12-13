@@ -1,0 +1,51 @@
+called with r0 = 4 .. r1 = 1 .. r7 = ?
+Look at 5483 -- 
+
+
+06027:  jt r0, 6035,
+06030:  add r0, r1, 1,
+06034:  ret
+06035:  jt r1, 6048,
+06038:  add r0, r0, 32767,
+06042:  set r1, r7,
+06045:  call 6027,
+06047:  ret
+06048:  push r0,
+06050:  add r1, r1, 32767,
+06054:  call 6027,
+06056:  set r1, r0, 
+06059:  pop r0, 
+06061:  add r0, r0, 32767, 
+06065:  call 6027, 
+06067:  ret
+
+
+
+f48( ) {
+   push a
+   b = b - 1
+   call f27()
+   b = a
+   pop a
+   a = a - 1
+   call f27()
+   return
+}
+
+f27( ) {
+   if( a > 0 ) {
+     jmp f35
+   }
+   a = b + 1
+   return
+}
+
+f35( ) {
+   if( b > 0 ) {
+     jmp f48
+   }
+   a = a - 1
+   b = r7
+   call f27()
+   return
+}

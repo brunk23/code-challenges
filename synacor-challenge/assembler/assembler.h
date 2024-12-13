@@ -76,6 +76,7 @@ int process_output( const char *, int );
 void print_token( TOKEN * );
 
 TOKEN *process_input( const char * );
+TOKEN *get_empty_token();
 TOKEN *token( char *, int );
 int pass1();
 int pass2();

@@ -13,18 +13,11 @@ TOKEN *token(char *s, int start) {
   int i = 0, j = 0, size = 0;
   char tmp[BUFFSIZE];
 
-  if( !(curr = malloc( sizeof(TOKEN) ))) {
+  curr = get_empty_token();
+  if( curr == (TOKEN *)FAIL ) {
     fprintf(stderr,"Failed to get memory in token(): ");
-    return (TOKEN *)FAIL;
+    return curr;
   }
-  tokencount++;
-  curr->line = 0;
-  curr->type = WORD;
-  curr->value = 0;
-  curr->location = 0;
-  curr->length = 0;
-  curr->word = NULL;
-  curr->next = NULL;
 
   size = strlen(s);
   i = start;
@@ -137,6 +130,25 @@ TOKEN *token(char *s, int start) {
   }
   return curr;
 }
+
+TOKEN *get_empty_token() {
+  TOKEN *curr = NULL;
+  
+  if( !(curr = malloc( sizeof(TOKEN) ))) {
+    return (TOKEN *)FAIL;
+  }
+
+  tokencount++;
+  curr->line = 0;
+  curr->type = WORD;
+  curr->value = 0;
+  curr->location = 0;
+  curr->length = 0;
+  curr->word = NULL;
+  curr->next = NULL;
+
+  return curr;
+}  
 
 void print_token(TOKEN *t) {
   printf("Line: %i\n",t->line);

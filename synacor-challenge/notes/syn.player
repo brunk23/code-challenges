@@ -1,0 +1,91 @@
+#!/bin/sh
+
+echo take tablet
+echo use tablet
+echo doorway
+echo north
+echo north
+echo north
+echo bridge
+echo "continue"
+echo down
+echo east
+echo take empty lantern
+echo west
+echo west
+echo passage
+echo ladder
+echo west
+echo south
+echo north
+echo take can
+echo use can
+echo use lantern
+echo west
+echo ladder
+echo darkness
+echo "continue"
+echo west
+echo west
+echo west
+echo west
+echo north
+echo take red coin
+echo north
+echo east
+echo take concave coin
+echo down
+echo take corroded coin
+echo up
+echo west
+echo west
+echo take blue coin
+echo up
+echo take shiny coin
+echo down
+echo east
+echo use blue coin
+echo use red coin
+echo use shiny coin
+echo use concave coin
+echo use corroded coin
+echo north
+echo take teleporter
+echo use teleporter
+echo take business card
+echo take strange book
+echo "#set r7 25734"
+echo "#set 6027 1"
+echo "#set 6029 6"
+echo "#set 6030 18"
+echo ""
+echo use teleporter
+echo east
+echo north
+echo north
+echo north
+echo north
+echo north
+echo north
+echo north
+echo east
+echo take journal
+echo west
+echo north
+echo north
+echo take orb
+echo north
+echo east
+echo east
+echo north
+echo west
+echo south
+echo east
+echo east
+echo west
+echo north
+echo north
+echo east
+echo vault
+echo take mirror
+echo use mirror

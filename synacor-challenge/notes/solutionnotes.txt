@@ -1,0 +1,105 @@
+***************
+** Simulator **
+***************
+    This was probably my favorite part of the challenge.
+I really enjoyed writing it, even though it wasn't horribly
+difficult to write.  And, I can't even describe the almost
+giddy feeling when it booted all the way into a text adventure
+game! That was so unexpected and fun.  The surprise of what
+the file turned out to be was definitely a great part of this.
+
+*****************
+** Twisty Maze **
+*****************
+    This brought back horrible memories of the biggest
+frustration I had as a child with text adventure games.
+Thanks for that. ;-) I don't think I ever solved these without
+help as a kid.
+
+    I tried to solve it manually. I drew a map out on
+paper. I dropped the tablet and lamp in rooms, while
+moving about, to make sure I caught when rooms looped back.
+In the end, I couldn't figure out the pattern.  So, I wrote
+a program to randomly try paths, up to sequences of 20 rooms.
+I figured the pattern had to be well under 20.  I then looked
+for any output that changed from the typical stuff.  This
+program is utilities/randomwalk.c
+
+***********
+** Coins **
+***********
+    This puzzle wasn't that difficult. I used ugly brute
+force to solve it though.  Just tried every possible way to
+place the coins and checked which ones equaled 399. I didn't
+even bother making the program smart enough to not use the
+same coin more than once.  It might not be a brilliant
+solution but it worked just fine.  I only got two possible
+results, one which has a repeat, so it was clear which answer
+was correct. [utilities/equation.c]
+
+****************
+** Teleporter **
+****************
+    My god, this was fiendishly difficult. I quickly realized
+that step 1 would be adding the ability to view/change memory and
+registers to my simulator would be important. I wound up getting
+stuck in the loop a few times.  I then wrote a quick hack to
+disassemble the entire image [simulator/synacor_disassem.c]. The
+output wasn't pretty, and could certainly be improved, but it was
+good enough.  I then added code that would output the instructions
+being executed (with their address) to my simulator and intentionally
+got stuck in the loop.
+
+    Once I got to the loop, I was able to find the algorithm. At this
+point, I got stuck and actually looked for help on this one. Just so
+you know, there's very little out there. Those who went before me
+refused to easily share their secrets. I did find some other ideas
+that I used. Someone mentioned adding the ability to save and restore
+the game. I added that to my simulator, it greatly sped things up.
+Someone mentioned Ackermann's function, but I had already recognized
+that it was similar to that. It's one of those functions that I've
+always had problems understanding computationally. I try to do it
+recursively and fail every time.
+
+    Stuck. Stuck, stuck, stuck. A big breakthrough was a combination
+of this site (http://user.das.ufsc.br/~gb/fei/ackermann.html) which
+explains that the function can be thought of like indexes into an
+array, the realization that if r7 was 1 it would be A(m,n) so change
+that part of the array access with r7, and finally the fact that all
+of this was mod(32768), which means I could completely solve the
+whole array.  I actually do that [algo.c] for each possible r7 and
+check which one leaves a value of 6 in A[4][1] (found this by checking
+for where 6027 was called from in the disassembled source. I do more
+work than I need to in this program that looks for the working r7.  I
+shouldn't regenerate row 0, or bother filling in row 4 after col 1.
+But, whatever, it works.
+
+     The above code also includes the original function, from the code,
+to make sure that my solution returned the same result when r7 was 0. It
+was 2 in both cases.  Once I knew the right value for r7, I just set it
+poked 6027 through 6030 with the machine code for {set r0, 6}{ret}.
+I make it seem simple.  But, I ended up crashing the simulation a bunch
+of times along the way, and tried to guess the number with disasterous
+results. This was really tough. I really enjoyed figuring it out. And,
+I want to improve my debug capabilities even more.
+
+***********
+** Vault **
+***********
+    Well, this one was pretty straight-forward. The first step was
+mapping out the rooms. I realized it was a 4x4 array. Based on the
+journal, the meaning of the rooms was pretty clear.  I made an array
+to represent the rooms and their value.  I then wrote a loop to
+randomly walk through the rooms. Yes, I know, I already used that
+strategy. But, it seemed the easiest way to approach it.  I started
+with 20 rooms as a max (again assuming that you weren't going to have
+a sequence length of more than 20). The program [orb.c] found a hit,
+tried it out but it was too long. So, I lowered the bound to less
+than that length. Got a second working sequence, it was again too
+long. That was 14. Set the bound to be under 14.  I got a hit of 12
+rooms.  I tried it and it worked.
+
+    The final trick was the mirror, although I saw it coming. I
+suspected the sequence would be the mirror image of what I read. But,
+I tried the obvious (unedited) sequence first. Then I tried the
+mirror version, which worked.
